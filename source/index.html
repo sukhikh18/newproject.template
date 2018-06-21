@@ -2,17 +2,70 @@
 <html class="no-js" lang="ru-RU">
 
 <head>
-  //= include/head.html
+    //= include/head.html
 </head>
 
-<body>
-  //= include/body.html
+//= include/body.html
+    <div id="page" class="site">
+        <header class="site-header">
+            <div class="container">
+                <div class="row align-content-center" itemscope itemtype="http://schema.org/Organization">
+                    <div class="col-3 logotype">
+                        <!-- <?$APPLICATION->IncludeFile(
+                            SITE_DIR . "include/{FILENAME}.php",
+                            array(),
+                            Array("MODE" => "html")
+                        );?> -->
+                    </div><!-- .logotype -->
+                    <div class="col-3 numbers"></div><!-- .numbers -->
+                    <div class="col-3 contacts"></div><!-- .contacts -->
+                    <div class="col-3 mini-cart"></div><!-- .mini-cart -->
+                </div>
+            </div>
 
-  <div class="container">
-    <p>Привет мир! Это шаблон HTML5.</p>
-  </div>
+            <nav id="main-navigation" class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container">
+                    <!-- <a class="navbar-brand" href="#">Navbar</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>-->
 
-  //= include/foot.html
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <?$APPLICATION->IncludeFile(
+                            $APPLICATION->GetTemplatePath("include/navbar.php"),
+                            array(),
+                            array('SHOW_BORDER' => false)
+                        );?>
+                    </div>
+                </div><!-- .container -->
+            </nav>
+        </header><!-- .site-header -->
+
+        <section class="site-content">
+            <!-- <?if( !is_front_page() ):?> -->
+            <section class="breadcrumb">
+                <div class="container">
+                    //= include/breadcrumb.html
+                </div>
+            </section>
+            <!-- <?endif;?> -->
+
+            <div class="<?// $APPLICATION->ShowProperty('container-class', 'container'); // or container-fluid ?>">
+                <div class="row">
+                    <div class="site-column <?
+                        //$APPLICATION->ShowProperty('content-class', DEFAULT_COLUMN_MAIN );?>">
+
+                        //= include/index.html
+                    </div><!-- .site-column -->
+                </div>
+            </div>
+        </section>
+
+        <footer class="site-footer">
+        </footer><!-- .site-footer -->
+    </div><!-- #page -->
+
+    //= include/foot.html
 </body>
 
 </html>
