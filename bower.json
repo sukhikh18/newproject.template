@@ -16,7 +16,6 @@
   ],
   "dependencies": {
     "jquery": "^3.3.1",
-    // "modernizr": "^3.6.0",
     "fancybox": "fancyBox#^3.3.5",
     "slick-carousel": "^1.8.1",
     "bootstrap": "^4.1.1"
