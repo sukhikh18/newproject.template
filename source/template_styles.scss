@@ -1,13 +1,25 @@
+/*!
+Theme Name: Developer's starter theme
+Author: NikolayS93
+Author URI: //vk.com/nikolays_93
+Description: Starter template for progressive developers.
+Version: 2.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: dev-starter-theme
+Tags: Start, Start-template, Developers-theme, Starter-theme, Bootstrap, Scss
+*/
+
 /* Site settings */
-@import "scss/site-settings";
+@import "styles/site-settings";
 
 /* Base */
-@import "scss/base";
+@import "styles/base";
 
 /* Layouts */
-@import "scss/layout/header";
-@import "scss/layout/footer";
-@import "scss/layout/nav";
+@import "styles/layout/header";
+@import "styles/layout/footer";
+@import "styles/layout/nav";
 
 /* Modules */
-// @import "scss/modules/";
+// @import "styles/modules/";

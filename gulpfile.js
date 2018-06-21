@@ -30,14 +30,14 @@ var path = {
     build: {
         html: dir.build,
         js: dir.build + 'assets/',
-        css: dir.build + 'assets/css/',
+        // css: dir.build + 'assets/css/',
         img: dir.build + 'img/',
         fonts: dir.build + 'assets/fonts/'
     },
     src: {
         html: dir.src + '*.html',
         js: dir.src + 'js/main.js',
-        style: dir.src + 'scss/template_styles.scss',
+        style: dir.src + '*.scss',
         img: dir.src + 'img/**/*.*',
         fonts: dir.src + 'fonts/**/*.*'
     },
@@ -88,7 +88,7 @@ gulp.task('style:build', function () {
         .pipe(reload({stream: true}));
 
     gulp.src( dir.src + '**/*.scss' )
-        .pipe(gulp.dest(dir.build + '/assets/scss/'))
+        .pipe(gulp.dest(dir.build))
 });
 
 gulp.task('image:build', function () {
@@ -120,7 +120,7 @@ gulp.task('jquery:vbuild', function () {
 });
 
 gulp.task('bootstrap:vbuild', function () {
-    gulp.src(dir.src + 'scss/bootstrap/bootstrap.scss')
+    gulp.src(dir.src + 'styles/bootstrap/bootstrap.scss')
         // .pipe(sourcemaps.init())
         .pipe(sass().on('error', sass.logError))
         .pipe(cssmin()) //Сожмем
@@ -132,14 +132,14 @@ gulp.task('bootstrap:vbuild', function () {
 gulp.task('fancybox:vbuild', function () {
     // jquery
     gulp.src('bower_components/fancybox/dist/*.*')
-        .pipe(gulp.dest(path.build.js + 'plugins/fancybox/'));
+        .pipe(gulp.dest(path.build.js + 'fancybox/'));
 });
 
 // move only
 gulp.task('slick:vbuild', function () {
     // jquery
     gulp.src('bower_components/slick-carousel/slick/**/*.*')
-        .pipe(gulp.dest(path.build.js + 'plugins/slick/'));
+        .pipe(gulp.dest(path.build.js + 'slick/'));
 });
 
 gulp.task('watch', function(){
