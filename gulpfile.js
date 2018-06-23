@@ -186,7 +186,7 @@ gulp.task('vbuild', [
 ]);
 
 // init project (first build | rebuild bootstrap)
-gulp.task('init', ['vbuild', 'build']);
+gulp.task('install', ['vbuild', 'build']);
 
 // start development
 gulp.task('default', ['build', 'webserver', 'watch']);
