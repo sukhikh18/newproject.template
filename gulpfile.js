@@ -8,7 +8,7 @@ var gulp = require('gulp'),
     // style
     sass = require('gulp-sass'),
     prefixer = require('gulp-autoprefixer'),
-    cssmin = require('gulp-minify-css'),
+    cssmin = require('gulp-clean-css'),
     // image
     imagemin = require('gulp-imagemin'),
     pngquant = require('imagemin-pngquant'),
