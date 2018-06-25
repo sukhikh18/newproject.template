@@ -14,11 +14,6 @@
     "test",
     "tests"
   ],
-  "mb_dependencies": {
-    "fancybox": "fancyBox#^3.3.5",
-    "slick-carousel": "^1.8.1",
-    "masonry-layout": "masonry#^4.2.1"
-  },
   "dependencies": {
     "jquery": "^3.3.1",
     "bootstrap": "^4.1.1",
