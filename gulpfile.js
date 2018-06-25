@@ -142,6 +142,13 @@ gulp.task('slick:vbuild', function () {
         .pipe(gulp.dest(path.build.js + 'slick/'));
 });
 
+// move only
+gulp.task('masonry:vbuild', function () {
+    // jquery
+    gulp.src('bower_components/masonry-layout/dist/**/*.*')
+        .pipe(gulp.dest(path.build.js + 'masonry/'));
+});
+
 gulp.task('watch', function(){
     watch([path.watch.html], function(event, cb) {
         gulp.start('html:build');
@@ -183,6 +190,7 @@ gulp.task('vbuild', [
     'bootstrap:vbuild',
     'fancybox:vbuild',
     'slick:vbuild',
+    'masonry:vbuild',
 ]);
 
 // init project (first build | rebuild bootstrap)
