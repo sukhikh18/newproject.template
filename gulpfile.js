@@ -14,13 +14,12 @@ var gulp = require('gulp'),
     pngquant = require('imagemin-pngquant'),
     // watch changes
     watch = require('gulp-watch'),
-    // debuger
-    plumber = require('gulp-plumber'),
     // server
     browserSync = require("browser-sync"),
     reload = browserSync.reload,
     // clear images
-    rimraf = require('rimraf');
+    rimraf = require('rimraf'),
+    combiner = require('stream-combiner2').obj;
 
 var dir = {
     build: 'project/',
@@ -34,21 +33,21 @@ var path = {
         js: dir.build + 'assets/',
         // css: dir.build + 'assets/css/',
         img: dir.build + 'img/',
-        fonts: dir.build + 'assets/fonts/'
+        font: dir.build + 'assets/fonts/'
     },
     src: {
-        html: dir.src + '*.html',
+        html: dir.src + '**/*.html',
         js: dir.src + 'js/*.js',
-        style: dir.src + '*.scss',
-        img: dir.src + 'img/**/*.*',
-        fonts: dir.src + 'fonts/**/*.*'
+        style: dir.src + 'styles/*.scss',
+        img: dir.src + 'img/*.*',
+        font: dir.src + 'fonts/**/*.*'
     },
     watch: {
         html: dir.src + '**/*.html',
         js: dir.src + 'js/**/*.js',
-        style: dir.src + 'scss/**/*.scss',
+        style: dir.src + 'styles/**/*.scss',
         img: dir.src + 'img/**/*.*',
-        fonts: dir.src + 'fonts/**/*.*'
+        font: dir.src + 'fonts/**/*.*'
     },
 };
 
@@ -62,116 +61,143 @@ var srvConfig = {
     logPrefix: "new.project"
 };
 
-gulp.task('html:build', function () {
-    gulp.src(path.src.html)
-        .pipe(plumber())
-        .pipe(rigger())
-        .pipe(gulp.dest(path.build.html))
-        .pipe(reload({stream: true}));
+// for pretty code
+var r = {stream: true};
+
+gulp.task('build::html', function () {
+    return combiner(
+        gulp.src(path.src.html)
+            ,rigger()
+        ,gulp.dest(path.build.html)
+            ,reload(r)
+    );
 });
 
-gulp.task('js:build', function () {
-    gulp.src(path.src.js)
-        .pipe(plumber())
-        .pipe(rigger())
-        .pipe(sourcemaps.init())
-        .pipe(uglify())
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest(path.build.js))
-        .pipe(reload({stream: true}));
+gulp.task('build::style', function () {
+    return combiner(
+        gulp.src(path.src.style)
+            // ,sourcemaps.init()
+            ,sass().on('error', sass.logError)
+            ,prefixer()
+            ,cssmin()
+            // ,sourcemaps.write()
+        ,gulp.dest(path.build.html)
+            ,reload(r)
+    );
 });
 
-gulp.task('style:build', function () {
-    gulp.src(path.src.style)
-        .pipe(plumber())
-        .pipe(sourcemaps.init())
-        .pipe(sass().on('error', sass.logError))
-        .pipe(prefixer())
-        .pipe(cssmin())
-        .pipe(sourcemaps.write())
-        .pipe(gulp.dest(path.build.html))
-        .pipe(reload({stream: true}));
-
-    gulp.src( dir.src + '**/*.scss' )
-        .pipe(gulp.dest(dir.build))
+gulp.task('build::js', function () {
+    return combiner(
+        gulp.src(path.src.js)
+            ,rigger()
+            // ,sourcemaps.init()
+            ,uglify()
+            // ,sourcemaps.write()
+        ,gulp.dest(path.build.js)
+            ,reload(r)
+    );
 });
 
-gulp.task('image:build', function () {
-    gulp.src(path.src.img)
-        .pipe(plumber())
-        .pipe(imagemin({
-            progressive: true,
-            svgoPlugins: [{removeViewBox: false}],
-            use: [pngquant()],
-            interlaced: true
-        }))
-        .pipe(gulp.dest(path.build.img))
-        .pipe(reload({stream: true}));
+gulp.task('build::image', function () {
+    return combiner(
+        gulp.src(path.src.img)
+            ,imagemin({
+                progressive: true,
+                svgoPlugins: [{removeViewBox: false}],
+                use: [pngquant()],
+                interlaced: true
+            })
+        ,gulp.dest(path.build.img)
+            ,reload(r)
+    );
 });
 
 // move only
-gulp.task('fonts:build', function() {
-    gulp.src(path.src.fonts)
-        .pipe(gulp.dest(path.build.fonts))
+gulp.task('build::font', function() {
+    return combiner(
+        gulp.src(path.src.font)
+        ,gulp.dest(path.build.font)
+    );
 });
+
+gulp.task('watch', function() {
+    watch([path.watch.html], function(event, cb) {
+        gulp.start('build::html');
+    });
+
+    watch([path.watch.style], function(event, cb) {
+        gulp.start('build::style');
+    });
+
+    watch([path.watch.js], function(event, cb) {
+        gulp.start('build::js');
+    });
+
+    watch([path.watch.img], function(event, cb) {
+        gulp.start('build::image');
+    });
+
+    watch([path.watch.font], function(event, cb) {
+        gulp.start('build::font');
+    });
+
+    watch([dir.src + 'styles/bootstrap/**/*.scss', dir.src + 'styles/_site-settings.scss'], function(event, cb) {
+        gulp.start('vbuild::bootstrap');
+    });
+});
+
 
 /**
  * build vendor packages (use after bower)
  */
-// move only
-gulp.task('jquery:vbuild', function () {
-    // jquery
-    gulp.src('bower_components/jquery/dist/jquery.min.js')
-        .pipe(gulp.dest(path.build.js));
-});
-
-gulp.task('bootstrap:vbuild', function () {
-    gulp.src(dir.src + 'styles/bootstrap/bootstrap.scss')
-        .pipe(plumber())
-        // .pipe(sourcemaps.init())
-        .pipe(sass().on('error', sass.logError))
-        .pipe(cssmin()) //Сожмем
-        // .pipe(sourcemaps.write())
-        .pipe(gulp.dest(dir.build + 'assets/'))
+gulp.task('vbuild::bootstrap', function () {
+    return combiner(
+        gulp.src(dir.src + 'styles/bootstrap/bootstrap.scss')
+            // ,sourcemaps.init()
+            ,sass().on('error', sass.logError)
+            ,cssmin() // minify/uglify
+            // ,sourcemaps.write()
+        ,gulp.dest(dir.build + 'assets/')
+    );
 });
 
 // move only
-gulp.task('fancybox:vbuild', function () {
-    // jquery
-    gulp.src('bower_components/fancybox/dist/*.*')
-        .pipe(gulp.dest(path.build.js + 'fancybox/'));
+gulp.task('vbuild::jquery', function () {
+    return combiner(
+        gulp.src('bower_components/jquery/dist/jquery.min.js')
+        ,gulp.dest(path.build.js)
+    );
 });
 
 // move only
-gulp.task('slick:vbuild', function () {
-    // jquery
-    gulp.src('bower_components/slick-carousel/slick/**/*.*')
-        .pipe(gulp.dest(path.build.js + 'slick/'));
+gulp.task('vbuild::fancybox', function () {
+    return combiner(
+        gulp.src('bower_components/fancybox/dist/*.*')
+        ,gulp.dest(path.build.js + 'fancybox/')
+    );
 });
 
-// move only
-gulp.task('masonry:vbuild', function () {
-    // jquery
-    gulp.src('bower_components/masonry-layout/dist/**/*.*')
-        .pipe(gulp.dest(path.build.js + 'masonry/'));
+// // move only
+gulp.task('vbuild::slick', function () {
+    return combiner(
+        gulp.src('bower_components/slick-carousel/slick/**/*.*')
+        ,gulp.dest(path.build.js + 'slick/')
+    );
 });
 
-gulp.task('watch', function(){
-    watch([path.watch.html], function(event, cb) {
-        gulp.start('html:build');
-    });
-    watch([path.watch.style], function(event, cb) {
-        gulp.start('style:build');
-    });
-    watch([path.watch.js], function(event, cb) {
-        gulp.start('js:build');
-    });
-    watch([path.watch.img], function(event, cb) {
-        gulp.start('image:build');
-    });
-    watch([path.watch.fonts], function(event, cb) {
-        gulp.start('fonts:build');
-    });
+// // move only
+gulp.task('vbuild::masonry', function () {
+    return combiner(
+        gulp.src('bower_components/masonry-layout/dist/**/*.*')
+        ,gulp.dest(path.build.js + 'masonry/')
+    );
+});
+
+gulp.task('moveSource::scss', function () {
+    return combiner(
+        gulp.src( dir.src + '**/*.scss' )
+        ,gulp.dest(dir.build)
+    );
 });
 
 gulp.task('webserver', function () {
@@ -184,24 +210,24 @@ gulp.task('clean', function (cb) {
 
 // build project
 gulp.task('build', [
-    'html:build',
-    'js:build',
-    'style:build',
-    'fonts:build',
-    'image:build'
+    'build::html',
+    'build::js',
+    'build::style',
+    'build::font',
+    'build::image'
 ]);
 
 // build vendor packages
 gulp.task('vbuild', [
-    'jquery:vbuild',
-    'bootstrap:vbuild',
-    'fancybox:vbuild',
-    'slick:vbuild',
-    'masonry:vbuild',
+    'vbuild::jquery',
+    'vbuild::bootstrap',
+    'vbuild::fancybox',
+    'vbuild::slick',
+    'vbuild::masonry',
 ]);
 
-// init project (first build | rebuild bootstrap)
-gulp.task('install', ['vbuild', 'build']);
+// init project
+gulp.task('install', ['vbuild', 'build', 'moveSource::scss']);
 
 // start development
 gulp.task('default', ['build', 'webserver', 'watch']);
