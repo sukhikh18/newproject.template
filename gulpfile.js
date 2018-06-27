@@ -7,7 +7,7 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglify'),
     // style
     sass = require('gulp-sass'),
-    prefixer = require('gulp-autoprefixer'),
+    // prefixer = require('gulp-autoprefixer'),
     cssmin = require('gulp-clean-css'),
     // image
     imagemin = require('gulp-imagemin'),
@@ -78,7 +78,7 @@ gulp.task('build::style', function () {
         gulp.src(path.src.style)
             // ,sourcemaps.init()
             ,sass().on('error', sass.logError)
-            ,prefixer()
+            // ,prefixer()
             ,cssmin()
             // ,sourcemaps.write()
         ,gulp.dest(path.build.html)
