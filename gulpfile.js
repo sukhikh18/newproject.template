@@ -14,6 +14,8 @@ var gulp = require('gulp'),
     pngquant = require('imagemin-pngquant'),
     // watch changes
     watch = require('gulp-watch'),
+    // debuger
+    plumber = require('gulp-plumber'),
     // server
     browserSync = require("browser-sync"),
     reload = browserSync.reload,
@@ -62,6 +64,7 @@ var srvConfig = {
 
 gulp.task('html:build', function () {
     gulp.src(path.src.html)
+        .pipe(plumber())
         .pipe(rigger())
         .pipe(gulp.dest(path.build.html))
         .pipe(reload({stream: true}));
@@ -69,6 +72,7 @@ gulp.task('html:build', function () {
 
 gulp.task('js:build', function () {
     gulp.src(path.src.js)
+        .pipe(plumber())
         .pipe(rigger())
         .pipe(sourcemaps.init())
         .pipe(uglify())
@@ -79,6 +83,7 @@ gulp.task('js:build', function () {
 
 gulp.task('style:build', function () {
     gulp.src(path.src.style)
+        .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(sass().on('error', sass.logError))
         .pipe(prefixer())
@@ -93,6 +98,7 @@ gulp.task('style:build', function () {
 
 gulp.task('image:build', function () {
     gulp.src(path.src.img)
+        .pipe(plumber())
         .pipe(imagemin({
             progressive: true,
             svgoPlugins: [{removeViewBox: false}],
@@ -121,6 +127,7 @@ gulp.task('jquery:vbuild', function () {
 
 gulp.task('bootstrap:vbuild', function () {
     gulp.src(dir.src + 'styles/bootstrap/bootstrap.scss')
+        .pipe(plumber())
         // .pipe(sourcemaps.init())
         .pipe(sass().on('error', sass.logError))
         .pipe(cssmin()) //Сожмем
