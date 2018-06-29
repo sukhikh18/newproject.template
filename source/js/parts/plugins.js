@@ -1,3 +1,12 @@
+var DTools = {
+  is_mobile: false,
+  sticky: false || 'forever' || 'phone_only',
+  sticky_selector: '#main.navbar',
+  wow: false || 'forever' || 'desktop',
+  appearJs: false || true,
+  countTo: false || '.counter',
+}
+
 // Avoid `console` errors in browsers that lack a console.
 (function() {
   var method;
@@ -20,6 +29,41 @@
     }
   }
 }());
+
+jQuery(document).ready(function($) {
+  // sticky
+  if( DTools.sticky_selector ){
+    if( DTools.is_mobile && DTools.sticky == 'phone_only' || DTools.sticky == 'forever' ){
+      var space = ( $('#wpadminbar').length ) ? 32 : 0;
+
+      var $container = $( DTools.sticky_selector );
+      $container.sticky({topSpacing:space,zIndex:1100});
+      $container.parent('.sticky-wrapper').css('margin-bottom', $container.css('margin-bottom') );
+    }
+  }
+
+  //
+  if( DTools.wow ){
+    if( ! DTools.is_mobile && DTools.wow == 'desktop' || DTools.wow == 'forever' ){
+      new WOW().init();
+    }
+  }
+
+  if( DTools.appearJs ){
+    if( DTools.countTo ){
+      $( DTools.countTo ).appear();
+      $( DTools.countTo ).on("appear", function(event, $all_appeared_elements) {
+        if( ! $(this).attr("data-appeared") )
+          $(this).countTo();
+
+        $(this).attr("data-appeared", 1);
+      });
+    }
+  }
+  else if( DTools.countTo ){
+    $( DTools.countTo ).countTo();
+  }
+});
 
 // Place any jQuery/helper plugins in here.
 // $('.zoom').fancybox({
