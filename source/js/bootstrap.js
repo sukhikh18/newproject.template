@@ -1,11 +1,12 @@
-//= ../../bower_components/popper.js/dist/umd/popper.js
+// required `bower install popper.js`
+// ../../bower_components/popper.js/dist/umd/popper.js
 
 //= ../../bower_components/bootstrap/js/dist/util.js
 // ../../bower_components/bootstrap/js/dist/alert.js
 // ../../bower_components/bootstrap/js/dist/button.js
 // ../../bower_components/bootstrap/js/dist/carousel.js
 //= ../../bower_components/bootstrap/js/dist/collapse.js
-//= ../../bower_components/bootstrap/js/dist/dropdown.js
+// ../../bower_components/bootstrap/js/dist/dropdown.js
 // ../../bower_components/bootstrap/js/dist/modal.js
 //= ../../bower_components/bootstrap/js/dist/scrollspy.js
 //= ../../bower_components/bootstrap/js/dist/tab.js
