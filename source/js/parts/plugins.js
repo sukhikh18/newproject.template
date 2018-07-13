@@ -1,10 +1,10 @@
 var DTools = {
   is_mobile: false,
-  sticky: false || 'forever' || 'phone_only',
+  sticky: false, // || 'forever' || 'phone_only',
   sticky_selector: '#main.navbar',
-  wow: false || 'forever' || 'desktop',
-  appearJs: false || true,
-  countTo: false || '.counter',
+  wow: false, // || 'forever' || 'desktop',
+  appearJs: false, // || true,
+  countTo: false, // || '.counter',
 }
 
 jQuery(document).ready(function($) {
