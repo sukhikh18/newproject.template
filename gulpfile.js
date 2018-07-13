@@ -38,14 +38,19 @@ var path = {
     src: {
         html: dir.src + '**/*.html',
         js: dir.src + 'js/*.js',
-        style: dir.src + 'styles/*.scss',
+        style: dir.src + 'template_styles.scss',
         img: dir.src + 'img/*.*',
         font: dir.src + 'fonts/**/*.*'
     },
     watch: {
         html: dir.src + '**/*.html',
         js: dir.src + 'js/**/*.js',
-        style: dir.src + 'styles/**/*.scss',
+        style: [
+            dir.src + 'template_styles.scss'
+            , dir.src + 'layout/**/*.scss'
+            , dir.src + 'module/**/*.scss'
+            , dir.src + 'property/**/*.scss'
+        ],
         img: dir.src + 'img/**/*.*',
         font: dir.src + 'fonts/**/*.*'
     },
@@ -125,7 +130,7 @@ gulp.task('watch', function() {
         gulp.start('build::html');
     });
 
-    watch([path.watch.style], function(event, cb) {
+    watch(path.watch.style, function(event, cb) {
         gulp.start('build::style');
     });
 

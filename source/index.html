@@ -2,69 +2,32 @@
 <html class="no-js" lang="ru-RU">
 
 <head>
+    <!-- header scripts -->
     //= include/head.html
 </head>
-
-//= include/body.html
+<!-- <body <?php body_class(); ?>> -->
+<body>
+    <!-- <?$APPLICATION->ShowPanel();?> -->
+    <!--[if lte IE 9]>
+        <p class="browserupgrade">Вы используете <strong>устаревший</strong> браузер. Пожалуйста <a href="https://browsehappy.com/">обновите ваш браузер</a> для лучшего отображения и безопасности.</p>
+    <![endif]-->
     <div id="page" class="site">
-        <header class="site-header">
-            <div class="container">
-                <div class="row align-content-center" itemscope itemtype="http://schema.org/LocalBusiness">
-                    <div class="col-3 logotype">
-                        <!-- <?$APPLICATION->IncludeFile(
-                            SITE_DIR . "include/{FILENAME}.php",
-                            array(),
-                            Array("MODE" => "html")
-                        );?> -->
-                    </div><!-- .logotype -->
-                    <div class="col-3 numbers"></div><!-- .numbers -->
-                    <div class="col-3 contacts"></div><!-- .contacts -->
-                    <div class="col-3 mini-cart"></div><!-- .mini-cart -->
-                </div>
-            </div>
+        <header class="l-header">
+            //= include/header.html
+        </header><!-- .l-header -->
 
-            <nav id="main-navigation" class="navbar navbar-expand-lg navbar-light bg-light">
-                <div class="container">
-                    <!-- <a class="navbar-brand" href="#">Navbar</a>
-                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>-->
+        <section class="l-content">
+            //= include/breadcrumb.html
 
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <?$APPLICATION->IncludeFile(
-                            $APPLICATION->GetTemplatePath("include/navbar.php"),
-                            array(),
-                            array('SHOW_BORDER' => false)
-                        );?>
-                    </div>
-                </div><!-- .container -->
-            </nav>
-        </header><!-- .site-header -->
+            //= include/index.html
+        </section><!-- .l-content -->
 
-        <section class="site-content">
-            <!-- <?if( !is_front_page() ):?> -->
-            <section class="breadcrumb">
-                <div class="container">
-                    //= include/breadcrumb.html
-                </div>
-            </section>
-            <!-- <?endif;?> -->
-
-            <div class="<?// $APPLICATION->ShowProperty('container-class', 'container'); // or container-fluid ?>">
-                <div class="row">
-                    <div class="site-column <?
-                        //$APPLICATION->ShowProperty('content-class', DEFAULT_COLUMN_MAIN );?>">
-
-                        //= include/index.html
-                    </div><!-- .site-column -->
-                </div>
-            </div>
-        </section>
-
-        <footer class="site-footer">
-        </footer><!-- .site-footer -->
+        <footer class="l-footer">
+            //= include/footer.html
+        </footer><!-- .l-footer -->
     </div><!-- #page -->
 
+    <!-- footer scripts -->
     //= include/foot.html
 </body>
 
