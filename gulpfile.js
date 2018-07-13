@@ -36,7 +36,7 @@ var path = {
         font: dir.build + 'assets/fonts/'
     },
     src: {
-        html: dir.src + '**/*.html',
+        html: dir.src + '*.html',
         js: dir.src + 'js/*.js',
         style: dir.src + 'template_styles.scss',
         img: dir.src + 'img/*.*',
@@ -198,6 +198,13 @@ gulp.task('vbuild::masonry', function () {
     );
 });
 
+gulp.task('moveSource::html', function () {
+    return combiner(
+        gulp.src( dir.src + '*.html' )
+        ,gulp.dest(dir.build + 'html/')
+    );
+});
+
 gulp.task('moveSource::scss', function () {
     return combiner(
         gulp.src( dir.src + '**/*.scss' )
@@ -232,7 +239,10 @@ gulp.task('vbuild', [
 ]);
 
 // init project
-gulp.task('install', ['vbuild', 'build', 'moveSource::scss']);
+gulp.task('install', ['vbuild', 'build']);
 
 // start development
 gulp.task('default', ['build', 'webserver', 'watch']);
+
+// complete project (build + move source)
+gulp.task('complete', ['install', 'moveSource::html', 'moveSource::scss' ]);
