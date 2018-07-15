@@ -47,9 +47,7 @@ var path = {
         js: dir.src + 'js/**/*.js',
         style: [
             dir.src + 'template_styles.scss'
-            , dir.src + 'layout/**/*.scss'
-            , dir.src + 'module/**/*.scss'
-            , dir.src + 'property/**/*.scss'
+            ,dir.src + 'styles/**/*.scss'
         ],
         img: dir.src + 'img/**/*.*',
         font: dir.src + 'fonts/**/*.*'
