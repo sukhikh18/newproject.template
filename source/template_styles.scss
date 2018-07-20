@@ -14,12 +14,12 @@ Tags: Start, Start-template, Developers-theme, Starter-theme, Bootstrap, Scss
 @import "styles/_site-settings.scss";
 
 /* Base */
-@import "styles/_base.scss";
+@import "styles/base";
 
 /* Layouts */
-@import "styles/layout/_header.scss";
-@import "styles/layout/_footer.scss";
-@import "styles/layout/_nav.scss";
+@import "styles/layout/header";
+@import "styles/layout/footer";
+@import "styles/layout/nav";
 
 /* Modules */
-// @import "styles/module/_module.scss";
+// @import "styles/module/module";

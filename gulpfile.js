@@ -94,7 +94,7 @@ gulp.task('build::js', function () {
         gulp.src(path.src.js)
             ,rigger()
             // ,sourcemaps.init()
-            ,uglify()
+            // ,uglify()
             // ,sourcemaps.write()
         ,gulp.dest(path.build.js)
             ,reload(r)
@@ -196,10 +196,10 @@ gulp.task('vbuild::masonry', function () {
     );
 });
 
-gulp.task('moveSource::html', function () {
+gulp.task('moveSource', function () {
     return combiner(
-        gulp.src( dir.src + '*.html' )
-        ,gulp.dest(dir.build + 'html/')
+        gulp.src( dir.src + '**/*.*' )
+        ,gulp.dest(dir.build + 'source/')
     );
 });
 
@@ -243,4 +243,4 @@ gulp.task('install', ['vbuild', 'build']);
 gulp.task('default', ['build', 'webserver', 'watch']);
 
 // complete project (build + move source)
-gulp.task('complete', ['install', 'moveSource::html', 'moveSource::scss' ]);
+gulp.task('complete', ['install', 'moveSource', 'moveSource::scss' ]);

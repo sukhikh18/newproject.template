@@ -12,7 +12,7 @@ tasks:
 `gulp install` - initial build (move vendors)
 
 complete:
-`gulp complete` - build (with vendors), move html/scss source code
+`gulp complete` - build (with vendors), move source code to project/source/
 
 #### Frequently used commands ####
 - `bower install fancybox`
