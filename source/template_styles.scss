@@ -11,9 +11,12 @@ Tags: Start, Start-template, Developers-theme, Starter-theme, Bootstrap, Scss
 */
 
 /* Site settings */
-@import "styles/_site-settings.scss";
+@import "styles/site-settings";
 
 /* Base */
+@import "styles/animate";
+@import "styles/utilites";
+@import "styles/grid-2-4";
 @import "styles/base";
 
 /* Layouts */
