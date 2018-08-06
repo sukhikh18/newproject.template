@@ -22,7 +22,7 @@ var gulp = require('gulp'),
     combiner = require('stream-combiner2').obj;
 
 var dir = {
-    build: 'project/',
+    build: '../project/',
     src: 'source/',
     base: './project'
 }
@@ -203,9 +203,9 @@ gulp.task('moveSource', function () {
     );
 });
 
-gulp.task('moveSource::scss', function () {
+gulp.task('moveSource::styles', function () {
     return combiner(
-        gulp.src( dir.src + '**/*.scss' )
+        gulp.src( [dir.src + '**/*.scss', dir.src + '**/*.css'] )
         ,gulp.dest(dir.build)
     );
 });
@@ -243,4 +243,4 @@ gulp.task('install', ['vbuild', 'build']);
 gulp.task('default', ['build', 'webserver', 'watch']);
 
 // complete project (build + move source)
-gulp.task('complete', ['install', 'moveSource', 'moveSource::scss' ]);
+gulp.task('complete', ['install', 'moveSource', 'moveSource::styles' ]);
