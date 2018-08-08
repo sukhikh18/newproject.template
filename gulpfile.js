@@ -1,6 +1,7 @@
 'use strict';
 
 var gulp = require('gulp'),
+    rename = require('gulp-rename'),
     // html
     rigger = require('gulp-rigger'),
     sourcemaps = require('gulp-sourcemaps'),
@@ -153,7 +154,7 @@ gulp.task('watch', function() {
 /**
  * build vendor packages (use after bower)
  */
-gulp.task('vbuild::bootstrap', function () {
+gulp.task('vbuild::bootstrap-style', function () {
     return combiner(
         gulp.src(dir.src + 'styles/bootstrap/bootstrap.scss')
             // ,sourcemaps.init()
@@ -161,6 +162,22 @@ gulp.task('vbuild::bootstrap', function () {
             ,cssmin() // minify/uglify
             // ,sourcemaps.write()
         ,gulp.dest(dir.build + 'assets/')
+            ,reload(r)
+    );
+});
+
+gulp.task('vbuild::bootstrap-script', function () {
+    return combiner(
+        gulp.src(dir.src + 'js/bootstrap.js')
+            ,rigger()
+            // ,sourcemaps.init()
+            ,uglify()
+            // ,sourcemaps.write()
+            ,rename({
+                suffix: '.min'
+            })
+        ,gulp.dest(dir.build + 'assets/')
+            ,reload(r)
     );
 });
 
@@ -225,6 +242,12 @@ gulp.task('build', [
     'build::style',
     'build::font',
     'build::image'
+]);
+
+// build bootstrap
+gulp.task('vbuild::bootstrap', [
+    'vbuild::bootstrap-style',
+    'vbuild::bootstrap-script',
 ]);
 
 // build vendor packages
