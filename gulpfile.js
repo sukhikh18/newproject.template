@@ -1,6 +1,6 @@
 'use strict';
 
-var gulp = require('gulp'),
+const gulp = require('gulp'),
     rename = require('gulp-rename'),
     // html
     rigger = require('gulp-rigger'),
@@ -22,13 +22,13 @@ var gulp = require('gulp'),
     rimraf = require('rimraf'),
     combiner = require('stream-combiner2').obj;
 
-var dir = {
+const dir = {
     build: '../project/',
     src: 'source/',
-    base: './project'
+    base: './../project'
 }
 
-var path = {
+const path = {
     build: {
         html: dir.build,
         js: dir.build + 'assets/',
@@ -55,7 +55,7 @@ var path = {
     },
 };
 
-var srvConfig = {
+const srvConfig = {
     server: {
         baseDir: dir.base
     },
@@ -66,7 +66,7 @@ var srvConfig = {
 };
 
 // for pretty code
-var r = {stream: true};
+const r = {stream: true};
 
 gulp.task('build::html', function () {
     return combiner(
