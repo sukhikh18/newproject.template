@@ -1,10 +1,13 @@
 'use strict';
 
+const projectName = 'project';
+const cms = ''; // || wordpress || bitrix
+
 const gulp = require('gulp'),
     rename = require('gulp-rename'),
-    // html
+    // code
     rigger = require('gulp-rigger'),
-    sourcemaps = require('gulp-sourcemaps'),
+    // sourcemaps = require('gulp-sourcemaps'),
     uglify = require('gulp-uglify'),
     // style
     sass = require('gulp-sass'),
@@ -22,29 +25,52 @@ const gulp = require('gulp'),
     rimraf = require('rimraf'),
     combiner = require('stream-combiner2').obj;
 
-const dir = {
-    build: '../project/',
-    src: 'source/',
-    base: './../project'
+if( 'wordpress' == cms ) {
+    const dir = {
+        build: '../../wordpress.cms/wp-content/themes/'+projectName+'/',
+        src: 'source/',
+        base: './../../wordpress.cms/wp-content/themes/'+projectName
+    }
+}
+else if( 'bitrix' == cms ) {
+    const dir = {
+        build: '../../bitrix.cms/local/templates/'+projectName+'/',
+        src: 'source/',
+        base: './../../bitrix.cms/local/templates/'+projectName
+    }
+}
+else {
+    const dir = {
+        // dont change project name for the .gitignore
+        build: 'project/',
+        src: 'source/',
+        base: './project'
+    }
 }
 
 const path = {
     build: {
-        html: dir.build,
+        code: dir.build,
         js: dir.build + 'assets/',
         // css: dir.build + 'assets/css/',
         img: dir.build + 'img/',
         font: dir.build + 'assets/fonts/'
     },
     src: {
-        html: dir.src + '*.html',
+        code: [
+            dir.src + '*.html',
+            dir.src + '*.php'
+        ],
         js: dir.src + 'js/*.js',
         style: dir.src + 'template_styles.scss',
         img: dir.src + 'img/*.*',
         font: dir.src + 'fonts/**/*.*'
     },
     watch: {
-        html: dir.src + '**/*.html',
+        code: [
+            dir.src + '**/*.html'
+            ,dir.src + '**/*.php'
+        ],
         js: dir.src + 'js/**/*.js',
         style: [
             dir.src + 'template_styles.scss'
@@ -62,17 +88,17 @@ const srvConfig = {
     tunnel: false,
     host: 'localhost',
     port: 8080,
-    logPrefix: "new.project"
+    logPrefix: projectName
 };
 
 // for pretty code
 const r = {stream: true};
 
-gulp.task('build::html', function () {
+gulp.task('build::code', function () {
     return combiner(
-        gulp.src(path.src.html)
+        gulp.src(path.src.code)
             ,rigger()
-        ,gulp.dest(path.build.html)
+        ,gulp.dest(path.build.code)
             ,reload(r)
     );
 });
@@ -85,7 +111,7 @@ gulp.task('build::style', function () {
             // ,prefixer()
             ,cssmin()
             // ,sourcemaps.write()
-        ,gulp.dest(path.build.html)
+        ,gulp.dest(path.build.code)
             ,reload(r)
     );
 });
@@ -125,8 +151,8 @@ gulp.task('build::font', function() {
 });
 
 gulp.task('watch', function() {
-    watch([path.watch.html], function(event, cb) {
-        gulp.start('build::html');
+    watch(path.watch.code, function(event, cb) {
+        gulp.start('build::code');
     });
 
     watch(path.watch.style, function(event, cb) {
@@ -237,7 +263,7 @@ gulp.task('clean', function (cb) {
 
 // build project
 gulp.task('build', [
-    'build::html',
+    'build::code',
     'build::js',
     'build::style',
     'build::font',
