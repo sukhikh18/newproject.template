@@ -25,26 +25,25 @@ const gulp = require('gulp'),
     rimraf = require('rimraf'),
     combiner = require('stream-combiner2').obj;
 
+let dir = {
+    // dont change project name for the .gitignore
+    build: 'project/',
+    src: 'source/',
+    base: './project'
+}
+
 if( 'wordpress' == cms ) {
-    const dir = {
+    let dir = {
         build: '../../wordpress.cms/wp-content/themes/'+projectName+'/',
         src: 'source/',
         base: './../../wordpress.cms/wp-content/themes/'+projectName
     }
 }
 else if( 'bitrix' == cms ) {
-    const dir = {
+    let dir = {
         build: '../../bitrix.cms/local/templates/'+projectName+'/',
         src: 'source/',
         base: './../../bitrix.cms/local/templates/'+projectName
-    }
-}
-else {
-    const dir = {
-        // dont change project name for the .gitignore
-        build: 'project/',
-        src: 'source/',
-        base: './project'
     }
 }
 
