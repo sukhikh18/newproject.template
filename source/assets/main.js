@@ -16,7 +16,7 @@ const Settings = {
 
 jQuery(document).ready(function($) {
     // sticky
-    if( Settings.stickySelector ){
+    if( Settings.stickySelector ) {
         if( 'mobile' == Settings.sticky && Settings.is_mobile || Settings.sticky == 'everywhere' ) {
             var $panel = $('#wpadminbar, #bx-panel');
             var space = ( $panel.length ) ? $panel.height() : 0;
@@ -31,13 +31,13 @@ jQuery(document).ready(function($) {
     }
 
     if( Settings.wow ) {
-        if( 'desktop' == Settings.wow && !Settings.is_mobile || Settings.wow == 'everywhere' ){
+        if( 'desktop' == Settings.wow && !Settings.is_mobile || Settings.wow == 'everywhere' ) {
             new WOW().init();
         }
     }
 
-    if( Settings.appearJs ){
-        if( Settings.countTo ){
+    if( Settings.appearJs ) {
+        if( Settings.countTo ) {
             $( Settings.countTo ).appear();
             $( Settings.countTo ).on("appear", function(event, $all_appeared_elements) {
                 if( ! $(this).data("appeared") )
@@ -47,7 +47,7 @@ jQuery(document).ready(function($) {
             });
         }
     }
-    else if( Settings.countTo ){
+    else if( Settings.countTo ) {
         $( Settings.countTo ).countTo();
     }
 
@@ -103,7 +103,7 @@ jQuery(document).ready(function($) {
         /**
          * Close button in popover content
          */
-         $(document).on("click", ".popover .close" , function(){
+         $(document).on("click", ".popover .close" , function() {
             $(this).parents(".popover").popover('hide');
         });
 

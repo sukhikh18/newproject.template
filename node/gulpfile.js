@@ -25,7 +25,7 @@ const gulp = require('gulp'),
 let dir = {
     build: '../public_html/',
     src: '../source/',
-    base: './public_html'
+    base: './../public_html'
 }
 
 const path = {
@@ -67,7 +67,7 @@ const r = {stream: true};
 
 gulp.task('build::code', function () {
     return combiner(
-        gulp.src(path.src.code)
+        gulp.src([dir.src + '*.html', dir.src + '*.php', dir.src + '*.tpl'])
             ,rigger()
         ,gulp.dest(path.build.code)
             ,reload(r)
@@ -75,8 +75,9 @@ gulp.task('build::code', function () {
 });
 
 gulp.task('build::style', function () {
+    let test = ''+path.src.style[0];
     return combiner(
-        gulp.src(path.src.style[0])
+        gulp.src( test )
             // ,sourcemaps.init()
             ,sass().on('error', sass.logError)
             // ,prefixer()
@@ -157,6 +158,9 @@ gulp.task('vbuild::bootstrap-style', function () {
             // ,sourcemaps.init()
             ,sass().on('error', sass.logError)
             ,cssmin() // minify/uglify
+            ,rename({
+                suffix: '.min'
+            })
             // ,sourcemaps.write()
         ,gulp.dest(dir.build + 'assets/')
             ,reload(r)
