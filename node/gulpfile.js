@@ -1,8 +1,5 @@
 'use strict';
 
-const projectName = 'project';
-const cms = ''; // || wordpress || bitrix
-
 const gulp = require('gulp'),
     rename = require('gulp-rename'),
     // code
@@ -26,57 +23,32 @@ const gulp = require('gulp'),
     combiner = require('stream-combiner2').obj;
 
 let dir = {
-    // dont change project name for the .gitignore
-    build: 'project/',
-    src: 'source/',
-    base: './project'
-}
-
-if( 'wordpress' == cms ) {
-    let dir = {
-        build: '../../wordpress.cms/wp-content/themes/'+projectName+'/',
-        src: 'source/',
-        base: './../../wordpress.cms/wp-content/themes/'+projectName
-    }
-}
-else if( 'bitrix' == cms ) {
-    let dir = {
-        build: '../../bitrix.cms/local/templates/'+projectName+'/',
-        src: 'source/',
-        base: './../../bitrix.cms/local/templates/'+projectName
-    }
+    build: '../public_html/',
+    src: '../source/',
+    base: './public_html'
 }
 
 const path = {
-    build: {
-        code: dir.build,
-        js: dir.build + 'assets/',
-        // css: dir.build + 'assets/css/',
-        img: dir.build + 'img/',
-        font: dir.build + 'assets/fonts/'
-    },
     src: {
-        code: [
-            dir.src + '*.html',
-            dir.src + '*.php'
-        ],
-        js: dir.src + 'js/*.js',
-        style: dir.src + 'template_styles.scss',
-        img: dir.src + 'img/*.*',
-        font: dir.src + 'fonts/**/*.*'
-    },
-    watch: {
         code: [
             dir.src + '**/*.html'
             ,dir.src + '**/*.php'
+            ,dir.src + '**/*.tpl'
         ],
-        js: dir.src + 'js/**/*.js',
         style: [
             dir.src + 'template_styles.scss'
-            ,dir.src + 'styles/**/*.scss'
+            ,dir.src + 'styles/**/*.scss',
         ],
+        js: dir.src + 'assets/**/*.js',
         img: dir.src + 'img/**/*.*',
-        font: dir.src + 'fonts/**/*.*'
+        font: dir.src + 'assets/fonts/**/*.*'
+    },
+    build: {
+        code: dir.build,
+        // css: dir.build + 'assets/.css_source/',
+        js: dir.build + 'assets/',
+        img: dir.build + 'img/**/*.*',
+        font: dir.build + 'assets/fonts/'
     },
 };
 
@@ -87,7 +59,7 @@ const srvConfig = {
     tunnel: false,
     host: 'localhost',
     port: 8080,
-    logPrefix: projectName
+    logPrefix: 'gulp'
 };
 
 // for pretty code
@@ -104,7 +76,7 @@ gulp.task('build::code', function () {
 
 gulp.task('build::style', function () {
     return combiner(
-        gulp.src(path.src.style)
+        gulp.src(path.src.style[0])
             // ,sourcemaps.init()
             ,sass().on('error', sass.logError)
             // ,prefixer()
@@ -150,23 +122,23 @@ gulp.task('build::font', function() {
 });
 
 gulp.task('watch', function() {
-    watch(path.watch.code, function(event, cb) {
+    watch(path.src.code, function(event, cb) {
         gulp.start('build::code');
     });
 
-    watch(path.watch.style, function(event, cb) {
+    watch(path.src.style, function(event, cb) {
         gulp.start('build::style');
     });
 
-    watch([path.watch.js], function(event, cb) {
+    watch([path.src.js], function(event, cb) {
         gulp.start('build::js');
     });
 
-    watch([path.watch.img], function(event, cb) {
+    watch([path.src.img], function(event, cb) {
         gulp.start('build::image');
     });
 
-    watch([path.watch.font], function(event, cb) {
+    watch([path.src.font], function(event, cb) {
         gulp.start('build::font');
     });
 
@@ -193,7 +165,7 @@ gulp.task('vbuild::bootstrap-style', function () {
 
 gulp.task('vbuild::bootstrap-script', function () {
     return combiner(
-        gulp.src(dir.src + 'js/bootstrap.js')
+        gulp.src(dir.src + 'assets/bootstrap.js')
             ,rigger()
             // ,sourcemaps.init()
             ,uglify()
@@ -238,17 +210,10 @@ gulp.task('vbuild::masonry', function () {
     );
 });
 
-gulp.task('moveSource', function () {
+gulp.task('move_source', function () {
     return combiner(
         gulp.src( dir.src + '**/*.*' )
         ,gulp.dest(dir.build + 'source/')
-    );
-});
-
-gulp.task('moveSource::styles', function () {
-    return combiner(
-        gulp.src( [dir.src + '**/*.scss', dir.src + '**/*.css'] )
-        ,gulp.dest(dir.build)
     );
 });
 
@@ -291,4 +256,4 @@ gulp.task('install', ['vbuild', 'build']);
 gulp.task('default', ['build', 'webserver', 'watch']);
 
 // complete project (build + move source)
-gulp.task('complete', ['install', 'moveSource', 'moveSource::styles' ]);
+gulp.task('complete', ['install', 'move_source' ]);
