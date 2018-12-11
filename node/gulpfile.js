@@ -37,7 +37,7 @@ const syncConf = {
     server: {
         baseDir: dir.base
     },
-    tunnel: tunnel,
+    tunnel: false,
     host: 'localhost',
     port: 8080,
     logPrefix: 'gulp'
