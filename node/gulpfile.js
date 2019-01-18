@@ -29,7 +29,7 @@ const gulp = require('gulp'),
 const r = {stream: true};
 const dir = {
     build: '../public_html/',
-    src: '../source/',
+    src: '../public_html/',
     base: './../public_html'
 }
 
@@ -50,8 +50,8 @@ const syncConf = {
 let watch = {
     code: [dir.src + '**/*.html', dir.src + '**/*.htm'],
     css:  [dir.src + '**/*.scss'],
-    img:  [dir.src + 'img/**/*.*'],
-    js:   [dir.src + 'assets/**/*.js'],
+    img:  [dir.src + 'img/raw/**/*.*'],
+    js:   [dir.src + 'assets/raw/**/*.js'],
     font: [dir.src + 'assets/fonts/*.*']
 }
 
@@ -86,8 +86,8 @@ watch.js.push('!' + bs.js);
  */
 gulp.task('build::code', function () {
     gulp.src(src.code)
-    .pipe(rigger())
-    .pipe(gulp.dest(build.code))
+    // .pipe(rigger())
+    // .pipe(gulp.dest(build.code))
         .pipe(reload(r));
 });
 
