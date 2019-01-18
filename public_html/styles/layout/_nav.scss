@@ -1,0 +1,36 @@
+/* ==|====================
+   Layout/Nav
+   ======================= */
+
+h1 {
+    color: red;
+}
+#main-navigation {
+    width: 100%;
+    .navbar {
+        padding: 0;
+        border-radius: 0;
+        .nav-link {
+        }
+        .nav-link:hover,
+        .nav-link:focus {
+        }
+        .nav-link,
+        .nav-link:hover,
+        .nav-link:focus {
+            text-decoration: none;
+        }
+    }
+    .non-responsive {
+        .navbar-brand {
+            display: none !important;
+        }
+        .navbar-nav {
+            -webkit-box-orient: horizontal;
+            -webkit-box-direction: normal;
+            -webkit-flex-direction: row;
+                -ms-flex-direction: row;
+                    flex-direction: row;
+        }
+    }
+}

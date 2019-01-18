@@ -1,6 +1,15 @@
 'use strict';
 
+const projectName = 'project';
+const domain = 'test.lc';
 const public_folder = '../public_html';
+
+// for pretty code
+const r = {stream: true};
+const syncConf = {
+    proxy: domain,
+    tunnel: false
+};
 
 const gulp = require('gulp'),
     // gutil = require('gulp-util'),
@@ -25,62 +34,58 @@ const gulp = require('gulp'),
     rimraf = require('rimraf');
 
 
-// for pretty code
-const r = {stream: true};
-const dir = {
-    build: '../public_html/',
-    src: '../public_html/',
-    base: './../public_html'
-}
-
-const syncConf = {
-    server: {
-        baseDir: dir.base
-    },
-    tunnel: false,
-    host: 'localhost',
-    port: 8080,
-    logPrefix: 'gulp'
-};
-
+const dir = public_folder + '/'; // for ex. '/wp-content/themes/' + projectName + '/'
+const assets = dir + 'assets/';
+const images = dir + 'img/';
+const fonts  = assets + 'fonts/';
+// styles for watch only
+const styles  = dir + 'styles/';
 
 /**
  * Set patches
  */
 let watch = {
-    code: [dir.src + '**/*.html', dir.src + '**/*.htm'],
-    css:  [dir.src + '**/*.scss'],
-    img:  [dir.src + 'img/raw/**/*.*'],
-    js:   [dir.src + 'assets/raw/**/*.js'],
-    font: [dir.src + 'assets/fonts/*.*']
+    code: [dir + '**/*.html'],
+    css:  [dir + '**/*.scss'],
+    img:  [images + 'raw/**/*.*'],
+    js:   [assets + 'raw/**/*.js'],
+    font: [fonts + '*.*']
 }
 
-// @todo think about push dir.src + '*.*' for htaccess, favicon..
-let src = watch;
+// @todo think about push dir + '*.*' for htaccess, favicon..
+let src = {
+    code: [dir + '**/*.html'],
+    css:  [dir + '**/*.scss'],
+    img:  [images + 'raw/**/*.*'],
+    js:   [assets + 'raw/**/*.js'],
+    font: [fonts + '*.*']
+}
 
 let build = {
-    code: dir.build,
-    css:  dir.build,
-    img:  dir.build + 'img/',
-    js:   dir.build + 'assets/',
-    font: dir.build + 'assets/fonts/'
+    code: dir,
+    css:  dir,
+    img:  images,
+    js:   assets,
+    font: fonts,
 }
 
 let bs = {
-    css:  dir.src + 'styles/bootstrap.scss',
-    js:   dir.src + 'assets/bootstrap.js',
-    opts: dir.src + 'styles/_site-settings.scss',
+    css:  styles + 'bootstrap.scss',
+    js:   assets + 'bootstrap.js',
+    opts: styles + '_site-settings.scss',
 }
 
 // exclude snippets/includes
-src.code.push('!' + dir.src + 'include/**/*');
-src.css.push( '!' + dir.src + 'styles/**/*' );
-src.js.push( '!' + dir.src + 'assets/include/**/*', '!' + bs.js );
+src.code.push('!' + dir + 'include/**/*');
+src.css.push( '!' + styles + '**/*' );
+src.js.push( '!' + bs.js );
 
 // exclude boostrap
 watch.css.push('!' + bs.css);
 watch.js.push('!' + bs.js);
 
+
+console.log( watch.css );
 /**
  * Tasks
  */
@@ -150,7 +155,7 @@ gulp.task('vbuild::bootstrap-style', function () {
             suffix: '.min'
         }))
         // .pipe(sourcemaps.write())
-    .pipe(gulp.dest(dir.build + 'assets/'))
+    .pipe(gulp.dest(assets))
         .pipe(reload(r));
 });
 
@@ -250,8 +255,8 @@ gulp.task('install', [
     // 'build',
 ]);
 
-gulp.task('clean', function (cb) {
-    rimraf(dir.base, cb);
-});
+// gulp.task('clean', function (cb) {
+//     rimraf(dir.base, cb);
+// });
 
 gulp.task('default', ['watch', 'vbuild::bootstrap', 'build', 'webserver']);
