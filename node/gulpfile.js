@@ -1,15 +1,22 @@
 'use strict';
 
-const projectName = 'project';
 const domain = 'test.lc';
-const public_folder = '../public_html';
+const dir = '../public_html/';
 
-// for pretty code
-const r = {stream: true};
+const assets = dir + 'assets/';
+// styles for watch only
+const styles = dir + 'styles/';
+const js     = dir + 'assets/';
+const images = dir + 'img/';
+const fonts  = dir + 'assets/fonts/';
+
 const syncConf = {
     proxy: domain,
     tunnel: false
 };
+// for pretty code
+const r = {stream: true};
+
 
 const gulp = require('gulp'),
     // gutil = require('gulp-util'),
@@ -33,14 +40,6 @@ const gulp = require('gulp'),
     // clear images
     rimraf = require('rimraf');
 
-
-const dir = public_folder + '/'; // for ex. '/wp-content/themes/' + projectName + '/'
-const assets = dir + 'assets/';
-const images = dir + 'img/';
-const fonts  = assets + 'fonts/';
-// styles for watch only
-const styles  = dir + 'styles/';
-
 /**
  * Set patches
  */
@@ -48,7 +47,7 @@ let watch = {
     code: [dir + '**/*.html'],
     css:  [dir + '**/*.scss'],
     img:  [images + 'raw/**/*.*'],
-    js:   [assets + 'raw/**/*.js'],
+    js:   [js + 'raw/**/*.js'],
     font: [fonts + '*.*']
 }
 
@@ -57,7 +56,7 @@ let src = {
     code: [dir + '**/*.html'],
     css:  [dir + '**/*.scss'],
     img:  [images + 'raw/**/*.*'],
-    js:   [assets + 'raw/**/*.js'],
+    js:   [js + 'raw/**/*.js'],
     font: [fonts + '*.*']
 }
 
@@ -65,13 +64,13 @@ let build = {
     code: dir,
     css:  dir,
     img:  images,
-    js:   assets,
+    js:   js,
     font: fonts,
 }
 
 let bs = {
     css:  styles + 'bootstrap.scss',
-    js:   assets + 'bootstrap.js',
+    js:   js + 'bootstrap.js',
     opts: styles + '_site-settings.scss',
 }
 
