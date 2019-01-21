@@ -1,7 +1,7 @@
 'use strict';
 
-const domain = 'localhost.lc';
-const dir = '../public_html/wp-content/themes/main/';
+const domain = ''; // localhost.lc
+const dir = '../public_html/';
 
 const assets = dir + 'assets/';
 const styles = dir + 'styles/';
@@ -9,12 +9,21 @@ const js     = dir + 'assets/';
 const img    = dir + 'img/';
 const fonts  = dir + 'assets/fonts/';
 
-// for pretty code
-const r = {stream: true};
-const syncConf = {
-    proxy: domain,
+let syncConf = {
+    server: {
+        baseDir: dir
+    },
+    host: 'localhost',
+    port: 8080,
     tunnel: false
-};
+}
+
+if( domain ) {
+    syncConf = {
+        proxy: domain,
+        tunnel: false
+    };
+}
 
 const gulp = require('gulp'),
     // gutil = require('gulp-util'),
@@ -52,6 +61,9 @@ const gulp = require('gulp'),
     debug = require("gulp-debug");
     // clean: require("gulp-clean"),
 
+// for pretty code
+const r = {stream: true};
+
 /**
  * Set patches
  */
@@ -63,7 +75,6 @@ let watch = {
     font: [fonts + 'raw/*.*']
 }
 
-// @todo think about push dir + '*.*' for htaccess, favicon..
 let src = {
     code: [dir + '**/*.html', '!' + assets + '**/*', '!' + dir + 'include/**/*'],
     css:  [dir + '**/*.scss', '!' + assets + '**/*', '!' + styles + '**/*'],
@@ -82,7 +93,7 @@ let build = {
 
 let bs = {
     css:  styles + 'bootstrap.scss',
-    js:   js + 'bootstrap.js',
+    js:   js + 'raw/bootstrap.js',
     opts: styles + '_site-settings.scss',
 }
 
@@ -109,10 +120,9 @@ gulp.task('build::style', function () {
     gulp.src(src.css)
         .pipe(plumber())
         // .pipe(sourcemaps.init())
-        .pipe(sass()) // .on('error', sass.logError)
+        .pipe(sass.sync({outputStyle: 'expanded'})) // .on('error', sass.logError)
         .pipe(prefixer({browsers: ["last 12 versions", "> 1%", "ie 8", "ie 7"]}))
-        .pipe(cssmin({compatibility: "ie8", level: {1: {specialComments: 0}}}))
-        // do not rename for proxy (bitrix for ex.)
+        // .pipe(cssmin({compatibility: "ie8", level: {1: {specialComments: 0}}}))
         // .pipe(rename({
         //     suffix: '.min'
         // }))
@@ -249,6 +259,8 @@ gulp.task('move::assets', function () {
     //     .pipe(gulp.dest(build.code + 'assets/count-to/'))
 });
 
+// @todo add move htaccess..
+
 gulp.task('webserver', function () {
     browserSync(syncConf);
 });
@@ -267,7 +279,6 @@ gulp.task('vbuild::bootstrap', [
     'vbuild::bootstrap-style',
     'vbuild::bootstrap-script',
 ]);
-
 
 gulp.task('install', [
     'move::assets',

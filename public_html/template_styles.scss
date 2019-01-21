@@ -1,9 +1,9 @@
 
 /* Site settings */
 @import "styles/site-settings";
+@import "styles/mixins";
 
 /* Base */
-@import "styles/animate";
 @import "styles/utilites";
 @import "styles/grid-2-4";
 @import "styles/base";
@@ -15,4 +15,3 @@
 
 /* Modules */
 // @import "styles/module/module";
-
