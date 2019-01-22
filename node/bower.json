@@ -21,5 +21,9 @@
   },
   "polyfills": {
     "polyfill-svg-uri": "^1.0.2"
+  },
+  "dependencies": {
+    "slick-carousel": "slick-slide#^1.8.1",
+    "css-hamburgers": "^1.1.3"
   }
 }
