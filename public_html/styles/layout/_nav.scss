@@ -1,5 +1,10 @@
-#main-navigation {
+.site-header, .site-navigation {
     width: 100%;
+
+    .container {
+        padding: 0 15px;
+    }
+
     .navbar {
         padding: 0;
         border-radius: 0;
@@ -14,6 +19,7 @@
             text-decoration: none;
         }
     }
+
     .non-responsive {
         .navbar-brand {
             display: none !important;

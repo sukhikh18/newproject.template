@@ -239,13 +239,20 @@ gulp.task('move::assets', function () {
     gulp.src('bower_components/jquery/dist/jquery.min.js')
         .pipe(gulp.dest(build.js))
 
-    // gulp.src('bower_components/fancybox/dist/*.*')
-    //     .pipe(gulp.dest(build.code + 'assets/fancybox/'))
+    gulp.src('bower_components/fancybox/dist/*.*')
+        .pipe(gulp.dest(build.code + 'assets/fancybox/'))
 
-    // gulp.src('bower_components/slick-carousel/slick/**/*.*')
-    //     .pipe(gulp.dest(build.code + 'assets/slick/'))
+    gulp.src('bower_components/slick-carousel/slick/**/*.*')
+        .pipe(gulp.dest(build.code + 'assets/slick/'))
 
-    // gulp.src('bower_components/masonry-layout/dist/**/*.*')
+    gulp.src('bower_components/sticky/jquery.sticky.js')
+        .pipe(uglify())
+        .pipe(rename({
+            suffix: '.min'
+        }))
+        .pipe(gulp.dest(build.code + 'assets/sticky/'))
+
+    // gulp.src('bower_components/masonry-layout/dist/**/*.{css,js}')
     //     .pipe(gulp.dest(build.code + 'assets/masonry/'))
 
     // gulp.src('bower_components/jquery-countTo/jquery.countTo.js')

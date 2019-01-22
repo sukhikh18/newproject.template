@@ -13,7 +13,7 @@ $hamburger-hover-use-filter   : false !default;
 $hamburger-hover-filter       : opacity(50%) !default;
 $hamburger-active-hover-filter: $hamburger-hover-filter !default;
 
-$hamburger-types: ( spin );
+$hamburger-types: ( elastic );
 
 @import "../../../node/bower_components/css-hamburgers/_sass/hamburgers/hamburgers";
 
@@ -24,6 +24,6 @@ $hamburger-types: ( spin );
 
     &[aria-expanded="true"] {
         @extend .hamburger.is-active;
-        @extend .hamburger--spin.is-active;
+        @extend .hamburger--elastic.is-active;
     }
 }
