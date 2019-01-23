@@ -286,8 +286,8 @@ h1 {
 
 @media (min-width: 992px) and (max-width: 1440px) {
   .archive-description {
-    font-size: -webkit-calc( 16px + 4 * (100vw - 992px) / 448);
-    font-size: calc( 16px + 4 * (100vw - 992px) / 448);
+    font-size: -webkit-calc( 16px + 4 * (100vw - 992px) / 448);
+    font-size: calc( 16px + 4 * (100vw - 992px) / 448);
   }
 }
 
@@ -660,4 +660,8 @@ h1 {
   -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
+}
+
+.slider .slick-slide {
+  margin-bottom: 1rem;
 }
