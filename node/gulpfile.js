@@ -280,6 +280,10 @@ gulp.task('move::assets', function () {
         .pipe(gulp.dest(assets + 'sticky/'))
         .pipe(debug({"title": "vbuild::sticky"}));
 
+    gulp.src('bower_components/css-hamburgers/_sass/hamburgers/**/*.*')
+        .pipe(gulp.dest(styles + 'module/hamburgers/'))
+        .pipe(debug({"title": "move::hamburgers"}));
+
     // need `bower install masonry-layout`
     // gulp.src('bower_components/masonry-layout/dist/**/*.{css,js}')
     //     .pipe(gulp.dest(assets + 'masonry/'))

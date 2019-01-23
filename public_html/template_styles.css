@@ -257,6 +257,46 @@ textarea {
   padding: 0.2em 0;
 }
 
+h1 {
+  margin-top: 2rem;
+  font-size: 5vw;
+}
+
+@media screen and (min-width: 1439px) {
+  h1 {
+    font-size: 3.84615vw;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  h1 {
+    font-size: 5.20833vw;
+  }
+}
+
+@media screen and (max-width: 575px) {
+  h1 {
+    font-size: 24px;
+  }
+}
+
+.archive-description {
+  font-size: 16px;
+}
+
+@media (min-width: 992px) and (max-width: 1440px) {
+  .archive-description {
+    font-size: -webkit-calc( 16px + 4 * (100vw - 992px) / 448);
+    font-size: calc( 16px + 4 * (100vw - 992px) / 448);
+  }
+}
+
+@media (min-width: 1440px) {
+  .archive-description {
+    font-size: 20px;
+  }
+}
+
 /* Layouts */
 .site-navigation {
   width: 100%;
