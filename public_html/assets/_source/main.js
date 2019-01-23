@@ -137,12 +137,14 @@ jQuery(document).ready(function($) {
             this.props = _defaults;
         }
 
+        console.log( this.props );
+
         this.$slider = $( target );
         this.isInit = false;
     }
 
     window.slickSlider.prototype = {
-        init: function( minWidth = 992 ) {
+        init: function( minWidth ) {
             if( !this.$slider.length ) return false;
 
             if( !this.isInit ) {
@@ -154,23 +156,31 @@ jQuery(document).ready(function($) {
                 }
             }
         },
-        responsive: function() {
+        responsive: function( minWidth ) {
+            var self = this;
+
+            if( !minWidth ) minWidth = 992;
             if( !this.$slider.length ) return false;
 
             $(window).on('load resize', function(e) {
                 if( minWidth < $(window).width() ) {
-                    if( this.isInit ) {
-                        this.$slider.slick('unslick');
-                        this.isInit = false;
+                    if( self.isInit ) {
+                        self.$slider.slick('unslick');
+                        self.isInit = false;
                     }
                 }
                 else {
-                    this.init();
+                    self.init();
                 }
             });
         }
     };
 
-    var slick = new slickSlider('.slider', {slidesToShow: 1, slidesToScroll: 1});
-    slick.init();
+    var slick = new slickSlider('.slider', {slidesToShow: 3, slidesToScroll: 1, responsive: [{
+            breakpoint: 576,
+            settings: {
+                slidesToShow: 1
+            }
+        }]});
+    slick.responsive();
 });

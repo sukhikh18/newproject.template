@@ -258,33 +258,33 @@ textarea {
 }
 
 /* Layouts */
-.site-header, .site-navigation {
+.site-navigation {
   width: 100%;
 }
 
-.site-header .container, .site-navigation .container {
+.site-navigation .container {
   padding: 0 15px;
 }
 
-.site-header .navbar, .site-navigation .navbar {
+.site-navigation .navbar {
+  z-index: 1100;
+  background: #fff;
   padding: 0;
   -webkit-border-radius: 0;
           border-radius: 0;
 }
 
-.site-header .navbar .nav-link,
-.site-header .navbar .nav-link:hover,
-.site-header .navbar .nav-link:focus, .site-navigation .navbar .nav-link,
+.site-navigation .navbar .nav-link,
 .site-navigation .navbar .nav-link:hover,
 .site-navigation .navbar .nav-link:focus {
   text-decoration: none;
 }
 
-.site-header .non-responsive .navbar-brand, .site-navigation .non-responsive .navbar-brand {
+.site-navigation .non-responsive .navbar-brand {
   display: none !important;
 }
 
-.site-header .non-responsive .navbar-nav, .site-navigation .non-responsive .navbar-nav {
+.site-navigation .non-responsive .navbar-nav {
   -webkit-box-orient: horizontal;
   -webkit-box-direction: normal;
   -webkit-flex-direction: row;
@@ -609,4 +609,15 @@ textarea {
 .slick-dots li.slick-active button:before {
   color: black;
   opacity: 0.75;
+}
+
+.slider {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
 }

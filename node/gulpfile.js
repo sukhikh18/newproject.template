@@ -8,6 +8,7 @@ const styles = dir + 'styles/';
 const js     = dir + 'assets/';
 const img    = dir + 'img/';
 const fonts  = dir + 'assets/fonts/';
+const source = '_source/';
 
 let syncConf = {
     server: {
@@ -31,6 +32,8 @@ const gulp = require('gulp'),
     // code
     rigger = require('gulp-rigger'),
     sourcemaps = require('gulp-sourcemaps'),
+    // js
+    // babel = require('gulp-babel'),
     uglify = require('gulp-uglify'),
     // style
     sass     = require('gulp-sass'),
@@ -49,7 +52,6 @@ const gulp = require('gulp'),
     rimraf = require('rimraf'),
 
     // packageJson: require('./package.json'),
-    // babel: require("gulp-babel"),
     // concat: require("gulp-concat"),
     // favicons: require("gulp-favicons"),
     // iconfont: require("gulp-iconfont"),
@@ -69,18 +71,18 @@ const r = {stream: true};
  */
 let watch = {
     code: [dir + '**/*.html'],
-    css:  [dir + '**/*.scss'],
-    img:  [img   + 'raw/**/*.*'],
-    js:   [js    + 'raw/**/*.js'],
-    font: [fonts + 'raw/*.*']
+    css:  [dir + '*.scss', styles + '**/*.scss'],
+    img:  [img   + source + '**/*.*'],
+    js:   [js    + source + '**/*.js'],
+    font: [fonts + source + '*.*']
 }
 
 let src = {
     code: [dir + '**/*.html', '!' + assets + '**/*', '!' + dir + 'include/**/*'],
-    css:  [dir + '**/*.scss', '!' + assets + '**/*', '!' + styles + '**/*'],
-    img:  [img   + 'raw/**/*.*'],
-    js:   [js    + 'raw/**/*.js'],
-    font: [fonts + 'raw/*.*']
+    css:  [dir + '*.scss',    '!' + assets + '**/*', '!' + styles + '**/*'],
+    img:  [img   + source + '**/*.*'],
+    js:   [js    + source + '**/*.js'],
+    font: [fonts + source + '*.*']
 }
 
 let build = {
@@ -93,17 +95,17 @@ let build = {
 
 let bs = {
     css:  styles + 'bootstrap.scss',
-    js:   js + 'raw/bootstrap.js',
+    js:   js + source + 'bootstrap.js',
     opts: styles + '_site-settings.scss',
 }
 
 
 // exclude boostrap
 watch.css.push('!' + bs.css);
-watch.js.push('!' + bs.js);
+watch.js.push('!' + bs.js, '!' + js + source + 'bootstrap/**/*');
 
 src.css.push('!' + bs.css);
-src.js.push('!' + bs.js);
+src.js.push('!' + bs.js, '!' + js + source + 'bootstrap/**/*');
 
 /**
  * Tasks
@@ -134,15 +136,16 @@ gulp.task('build::style', function () {
 });
 
 gulp.task('build::js', function () {
-    // .pipe($.babel({presets: ["@babel/preset-env"]}))
-    return gulp.src(src.js)
+    gulp.src(src.js)
+        .pipe(plumber())
         .pipe(rigger())
-        // .pipe(sourcemaps.init())
-        // .pipe(uglify())
-        // .pipe(rename({
-        //     suffix: '.min'
-        // }))
-        // .pipe(sourcemaps.write("./"))
+        // .pipe(babel({presets: ["@babel/preset-env"]}))
+        .pipe(sourcemaps.init())
+        .pipe(uglify())
+        .pipe(rename({
+            suffix: '.min'
+        }))
+        .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest(build.js))
         .pipe(debug({"title": "build::js"}))
         .pipe(reload(r));
@@ -177,6 +180,7 @@ gulp.task('build::font', function() {
  */
 gulp.task('vbuild::bootstrap-style', function () {
     gulp.src( bs.css )
+        .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(sass().on('error', sass.logError))
         .pipe(cssmin()) // minify/uglify
@@ -185,19 +189,23 @@ gulp.task('vbuild::bootstrap-style', function () {
         }))
         .pipe(sourcemaps.write('./'))
     .pipe(gulp.dest(assets))
+        .pipe(debug({"title": "vbuild::bootstrap-style"}))
         .pipe(reload(r));
 });
 
 gulp.task('vbuild::bootstrap-script', function () {
     gulp.src( bs.js )
+        .pipe(plumber())
         .pipe(rigger())
         .pipe(sourcemaps.init())
+        // .pipe(babel()) // {presets: ["@babel/preset-env"]}
         .pipe(uglify())
         .pipe(rename({
             suffix: '.min'
         }))
         .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest(build.js))
+        .pipe(debug({"title": "vbuild::bootstrap-script"}))
         .pipe(reload(r));
 });
 
@@ -236,34 +244,56 @@ gulp.task('watch', function() {
  * Bower migrations
  */
 gulp.task('move::assets', function () {
+    gulp.src('bower_components/bootstrap/js/dist/*.js')
+        .pipe(gulp.dest(assets + source + 'bootstrap/js/'))
+        .pipe(debug({"title": "move::bootstrapJS"}));
+
+    gulp.src('bower_components/bootstrap/scss/**/*.scss')
+        .pipe(gulp.dest(assets + source + 'bootstrap/scss/'))
+        .pipe(debug({"title": "move::bootstrapSCSS"}));
+
+    gulp.src('bower_components/popper.js/dist/umd/popper.js')
+        .pipe(gulp.dest(assets + 'popper.js/'))
+        .pipe(debug({"title": "move::popper"}));
+
     gulp.src('bower_components/jquery/dist/jquery.min.js')
         .pipe(gulp.dest(build.js))
+        .pipe(debug({"title": "move::jquery"}));
 
     gulp.src('bower_components/fancybox/dist/*.*')
-        .pipe(gulp.dest(build.code + 'assets/fancybox/'))
+        .pipe(gulp.dest(assets + 'fancybox/'))
+        .pipe(debug({"title": "move::fancybox"}));
 
     gulp.src('bower_components/slick-carousel/slick/**/*.*')
-        .pipe(gulp.dest(build.code + 'assets/slick/'))
+        .pipe(gulp.dest(assets + 'slick/'))
+        .pipe(debug({"title": "move::slick"}));
 
     gulp.src('bower_components/sticky/jquery.sticky.js')
+        .pipe(gulp.dest(assets + 'sticky/'))
+        .pipe(debug({"title": "move::sticky"}));
+
+    gulp.src(assets + 'sticky/jquery.sticky.js')
         .pipe(uglify())
         .pipe(rename({
             suffix: '.min'
         }))
-        .pipe(gulp.dest(build.code + 'assets/sticky/'))
+        .pipe(gulp.dest(assets + 'sticky/'))
+        .pipe(debug({"title": "vbuild::sticky"}));
 
+    // need `bower install masonry-layout`
     // gulp.src('bower_components/masonry-layout/dist/**/*.{css,js}')
-    //     .pipe(gulp.dest(build.code + 'assets/masonry/'))
+    //     .pipe(gulp.dest(assets + 'masonry/'))
 
+    // need `bower install jquery-countTo`
     // gulp.src('bower_components/jquery-countTo/jquery.countTo.js')
+    //     .pipe(gulp.dest(assets + 'count-to/'))
+
+    // gulp.src(assets + 'count-to/jquery.countTo.js')
     //     .pipe(uglify())
     //     .pipe(rename({
     //         suffix: '.min'
     //     }))
-    //     .pipe(gulp.dest(build.code + 'assets/count-to/'))
-
-    // gulp.src('bower_components/jquery-countTo/jquery.countTo.js')
-    //     .pipe(gulp.dest(build.code + 'assets/count-to/'))
+    //     .pipe(gulp.dest(assets + 'count-to/'))
 });
 
 // @todo add move htaccess..
