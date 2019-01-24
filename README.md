@@ -1,14 +1,14 @@
-﻿﻿## Как использовать ##
+﻿## Как использовать ##
 
 Сначала качаем и устанавливаем [node.js](https://nodejs.org/en/download/) иначе `npm` работать не будет.
+
+Устанавливаем gulp `npm install --global gulp`
 
 Скачиваем или клонируем репозиторий `git clone https://github.com/nikolays93/newproject.boilerplate.git`
 ([git](https://git-scm.com/download) клиент должен быть установлен)
 
 Клонируем шаблон-подмодуль. Для этого выполняем `clone-submodule.sh` (Проверено из win10)
-или клонируем/скачиваем `git clone https://github.com/nikolays93/newproject.template`
-
-После устанавливаем gulp `npm install --global gulp`
+или клонируем/скачиваем `git clone https://github.com/nikolays93/newproject.template` в папку `public_html`
 
 Запускаем консоль из папки проекта и пишем:
 
