@@ -1,13 +1,13 @@
 ﻿# New project Boilerplate
 
 ## Особенности
-* автоматическая перезагрузка страницы в браузере с использованием [Browsersync](https://www.browsersync.io/);
-* использование препроцессора [SCSS](https://sass-lang.com/);
+- автоматическая перезагрузка страницы в браузере с использованием [Browsersync](https://www.browsersync.io/);
+- использование препроцессора [SCSS](https://sass-lang.com/);
 
 ## Установка
 1. Установите [node.js](https://nodejs.org/en/download/).
 2. Установите [Yarn](https://yarnpkg.com/en/docs/install/).
-3. Установите ```gulp``` глобально: ```yarn global add gulp-cli```;
+3. Установите [Gulp](https://gulpjs.com) глобально: ```yarn global add gulp-cli```;
 
 ## Как пользоваться
 * Скачайте сборку из этого репозитория [newproject.boilerplate](https://github.com/nikolays93/newproject.boilerplate).
@@ -38,5 +38,7 @@
 
 ## Дополнительно
 За основу взят шаблон [html5 boilerplate](https://github.com/h5bp/html5-boilerplate) (вер. 6.1.0)
+
 И сборщик [gulp-scss-starter](https://github.com/andreyalexeich/gulp-scss-starter) от [Андрея Горохова](https://github.com/andreyalexeich)
+
 В сборщике использована CSS-сетка [smart-grid](https://github.com/dmitry-lavrik/smart-grid) от [Дмитрия Лаврика](https://dmitrylavrik.ru/)
