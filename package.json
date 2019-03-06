@@ -51,6 +51,6 @@
 		"jquery": "^3.3.1",
 		"popper.js": "^1.14.6",
 		"smart-grid": "^2.1.2",
-		"swiper": "^4.4.6"
+		"slick-carousel": "^1.8.1"
 	}
 }
