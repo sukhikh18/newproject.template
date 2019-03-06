@@ -1,39 +1,42 @@
-﻿## Как использовать ##
+﻿# New project Boilerplate
 
-Сначала качаем и устанавливаем [node.js](https://nodejs.org/en/download/) иначе `npm` работать не будет.
+## Особенности
+* автоматическая перезагрузка страницы в браузере с использованием [Browsersync](https://www.browsersync.io/);
+* использование препроцессора [SCSS](https://sass-lang.com/);
 
-Устанавливаем gulp `npm install --global gulp`
+## Установка
+1. Установите [node.js](https://nodejs.org/en/download/).
+2. Установите [Yarn](https://yarnpkg.com/en/docs/install/).
+3. Установите ```gulp``` глобально: ```yarn global add gulp-cli```;
 
-Скачиваем или клонируем репозиторий `git clone https://github.com/nikolays93/newproject.boilerplate.git`
-([git](https://git-scm.com/download) клиент должен быть установлен)
+## Как пользоваться
+* Скачайте сборку из этого репозитория [newproject.boilerplate](https://github.com/nikolays93/newproject.boilerplate).
+* Откройте консоль в папке скачанной сборки.
+* Введите команду ```yarn``` для установки/сборки проекта.
+* Введите ```yarn run dev``` или ```gulp``` для разработки;
+* Введите ```yarn run prod``` или ```gulp build --production``` для завершения разработки.
 
-Клонируем шаблон-подмодуль. Для этого выполняем `clone-submodule.sh` (Проверено из win10)
-или клонируем/скачиваем `git clone https://github.com/nikolays93/newproject.template` в папку `public_html`
+## Плагины
+* [browser-sync](https://browsersync.io/docs/gulp) - живая перезагрузка веб-страницы при внесении изменений в файлы вашего проекта;
+* [gulp-autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) — автоматически расставляет вендорные префиксы в CSS в соответствии с сервисом [Can I Use](https://caniuse.com/);
+* [gulp-uglify](https://www.npmjs.com/package/gulp-uglify) — минификация JS-файлов;
+* [gulp-sass](https://www.npmjs.com/package/gulp-sass) — компиляция SCSS в CSS;
+* [gulp-group-css-media-queries](https://www.npmjs.com/package/gulp-group-css-media-queries) - группировка ```@media```;
+* [gulp-clean-css](https://www.npmjs.com/package/gulp-clean-css) — минификация CSS-файлов;
+* [gulp-sourcemaps](https://www.npmjs.com/package/gulp-sourcemaps) - карта стилей;
+* [gulp-rename](https://www.npmjs.com/package/gulp-rename) — переименование файлов, добавление суффиксов и префиксов (например, добавление суффикса ```.min``` к минифицированным файлам);
+* [gulp-imagemin](https://www.npmjs.com/package/gulp-imagemin) — сжатие изображений PNG, JPG, GIF и SVG (включая дополнительные плагины для оптимизации);
+* [gulp-if](https://www.npmjs.com/package/gulp-if) - запуск заданий только тогда, когда это нужно;
+* [gulp-replace](https://www.npmjs.com/package/gulp-replace) - замена строк;
+* [gulp-rigger](https://www.npmjs.com/package/gulp-rigger) - позволяет вставлять содержимое из отдельных файлов в основной;
+* [gulp-plumber](https://www.npmjs.com/package/gulp-plumber) — оповещения в командной строке (например, ошибки в SCSS/Sass);
+* [gulp-debug](https://www.npmjs.com/package/gulp-debug) — отладка в терминале;
+* [gulp-watch](https://www.npmjs.com/package/gulp-watch) — отслеживание изменений в ваших файлах проекта;
+* [gulp-clean](https://www.npmjs.com/package/gulp-clean) — удаление файлов и папок;
+* [gulp-newer](https://www.npmjs.com/package/gulp-newer) - пропуск повторной обработки;
+* [yargs](https://www.npmjs.com/package/yargs) - получение аргументов командной строки в Node.js.
 
-Запускаем консоль из папки проекта и пишем:
-
-#### Для старта\*: ####
-`npm install` - установит все необходимые модули
-
-#### После установки запукаем ####
-`gulp` - соберет проект, запустит локальный сервер (если не указан domain), установит live-reload
-
-_\* Так как на данный момент bower.io хостится на запрещенном в России IP 104.27.140.156 по информации с сайта [blocklist.rkn.gov.ru](http://blocklist.rkn.gov.ru/) использовать `bower install` и `gulp install` не обязательно, а скорее всего бесполезно._
-____
+## Дополнительно
 За основу взят шаблон [html5 boilerplate](https://github.com/h5bp/html5-boilerplate) (вер. 6.1.0)
-
-## How to use ##
-
-for install:
-- `bower install`
-- `npm install`*
-- `gulp install`
-
-__\* - required__
-
-#### tasks: ####
-`gulp` - let's build, start localhost server, set live-reload
-`gulp install` - initial build (move vendors)
-
-___
-Based on [html5 boilerplate](https://github.com/h5bp/html5-boilerplate) ver. 6.1.0
+И сборщик [gulp-scss-starter](https://github.com/andreyalexeich/gulp-scss-starter) от [Андрея Горохова](https://github.com/andreyalexeich)
+В сборщике использована CSS-сетка [smart-grid](https://github.com/dmitry-lavrik/smart-grid) от [Дмитрия Лаврика](https://dmitrylavrik.ru/)
