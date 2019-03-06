@@ -13,6 +13,9 @@
 		"install": "bash install.sh"
 	},
 	"devDependencies": {
+		"@babel/core": "^7.3.4",
+		"@babel/preset-env": "^7.3.4",
+		"@babel/register": "^7.0.0",
 		"browser-sync": "^2.23.6",
 		"gulp": "^4.0.0",
 		"gulp-autoprefixer": "^5.0.0",
