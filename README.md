@@ -12,7 +12,7 @@
 
 ## Как пользоваться
 * Клонируйте репозиторий ```git clone https://github.com/nikolays93/newproject.boilerplate.git``` или скачайте сборку из этого репозитория и распакуйте [шаблон](https://github.com/nikolays93/newproject.template/) в public_html сборки;
-* Откройте консоль в папке скачанной сборки;
+* Перейдите к скачаной папке командой ```cd newproject.boilerplate``` или откройте консоль в папке скачанной сборки;
 * Введите команду ```yarn``` для установки/сборки проекта;
 * Введите ```yarn run dev``` или ```gulp``` для разработки;
 * Введите ```yarn run prod``` или ```gulp build --production``` для завершения разработки;
