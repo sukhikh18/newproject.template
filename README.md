@@ -7,14 +7,15 @@
 ## Установка
 1. Установите [node.js](https://nodejs.org/en/download/).
 2. Установите [Yarn](https://yarnpkg.com/en/docs/install/).
-3. Установите [Gulp](https://gulpjs.com) глобально: ```yarn global add gulp-cli```;
+3. Установите [Gulp](https://gulpjs.com) глобально: ```yarn global add gulp-cli```.
+4. Рекомендую так же установить [git-scm](https://git-scm.com) для клонирования репозиториев к себе на компьютер командой ```git clone```.
 
 ## Как пользоваться
-* Скачайте сборку из этого репозитория [newproject.boilerplate](https://github.com/nikolays93/newproject.boilerplate).
-* Откройте консоль в папке скачанной сборки.
-* Введите команду ```yarn``` для установки/сборки проекта.
+* Клонируйте репозиторий ```git clone https://github.com/nikolays93/newproject.boilerplate.git``` или скачайте сборку из этого репозитория и распакуйте [шаблон](https://github.com/nikolays93/newproject.template/) в public_html сборки;
+* Откройте консоль в папке скачанной сборки;
+* Введите команду ```yarn``` для установки/сборки проекта;
 * Введите ```yarn run dev``` или ```gulp``` для разработки;
-* Введите ```yarn run prod``` или ```gulp build --production``` для завершения разработки.
+* Введите ```yarn run prod``` или ```gulp build --production``` для завершения разработки;
 
 ## Плагины
 * [browser-sync](https://browsersync.io/docs/gulp) - живая перезагрузка веб-страницы при внесении изменений в файлы вашего проекта;
