@@ -7,7 +7,7 @@ global.domain = ''; // wordpress.cms
 global.tunnel = false;
 
 /** @type {String} Path to the template directory */
-global.dir = './public_html/';
+global.dir = './public_html/'; // wp-content/themes/project/
 
 import { src, dest, watch, parallel, series } from "gulp";
 import gulpif from "gulp-if";
@@ -105,7 +105,7 @@ export const styles = () => src(paths.src.styles)
 	.pipe(gulpif(production, autoprefixer({
 		browsers: ["last 12 versions", "> 1%", "ie 8", "ie 7"]
 	})))
-	// .pipe(gulpif(!production && '' != domain, browsersync.stream()))
+	.pipe(gulpif(!production && '' != domain, browsersync.stream()))
 	.pipe(gulpif(production, mincss({
 		compatibility: "ie8", level: {
 			1: {
@@ -132,7 +132,7 @@ export const styles = () => src(paths.src.styles)
 	.pipe(debug({
 		"title": "CSS files"
 	}))
-	.on("end", production || '' == domain ? browsersync.reload : null);
+	.on("end", () => production || '' == domain ? browsersync.reload : null);
 
 export const scripts = () => src(paths.src.scripts)
 	.pipe(plumber())
