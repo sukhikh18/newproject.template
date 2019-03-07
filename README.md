@@ -37,9 +37,5 @@
 * [gulp-newer](https://www.npmjs.com/package/gulp-newer) - пропуск повторной обработки;
 * [yargs](https://www.npmjs.com/package/yargs) - получение аргументов командной строки в Node.js.
 
-## Дополнительно
-За основу взят шаблон [html5 boilerplate](https://github.com/h5bp/html5-boilerplate) (вер. 6.1.0)
-
-И сборщик [gulp-scss-starter](https://github.com/andreyalexeich/gulp-scss-starter) от [Андрея Горохова](https://github.com/andreyalexeich)
-
-В сборщике использована CSS-сетка [smart-grid](https://github.com/dmitry-lavrik/smart-grid) от [Дмитрия Лаврика](https://dmitrylavrik.ru/)
+___
+За основу взят сборщик [gulp-scss-starter](https://github.com/andreyalexeich/gulp-scss-starter) от [Андрея Горохова](https://github.com/andreyalexeich)
