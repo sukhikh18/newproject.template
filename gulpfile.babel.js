@@ -43,6 +43,7 @@ global.js     = '';
 global.img    = '';
 
 global.additionalTasks = [];
+global.additionalAssetsTasks = [];
 global.additionalWatch = function() {}
 
 /** Path to the template configuration */
@@ -193,11 +194,11 @@ export const common = parallel(html, styles, scripts, images);
 /**
  * Move assets, build and stop
  */
-export const build = series(additionalAssetsTasks, additionalTasks, common);
+export const build = series(additionalAssetsTasks || global.additionalAssetsTasks, additionalTasks || global.additionalTasks, common);
 
 /**
  * Build and start server with watcher
  */
-export const run = series(additionalTasks, common, parallel(watchCode, server));
+export const run = series(additionalTasks || global.additionalTasks, common, parallel(watchCode || global.watchCode, server));
 
 export default run;

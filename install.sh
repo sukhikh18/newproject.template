@@ -7,6 +7,6 @@ if [ -f .gitmodules ]; then
     fi
 fi
 
-yarn run prod
+read -n 1 -s -r -p "Do you want git check out?"
 
-# read -n 1 -s -r -p "Press any key to exit"
+yarn run prod
