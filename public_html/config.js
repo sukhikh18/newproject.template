@@ -96,6 +96,9 @@ export const popper = () => src('./node_modules/popper.js/dist/umd/**/*')
 export const hamburgers = () => src('./node_modules/hamburgers/_sass/hamburgers/**/*')
     .pipe(dest(dir + assets + 'hamburgers/'));
 
+export const slickSource = () => src('./node_modules/slick-carousel/slick/**/*')
+    .pipe(dest(dir + assets + 'slick/'));
+
 
 export const fancybox = () => src('./node_modules/@fancyapps/fancybox/dist/**/*')
     .pipe(dest(dist + assets + 'fancybox/'));
@@ -112,5 +115,6 @@ export let additionalAssetsTasks = parallel(
     fancybox,
     hamburgers,
     jquery,
-    slick
+    slick,
+    slickSource
 );
