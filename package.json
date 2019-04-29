@@ -9,8 +9,7 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "gulp",
-		"prod": "gulp build --production",
-		"install": "bash install.sh"
+		"prod": "gulp build --production"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.3.4",

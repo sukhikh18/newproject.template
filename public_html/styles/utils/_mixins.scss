@@ -1,0 +1,222 @@
+//  strip units helper function
+@function num($input) {
+    @return $input/($input * 0 + 1);
+}
+
+//  default font scale bounding
+$font-lock-min:  992px !default;
+$font-lock-max: 1440px !default;
+
+$media-hd:  1440px !default;
+$media-fhd: 1560px !default;
+
+$wsm:  (1 / (num($media-sm)  * 0.01)) * 1vw;
+$wmd:  (1 / (num($media-md)  * 0.01)) * 1vw;
+$wlg:  (1 / (num($media-lg)  * 0.01)) * 1vw;
+$wxl:  (1 / (num($media-xl)  * 0.01)) * 1vw;
+$whd:  (1 / (num($media-hd)  * 0.01)) * 1vw;
+$wfhd: (1 / (num($media-fhd) * 0.01)) * 1vw;
+
+//
+// Media Quires
+//
+@mixin from($min_width) {
+    @media screen and (min-width: $min_width) {
+        @content;
+    }
+}
+
+@mixin to($max_width) {
+    @media screen and (max-width: $max_width) {
+        @content;
+    }
+}
+
+@mixin from-to($min_width, $max_width) {
+    @media screen and (min-width: $min_width) and (max-width: $max_width) {
+        @content;
+    }
+}
+
+//
+// Fonts
+// @note we have a some bugs on some devices
+//
+@mixin responsive-font(
+    $min,                       // font-size
+    $max: null,                 // optional maximum font size
+    $lock-min: $font-lock-min,  // optional minimum viewport width
+    $lock-max: $font-lock-max   // optional maximum viewport width
+) {
+    & { font-size: $min; }
+    @if $max {
+        @media (min-width: $lock-min) and (max-width: $lock-max - 1) {
+            & {
+                font-size: calc(
+                    #{$min} +
+                    #{num($max) - num($min)} *
+                    (100vw - #{$lock-min}) /
+                    #{num($lock-max) - num($lock-min)}
+                    );
+            }
+        }
+
+        @media (min-width: $lock-max) {
+            & { font-size: $max; }
+        }
+    }
+}
+
+@mixin vw(
+    $context,
+    $xl: null, // 1200
+    $md: $xl,  // 768
+    $sm: $md,  // 512
+    $hd: $xl ) {
+
+    #{$context}: $xl * $wxl;
+
+    @if $hd {
+        @media screen and (min-width: $media-hd) {
+            #{$context}: $hd * $wfhd;
+        }
+    }
+
+    @if $md {
+        @media screen and (max-width: $media-md - 1) {
+            #{$context}: $md * $wmd;
+        }
+    }
+
+    @if $sm {
+        @media screen and (max-width: $media-sm - 1) {
+            #{$context}: $sm * 1px;
+        }
+    }
+}
+
+//
+// Positions
+//
+// Define vertical, horizontal, or both ABSOLUTE* position
+// * Must be in absolute or relative parent
+//
+@mixin absolute-center($position: both) {
+    position: absolute;
+
+    @if $position == 'vertical' {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    @else if $position == 'horizontal' {
+        left: 50%;
+        transform: translate(-50%);
+    }
+    @else if $position == 'both' {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+//
+// Blocks
+//
+@mixin columns( $count: 2 ) {
+    column-count: $count;
+
+    > div, li {
+        display: inline-block;
+        position: relative;
+        width: 100%;
+    }
+}
+
+@mixin two-columns($direct: horizontal, $min-media: $media-xl) {
+    @media screen and (min-width: $min-media) {
+        @if $direct == vertical {
+            @include columns(2);
+        }
+        @else {
+            position: relative;
+            overflow: hidden;
+
+            > div, li {
+                float: left;
+                width: 49%;
+
+                &:nth-child(2n+1) {
+                    clear: both;
+                }
+                &:nth-child(2n+2) {
+                    float: right;
+                }
+            }
+        }
+    }
+}
+
+//
+// Images
+//
+$retina: "only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx)";
+@mixin retina-background-image($file, $type, $width, $height) {
+    background-image: url($file + '.' + $type);
+    @media #{$retina} {
+        background-image: url($file + '@2x.' + $type);
+        background-size: $width $height;
+    }
+}
+
+@mixin scale($max-width: 100%, $max-width-hover: 120%, $transition: .25s ease) {
+    & {
+        > img {
+            max-width: $max-width;
+            width: 999%;
+            transition: $transition max-width;
+
+            &:hover {
+                max-width: $max-width-hover;
+            }
+        }
+    }
+
+    .touch & {
+        > img {
+            max-width: $max-width-hover;
+        }
+    }
+}
+
+@mixin thumbnail-center($width, $height) {
+    & {
+        position: relative;
+
+        @if $width {
+            width: $width;
+        }
+
+        @if $height {
+            height: $height;
+        }
+    }
+
+    > img {
+        display: block;
+        width: 100%;
+        @include absolute-center();
+    }
+}
+
+@mixin rounded($deg) {
+    border-radius: $deg;
+}
+
+@mixin circle() {
+    overflow: hidden;
+    border-radius: 50%;
+
+    img {
+        clip-path: circle(50% at 50% 50%);
+    }
+}
