@@ -8,7 +8,9 @@
 ehthumbs.db
 Thumbs.db
 _config.yml
-node_modules
-dist
 *.lock
 package-lock.json
+
+node_modules/
+vendor/
+public_html/

@@ -11,7 +11,7 @@ global.serverCfg = {
 }
 
 /** @global {String} Path to the root directory */
-global.dir   = './public_html/';
+global.dir   = './source/';
 global.dist = './public_html/';
 
 // import webpack from "webpack";
@@ -37,7 +37,6 @@ import plumber from "gulp-plumber";
 import debug from "gulp-debug";
 import clean from "gulp-clean";
 import yargs from "yargs";
-import smartgrid from "smart-grid";
 
 import newer from "gulp-newer";
 import imagemin from "gulp-imagemin";
@@ -56,24 +55,11 @@ global.scss   = 'styles/';
 global.js     = 'assets/';
 global.img    = 'img/';
 
-let { additionalAssetsTasks } = require(dir + "config");
+require(dir + "config");
 
-if( !additionalAssetsTasks ) additionalAssetsTasks = [];
-
-// @warning do not change .html files (use htm) !! recursive updates !!
-export const html = () => src( paths.src.html, { allowEmpty: true })
-	.pipe(rigger())
-	.pipe(gulpif(production, replace("template_styles.css", "template_styles.min.css")))
-	.pipe(gulpif(production, replace("main.js", "main.min.js")))
-	.pipe(rename({
-		extname: ".html"
-	}))
-	.pipe(dest(paths.build.general))
-	.pipe(debug({
-		"title": "HTML files"
-	}))
-	.on("end", browsersync.reload);
-
+/**
+ * Style settings
+ */
 const defAutoPrefArgs = {
     browsers: ["last 12 versions", "> 1%", "ie 8", "ie 7"]
 };
@@ -98,13 +84,32 @@ const defMinCssArgs = {
     rebase: false
 };
 
+// @warning do not change .html files (use htm) !! recursive updates !!
+export const html = () => src( paths.src.html, { allowEmpty: true })
+	.pipe(rigger())
+	.pipe(replace("@min", production ? ".min" : ''))
+	.pipe(rename({
+		extname: ".html"
+	}))
+	.pipe(dest(dist))
+	.pipe(debug({
+		"title": "HTML files"
+	}))
+	.on("end", browsersync.reload);
+
+export const php = () => src( paths.src.php, { allowEmpty: true })
+	.pipe(dest(dist))
+	.pipe(debug({
+		"title": "PHP files"
+	}));
+
 export const styles = () => src(paths.src.styles, { allowEmpty: true })
 	.pipe(plumber())
 	// .pipe(gulpif(!production, sourcemaps.init()))
 	.pipe(sass())
 	.pipe(groupmediaqueries())
 	.pipe(gulpif(production, autoprefixer(defAutoPrefArgs)))
-	.pipe(gulpif(!production && '' != domain, browsersync.stream()))
+	.pipe(gulpif(!production, browsersync.stream()))
 	.pipe(gulpif(production, mincss(defMinCssArgs)))
 	.pipe(gulpif(production, rename({ suffix: ".min" })))
 	.pipe(plumber.stop())
@@ -186,6 +191,18 @@ export const images = () => src(paths.src.images, { allowEmpty: true })
 	}))
 	.on("end", browsersync.reload);
 
+export const assetsDists = (e) => {
+	paths.assets.forEach(function(item, i, arr) {
+		src(item.src, { allowEmpty: true })
+			.pipe(dest(item.dest))
+			.pipe(debug({
+				"title": "Assets"
+			}));
+	});
+
+	return e();
+};
+
 export const server = () => {
 	if( '' !== domain ) {
 		serverCfg.proxy = domain;
@@ -206,16 +223,17 @@ export const watchCode = () => {
     // if(additionalWatch) additionalWatch();
 };
 
+export const source = parallel(html, php);
 
-export const common = parallel(html, styles, scripts, images);
+export const common = parallel(source, styles, scripts, images);
 
 /**
  * Move assets, build and stop
  */
-export const build = series(additionalAssetsTasks, stylesAssets, common);
+export const build = series(assetsDists, stylesAssets, common);
 
 /**
- * Build and start server with watcher
+ * Build and continue with watcher
  */
 export const run = series(stylesAssets, common, parallel(watchCode, server));
 
