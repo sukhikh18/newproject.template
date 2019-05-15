@@ -4,7 +4,7 @@
 1. Установите [node.js](https://nodejs.org/en/download/).
 2. Установите [Yarn](https://yarnpkg.com/en/docs/install/).
 3. Установите [Gulp](https://gulpjs.com) глобально: ```yarn global add gulp-cli```.
-4. Рекомендую так же установить [git-scm](https://git-scm.com) для клонирования репозиториев к себе на компьютер командой ```git clone```.
+4. Рекомендую так же установить [git-scm](https://git-scm.com) для клонирования репозиториев командой ```git clone```.
 
 ## Как пользоваться
 * Клонируйте репозиторий ```git clone https://github.com/nikolays93/newproject.boilerplate.git``` или скачайте сборку из этого репозитория ```Clone or download > Download ZIP```;
