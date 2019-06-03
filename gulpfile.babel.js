@@ -138,7 +138,7 @@ global.paths.src = {
     ],
 
     sprites:  [dir + img + raw + 'icons/**/*.svg'],
-    favicons: [dir + img + raw + 'icons/favicon.{jpg,jpeg,png,gif}'],
+    favicons: [dir + img + raw + 'icons/favicon.{jpg,jpeg,png,gif,svg}'],
 };
 
 global.paths.watch = {
@@ -163,7 +163,7 @@ global.paths.watch = {
     ],
 
     sprites:  [dir + img + raw + 'icons/**/*.svg'],
-    favicons: [dir + img + raw + 'icons/favicon.{jpg,jpeg,png,gif}'],
+    favicons: [dir + img + raw + 'icons/favicon.{jpg,jpeg,png,gif,svg}'],
 };
 
 /**
