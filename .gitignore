@@ -11,6 +11,10 @@ _config.yml
 *.lock
 package-lock.json
 
+source/
+!source/_src/
+!source/*.*
+
 node_modules/
 vendor/
 public_html/
