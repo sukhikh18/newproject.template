@@ -318,9 +318,30 @@ export const images = () => src(paths.src.images, { allowEmpty: true })
 	}))
 	.on("end", browsersync.reload);
 
+export const favs = () => src(paths.src.favicons, { allowEmpty: true })
+    .pipe(newer(paths.build.favicons))
+    .pipe(favicons({
+        icons: {
+            appleIcon: true,
+            favicons: true,
+            online: false,
+            appleStartup: false,
+            android: false,
+            firefox: false,
+            yandex: false,
+            windows: false,
+            coast: false
+        }
+    }))
+    .pipe(dest(paths.build.favicons))
+    .pipe(debug({
+        "title": "Favicons"
+    }));
+
 export const moveAssets = (e) => {
 	paths.assets.forEach(function(item, i, arr) {
 		src(item.src, { allowEmpty: true })
+            .pipe(newer(item.dest))
 			.pipe(dest(item.dest))
 			.pipe(debug({
 				"title": "Assets"
@@ -352,8 +373,6 @@ export const watchCode = () => {
 
 export const source = parallel(html, php);
 
-export const common = parallel(source, styles, scripts, images);
-
 /**
  * Move assets
  */
@@ -362,7 +381,7 @@ export const install = series(moveAssets);
 /**
  * Build and stop
  */
-export const build = series(stylesAssets, common);
+export const build = series(stylesAssets, parallel(source, styles, scripts, favs, images));
 
 /**
  * Build and continue with watcher
