@@ -3,19 +3,8 @@
     @return $input/($input * 0 + 1);
 }
 
-//  default font scale bounding
-$font-lock-min:  992px !default;
-$font-lock-max: 1440px !default;
-
 $media-hd:  1440px !default;
 $media-fhd: 1560px !default;
-
-$wsm:  (1 / (num($media-sm)  * 0.01)) * 1vw;
-$wmd:  (1 / (num($media-md)  * 0.01)) * 1vw;
-$wlg:  (1 / (num($media-lg)  * 0.01)) * 1vw;
-$wxl:  (1 / (num($media-xl)  * 0.01)) * 1vw;
-$whd:  (1 / (num($media-hd)  * 0.01)) * 1vw;
-$wfhd: (1 / (num($media-fhd) * 0.01)) * 1vw;
 
 //
 // Media Quires
@@ -38,60 +27,58 @@ $wfhd: (1 / (num($media-fhd) * 0.01)) * 1vw;
     }
 }
 
-//
-// Fonts
-// @note we have a some bugs on some devices
-//
-@mixin responsive-font(
-    $min,                       // font-size
-    $max: null,                 // optional maximum font size
-    $lock-min: $font-lock-min,  // optional minimum viewport width
-    $lock-max: $font-lock-max   // optional maximum viewport width
-) {
-    & { font-size: $min; }
-    @if $max {
-        @media (min-width: $lock-min) and (max-width: $lock-max - 1) {
-            & {
-                font-size: calc(
-                    #{$min} +
-                    #{num($max) - num($min)} *
-                    (100vw - #{$lock-min}) /
-                    #{num($lock-max) - num($lock-min)}
-                    );
-            }
-        }
-
-        @media (min-width: $lock-max) {
-            & { font-size: $max; }
-        }
+@mixin font-sm( $size ) {
+    @include to( $media-sm ) {
+        font-size: $size * 1px;
+        font-size: num($size) * $wsm;
     }
 }
 
-@mixin vw(
-    $context,
-    $xl: null, // 1200
-    $md: $xl,  // 768
-    $sm: $md,  // 512
-    $hd: $xl ) {
+@mixin font-xl( $size ) {
+    @include from( $media-xl + 1 ) {
+        font-size: $size * 1px;
+        font-size: num($size) * $wfhd;
+    }
+}
 
-    #{$context}: $xl * $wxl;
+$tpl-sm: 320px;
+$tpl-fhd: 1920px;
 
-    @if $hd {
-        @media screen and (min-width: $media-hd) {
-            #{$context}: $hd * $wfhd;
+$wsm:  (1 / (num($tpl-sm)  * 0.01)) * 1vw;
+$wmd:  (1 / (num($media-md)  * 0.01)) * 1vw;
+$wlg:  (1 / (num($media-lg)  * 0.01)) * 1vw;
+$wxl:  (1 / (num($media-xl)  * 0.01)) * 1vw;
+$whd:  (1 / (num($media-hd)  * 0.01)) * 1vw;
+$wfhd: (1 / (num($tpl-fhd) * 0.01)) * 1vw;
+
+@mixin vw( $context, $value, $value-lg: $value, $value-sm: $value, $value-fhd: 0 ) {
+
+    @include from( $media-xl + 1 ) {
+        #{$context}: $value * $wfhd;
+    }
+
+    @if 0 != $value-fhd {
+        @include from( $media-fhd + 1 ) {
+            #{$context}: $value-fhd * $wfhd;
         }
     }
 
-    @if $md {
-        @media screen and (max-width: $media-md - 1) {
-            #{$context}: $md * $wmd;
-        }
+    @include to( $media-xl ) {
+        #{$context}: $value-lg * $wxl;
     }
 
-    @if $sm {
-        @media screen and (max-width: $media-sm - 1) {
-            #{$context}: $sm * 1px;
-        }
+    @include to( $media-lg ) {
+        #{$context}: $value-lg * $wlg;
+    }
+
+    @include to( $media-sm ) {
+        #{$context}: $value-sm * $wsm;
+    }
+}
+
+@mixin vw-sm( $context, $value ) {
+    @include to( $media-sm ) {
+        #{$context}: $value * $wsm;
     }
 }
 
