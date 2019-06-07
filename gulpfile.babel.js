@@ -213,7 +213,7 @@ export const buildFavs = () => src(paths.src.favicons, { allowEmpty: true })
 /**
  * Assets
  */
-export const buildAssetsStyle = () => src([dist + assets + '*.scss', '!' + dist + assets + '_*.scss'], { allowEmpty: true })
+export const buildAssetsStyle = () => src([dist + assets + raw + '*.scss', '!' + dist + assets + raw + '_*.scss'], { allowEmpty: true })
     .pipe(plumber())
     // .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(sass())
