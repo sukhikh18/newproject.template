@@ -1,43 +1,32 @@
 "use strict";
 
-/** @type {String} For use proxy */
-const domain = '';
-
-/** {String} Path to the root directory */
-const dir   = './source/'; // wp-content/themes/project/
-const dist = './public_html/';
-
-const assets = 'assets/';
-const scss   = 'styles/';
-const js     = 'assets/';
-const img    = 'img/';
-const raw    = '_src/';
+const root = './public_html/';
 
 // import webpack from "webpack";
 // import webpackStream from "webpack-stream";
 import { src, dest, watch, parallel, series } from "gulp";
 import gulpif from "gulp-if";
 import browsersync from "browser-sync";
+import rename from "gulp-rename";
+import replace from "gulp-replace";
+import plumber from "gulp-plumber";
+import debug from "gulp-debug";
+import clean from "gulp-clean";
+import yargs from "yargs";
+import rigger from "gulp-rigger";
+import pug from "gulp-pug";
 import autoprefixer from "gulp-autoprefixer";
-import uglify from "gulp-uglify";
 import sass from "gulp-sass";
 import groupmediaqueries from "gulp-group-css-media-queries";
 // import postcss from "gulp-postcss";
 // import mqpacker from "css-mqpacker";
 // import sortCSSmq from "sort-css-media-queries";
 import mincss from "gulp-clean-css";
+import uglify from "gulp-uglify";
 import sourcemaps from "gulp-sourcemaps";
-import rename from "gulp-rename";
+import newer from "gulp-newer";
 import favicons from "gulp-favicons";
 import svgSprite from "gulp-svg-sprite";
-import replace from "gulp-replace";
-import rigger from "gulp-rigger";
-import plumber from "gulp-plumber";
-import debug from "gulp-debug";
-import clean from "gulp-clean";
-import yargs from "yargs";
-
-import newer from "gulp-newer";
 import imagemin from "gulp-imagemin";
 import imageminPngquant from "imagemin-pngquant";
 import imageminZopfli from "imagemin-zopfli";
@@ -46,169 +35,98 @@ import imageminGiflossy from "imagemin-giflossy";
 // import imageminWebp from "imagemin-webp";
 // import webp from "gulp-webp";
 
+const { domain, dist, assets, scss, js, img, raw, assetslist, autoPrefixerConf, cleanCSSConf } = require(root + "config");
 const production = !!yargs.argv.production;
-var paths = {};
 
 var serverCfg = {
     port: 9000,
-    /** @type {Boolean} Need proxy for multiple devices */
+    /** @type {Boolean} tunnel is proxy for multiple devices */
     tunnel: false,
     notify: false
 }
 
-paths.assets = [
-    { // fonts
-        src: dir + 'fonts/**/*',
-        dest: dist + 'fonts/'
-    },
-    { // jquery
-        src: './node_modules/jquery/dist/**/*',
-        dest: dist + assets + 'jquery/'
-    },
-    // { // fancybox
-    //     src: './node_modules/@fancyapps/fancybox/dist/**/*',
-    //     dest: dist + assets + 'fancybox/'
-    // },
-    { // slick
-        src: './node_modules/slick-carousel/slick/**/*',
-        dest: dist + assets + 'slick/',
-    },
-    // { // appear
-    //     './node_modules/appear/dist/**/*',
-    //     dist + assets + 'appear/'
-    // },
-    // { // lettering
-    //     './node_modules/lettering/dist/**/*',
-    //     dist + assets + 'lettering/'
-    // },
-    { // popper (Required for dropdowns)
-        src: './node_modules/popper.js/dist/umd/**/*',
-        dest: dir + assets + 'popper.js/'
-    },
-    { // botstrap scripts
-        src: './node_modules/bootstrap/js/dist/**/*',
-        dest: dir + assets + 'bootstrap/js/'
-    },
-    { // botstrap styles
-        src: './node_modules/bootstrap/scss/**/*',
-        dest: dir + assets + 'bootstrap/scss/'
-    },
-    { // hamburgers
-        src: './node_modules/hamburgers/_sass/hamburgers/**/*',
-        dest: dir + assets + 'hamburgers/'
-    },
-    // {
-    //     src: './node_modules/slick-carousel/slick/**/*',
-    //     dest: dir + assets + 'slick/'
-    // },
-];
+/** Prepare config paths */
+const imageSource = img + raw;
+const jsSource    = js + 'js/';
 
-paths.build = {
-    styles:   dist,
-    scripts:  dist + assets,
-    images:   dist + img,
-    sprites:  dist + img + "sprites/",
-    favicons: dist + img + "favicons/",
+const htmlExt = 'index.raw.html';
+const pugExt  = 'index.pug.html';
+const scssExt = '*.scss';
+const jsExt   = '*.js';
+const imgExt  = '*.{jpg,jpeg,png,gif,svg}';
+
+var paths = {
+    build: {
+        html:     dist,
+        pug:      dist,
+        styles:   dist,
+        scripts:  dist + assets,
+        images:   dist + img,
+        sprites:  dist + img + "sprites/",
+        favicons: dist + img + "favicons/",
+    },
+    src: {
+        html:     [ dist + '**/' + htmlExt ],
+        pug:      [ dist + '**/' + pugExt ],
+        styles:   [ dist + scss + '**/' + scssExt ],
+        scripts:  [ dist + jsSource + jsExt ],
+        images:   [ dist + imageSource + '**/' + imgExt ],
+        sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
+        favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
+    }
 };
 
-paths.src = {
-    php:      [dir + '**/*.php'],
-    html:     [dir + '**/index.htm'],
-    styles:   [dir + '*.scss', dir + scss + '**/*.scss'],
-    scripts:  [dir + js + raw + '*.js'],
-    images:   [dir + img + raw + '**/*.{jpg,jpeg,png,gif,svg}'],
-    sprites:  [dir + img + raw + 'icons/**/*.svg'],
-    favicons: [dir + img + raw + 'icons/favicon.{jpg,jpeg,png,gif,svg}'],
-};
+paths.watch = Object.assign({}, paths.src);
 
-paths.watch = {
-    php:      [dir + '**/*.php'],
-    html:     [dir + '**/index.htm'],
-    styles:   [dir + '*.scss', dir + scss + '**/*.scss'],
-    scripts:  [dir + js + raw + '*.js'],
-    images:   [dir + img + raw + '**/*.{jpg,jpeg,png,gif,svg}'],
-    sprites:  [dir + img + raw + 'icons/**/*.svg'],
-    favicons: [dir + img + raw + 'icons/favicon.{jpg,jpeg,png,gif,svg}'],
-};
+/** Exclude start dashes */
+paths.src.html.push   ('!'+ dist + '**/' + htmlExt);
+paths.src.pug.push    ('!'+ dist + '**/' + pugExt);
+paths.src.styles.push ('!'+ dist + scss + '**/_*.scss');
+paths.src.scripts.push('!'+ dist + jsSource + '_*.js');
 
-/**
- * Exclude start dashes
- */
-paths.src.styles.push ('!'+dir + scss + '**/_*.scss');
-paths.src.scripts.push('!'+dir + js + raw + '_*.js');
+/** Exclude assets */
+paths.src.html.push  ('!' + dist + assets + '**/*');
+paths.src.styles.push('!' + dist + assets + '**/*');
 
-/**
- * Exclude assets
- */
-paths.src.html.push  ('!' + dir + assets + '**/*');
-paths.src.styles.push('!' + dir + assets + '**/*');
-
-/**
- * Exclude rigger parts
- */
-paths.src.html.push  ('!'+dir + 'template-parts/**/*.{htm,html}');
-
-/**
- * Exclude to be compiled images
- */
+/** Exclude to be compiled images */
 paths.src.images.push('!' + paths.src.sprites);
 paths.src.images.push('!' + paths.src.favicons);
 
-
-/**
- * Style settings
- */
-const defAutoPrefArgs = {
-    browsers: ["last 12 versions", "> 1%", "ie 8", "ie 7"]
-};
-
-const defMinCssArgs = {
-    compatibility: "ie8",
-    level: {
-        1: {
-            specialComments: 0,
-            removeEmpty: true,
-            removeWhitespace: true
-        },
-        2: {
-            mergeMedia: true,
-            removeEmpty: true,
-            removeDuplicateFontRules: true,
-            removeDuplicateMediaBlocks: true,
-            removeDuplicateRules: true,
-            removeUnusedAtRules: false
-        }
-    },
-    rebase: false
-};
-
-// @warning do not change .html files (use htm) !! recursive updates !!
 export const html = () => src( paths.src.html, { allowEmpty: true })
     .pipe(rigger())
     .pipe(replace("@min", production ? ".min" : ''))
     .pipe(rename({
-        extname: ".html"
+        basename: "index"
     }))
-    .pipe(dest(dist))
+    .pipe(dest(paths.build.html))
     .pipe(debug({
         "title": "HTML files"
     }))
     .on("end", browsersync.reload);
 
-export const php = () => src( paths.src.php, { allowEmpty: true })
-    .pipe(dest(dist))
+export const buildPug = () => src( paths.src.pug, { allowEmpty: true })
+    .pipe(pug({
+        pretty: '    ',
+        basedir: dist
+    }))
+    .pipe(replace("@min", production ? ".min" : ''))
+    .pipe(rename({
+        basename: "index"
+    }))
+    .pipe(dest(paths.build.pug))
     .pipe(debug({
-        "title": "PHP files"
-    }));
+        "title": "HTML files"
+    }))
+    .on("end", browsersync.reload);
 
 export const styles = () => src(paths.src.styles, { allowEmpty: true })
     .pipe(plumber())
     // .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(sass())
     .pipe(groupmediaqueries())
-    .pipe(gulpif(production, autoprefixer(defAutoPrefArgs)))
+    .pipe(gulpif(production, autoprefixer(autoPrefixerConf)))
     .pipe(gulpif(!production, browsersync.stream()))
-    .pipe(gulpif(production, mincss(defMinCssArgs)))
+    .pipe(gulpif(production, mincss(cleanCSSConf)))
     .pipe(gulpif(production, rename({ suffix: ".min" })))
     .pipe(plumber.stop())
     // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
@@ -217,24 +135,6 @@ export const styles = () => src(paths.src.styles, { allowEmpty: true })
         "title": "CSS files"
     }))
     .on("end", () => production || '' == domain ? browsersync.reload : null);
-
-export const stylesAssets = () => src([dir + assets + '*.scss', '!' + dir + assets + '_*.scss'], { allowEmpty: true })
-    .pipe(plumber())
-    // .pipe(gulpif(!production, sourcemaps.init()))
-    .pipe(sass())
-    // .pipe(groupmediaqueries())
-    .pipe(gulpif(production, autoprefixer(defAutoPrefArgs)))
-    .pipe(gulpif(production, mincss(defMinCssArgs)))
-    .pipe(gulpif(production, rename({
-        suffix: ".min"
-    })))
-    .pipe(plumber.stop())
-    // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
-    .pipe(dest(dist + assets))
-    .pipe(debug({
-        "title": "CSS files"
-    }))
-    .on("end", () => browsersync.reload);
 
 export const scripts = () => src(paths.src.scripts, { allowEmpty: true })
     .pipe(plumber())
@@ -309,13 +209,34 @@ export const favs = () => src(paths.src.favicons, { allowEmpty: true })
         "title": "Favicons"
     }));
 
+/**
+ * Assets
+ */
+export const compileAssetsStyle = () => src([dist + assets + '*.scss', '!' + dist + assets + '_*.scss'], { allowEmpty: true })
+    .pipe(plumber())
+    // .pipe(gulpif(!production, sourcemaps.init()))
+    .pipe(sass())
+    // .pipe(groupmediaqueries())
+    .pipe(gulpif(production, autoprefixer(autoPrefixerConf)))
+    .pipe(gulpif(production, mincss(cleanCSSConf)))
+    .pipe(gulpif(production, rename({
+        suffix: ".min"
+    })))
+    .pipe(plumber.stop())
+    // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
+    .pipe(dest(dist + assets))
+    .pipe(debug({
+        "title": "CSS files"
+    }))
+    .on("end", () => browsersync.reload);
+
 export const moveAssets = (e) => {
-    paths.assets.forEach(function(item, i, arr) {
+    assetslist.forEach(function(item, i, arr) {
         src(item.src, { allowEmpty: true })
             .pipe(newer(item.dest))
             .pipe(dest(item.dest))
             .pipe(debug({
-                "title": "Assets"
+                "title": item.name
             }));
     });
 
@@ -335,14 +256,13 @@ export const server = () => {
 
 export const watchCode = () => {
     watch(paths.watch.html,    html);
+    watch(paths.watch.pug,     buildPug);
     watch(paths.watch.styles,  styles);
     watch(paths.watch.scripts, scripts);
     watch(paths.watch.images,  images);
-
-    // if(additionalWatch) additionalWatch();
 };
 
-export const source = parallel(html, php);
+export const source = parallel(html, buildPug);
 
 /**
  * Move assets
@@ -352,7 +272,7 @@ export const install = series(moveAssets);
 /**
  * Build and stop
  */
-export const build = series(stylesAssets, parallel(source, styles, scripts, favs, images));
+export const build = series(compileAssetsStyle, parallel(source, styles, scripts, favs, images));
 
 /**
  * Build and continue with watcher
