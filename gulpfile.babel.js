@@ -234,7 +234,7 @@ export const moveAssets = (e) => {
     assetslist.forEach(function(item, i, arr) {
         src(item.src, { allowEmpty: true })
             .pipe(newer(item.dest))
-            .pipe(dest(item.dest))
+            .pipe(dest(dist + assets + raw + item.dest))
             .pipe(debug({
                 "title": item.name
             }));
