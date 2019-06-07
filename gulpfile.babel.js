@@ -47,7 +47,7 @@ var serverCfg = {
 
 /** Prepare config paths */
 const imageSource = img + raw;
-const jsSource    = js + 'js/';
+const jsSource    = js  + raw;
 
 const htmlExt = 'index.raw.html';
 const pugExt  = 'index.pug.html';
@@ -79,10 +79,10 @@ var paths = {
 paths.watch = Object.assign({}, paths.src);
 
 /** Exclude start dashes */
-paths.src.html.push   ('!'+ dist + '**/' + htmlExt);
-paths.src.pug.push    ('!'+ dist + '**/' + pugExt);
-paths.src.styles.push ('!'+ dist + scss + '**/_*.scss');
-paths.src.scripts.push('!'+ dist + jsSource + '_*.js');
+paths.src.html.push   ('!' + dist + '**/_' + htmlExt);
+paths.src.pug.push    ('!' + dist + '**/_' + pugExt);
+paths.src.styles.push ('!' + dist + scss + '**/_' + scssExt);
+paths.src.scripts.push('!' + dist + jsSource + '**/_' + jsExt);
 
 /** Exclude assets */
 paths.src.html.push  ('!' + dist + assets + '**/*');
