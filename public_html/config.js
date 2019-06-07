@@ -5,7 +5,7 @@ export const domain = '';
 
 /** {String} Path to the root directory */
 export const dir   = './source/';
-export const dist = './public_html/wp-content/themes/project/';
+export const dist = './public_html/';
 
 export const assets = 'assets/';
 export const scss   = 'scss/';
