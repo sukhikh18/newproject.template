@@ -92,7 +92,7 @@ paths.src.styles.push('!' + dist + assets + '**/*');
 paths.src.images.push('!' + paths.src.sprites);
 paths.src.images.push('!' + paths.src.favicons);
 
-export const html = () => src( paths.src.html, { allowEmpty: true })
+export const buildHtml = () => src( paths.src.html, { allowEmpty: true })
     .pipe(rigger())
     .pipe(replace("@min", production ? ".min" : ''))
     .pipe(rename({
@@ -119,7 +119,7 @@ export const buildPug = () => src( paths.src.pug, { allowEmpty: true })
     }))
     .on("end", browsersync.reload);
 
-export const styles = () => src(paths.src.styles, { allowEmpty: true })
+export const buildStyles = () => src(paths.src.styles, { allowEmpty: true })
     .pipe(plumber())
     // .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(sass())
@@ -136,22 +136,23 @@ export const styles = () => src(paths.src.styles, { allowEmpty: true })
     }))
     .on("end", () => production || '' == domain ? browsersync.reload : null);
 
-export const scripts = () => src(paths.src.scripts, { allowEmpty: true })
+export const buildScripts = () => src(paths.src.scripts, { allowEmpty: true })
     .pipe(plumber())
-    .pipe(rigger())
+    // .pipe(rigger())
     .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(gulpif(production, uglify()))
     .pipe(gulpif(production, rename({
         suffix: ".min"
     })))
     .pipe(gulpif(!production, sourcemaps.write("./maps/")))
+    // .pipe(plumber.stop())
     .pipe(dest(paths.build.scripts))
     .pipe(debug({
         "title": "JS files"
     }))
     .on("end", browsersync.reload);
 
-export const images = () => src(paths.src.images, { allowEmpty: true })
+export const buildImages = () => src(paths.src.images, { allowEmpty: true })
     .pipe(newer(paths.build.images))
     .pipe(gulpif(production, imagemin([
         imageminGiflossy({
@@ -189,7 +190,7 @@ export const images = () => src(paths.src.images, { allowEmpty: true })
     }))
     .on("end", browsersync.reload);
 
-export const favs = () => src(paths.src.favicons, { allowEmpty: true })
+export const buildFavs = () => src(paths.src.favicons, { allowEmpty: true })
     .pipe(newer(paths.build.favicons))
     .pipe(favicons({
         icons: {
@@ -212,7 +213,7 @@ export const favs = () => src(paths.src.favicons, { allowEmpty: true })
 /**
  * Assets
  */
-export const compileAssetsStyle = () => src([dist + assets + '*.scss', '!' + dist + assets + '_*.scss'], { allowEmpty: true })
+export const buildAssetsStyle = () => src([dist + assets + '*.scss', '!' + dist + assets + '_*.scss'], { allowEmpty: true })
     .pipe(plumber())
     // .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(sass())
@@ -255,14 +256,14 @@ export const server = () => {
 };
 
 export const watchCode = () => {
-    watch(paths.watch.html,    html);
+    watch(paths.watch.html,    buildHtml);
     watch(paths.watch.pug,     buildPug);
-    watch(paths.watch.styles,  styles);
-    watch(paths.watch.scripts, scripts);
-    watch(paths.watch.images,  images);
+    watch(paths.watch.styles,  buildStyles);
+    watch(paths.watch.scripts, buildScripts);
+    watch(paths.watch.images,  buildImages);
 };
 
-export const source = parallel(html, buildPug);
+export const buildSource = parallel(buildHtml, buildPug);
 
 /**
  * Move assets
@@ -272,7 +273,7 @@ export const install = series(moveAssets);
 /**
  * Build and stop
  */
-export const build = series(compileAssetsStyle, parallel(source, styles, scripts, favs, images));
+export const build = series(buildAssetsStyle, parallel(buildSource, buildStyles, buildScripts, buildFavs, buildImages));
 
 /**
  * Build and continue with watcher

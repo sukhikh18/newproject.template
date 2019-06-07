@@ -7,25 +7,38 @@ jQuery(document).ready(function($) {
         countTo: false, // || '.counter',
     }
 
-    // Do you want some animate?
-    // new WOW().init();
-
     if( Plugins.appearJs ) {
-        if( Plugins.countTo ) {
-            $( Plugins.countTo ).appear();
-            $( Plugins.countTo ).on("appear", function(event, $all_appeared_elements) {
-                if( ! $(this).data("appeared") )
-                    $(this).countTo();
+        appear({
+            init: function init() {
+                console.log('dom is ready');
+            },
+            elements: function elements() {
+                return document.getElementsByClassName('appear');
+            },
+            appear: function appear(el) {
+                if( !$(el).hasClass('appeared') ) {
+                    var appear = $(el).data('appear') || 0;
 
-                $(this).data("appeared", 1);
-            });
-            // $(Plugins.countTo).on('disappear', function(event, $all_disappeared_elements) {
-            // });
-        }
+                    $(el).data('appear', appear++).addClass('appeared');
+
+                    if( appear <= 1 ) {
+                        $( Plugins.countTo ).countTo();
+                    }
+                }
+            },
+            disappear: function disappear(el) {
+                $(el).removeClass('appeared');
+            },
+            bounds: 200,
+            reappear: true
+        });
     }
     else if( Plugins.countTo ) {
         $( Plugins.countTo ).countTo();
     }
+
+    // Do you want some animate?
+    // new WOW().init();
 
     window.scrollTo = function(selector, topOffset, delay) {
         if( !selector || selector.length <= 1 ) return;
@@ -52,7 +65,7 @@ jQuery(document).ready(function($) {
      * Fancybox preloader
      */
     var preloaderClass = 'fb-loading';
-    window.showPreloader = function( message ) {
+    window.showPreloader = function( message, timeout ) {
         if( !$.fancybox ) return false;
         if(!message) message = 'Загрузка..';
         var $preload = $('<p>'+ message +'</p>').css({
@@ -61,8 +74,6 @@ jQuery(document).ready(function($) {
             'padding-bottom': '',
             'color': '#ddd'
         });;
-
-        var $body = $('body');
 
         $.fancybox.open({
             content  : $preload,
@@ -73,114 +84,76 @@ jQuery(document).ready(function($) {
                 $('.fancybox-content', instance.$refs['fancybox-stage']).css('background', 'none');
             },
             afterShow: function(instance, current) {
-                $body.addClass(preloaderClass);
+                $('body').addClass(preloaderClass);
                 instance.showLoading( current );
             },
             afterClose: function(instance, current) {
-                $body.removeClass(preloaderClass);
+                $('body').removeClass(preloaderClass);
                 instance.hideLoading( current );
             }
         });
+
+        if( timeout ) { setTimeout(function() { window.hidePreloader(); }, timeout); }
     };
 
     window.hidePreloader = function() {
         if( !$.fancybox ) return false;
-        var $body = $('body');
 
-        if( $body.hasClass(preloaderClass) ) {
+        if( $('body').hasClass(preloaderClass) ) {
             $.fancybox.getInstance().close();
         }
     };
 
     /********************************* Slick **********************************/
-    window.slickSlider = function(target, props) {
-        var _defaults = {
+
+    window.slickResponsive = function(selector, args) {
+        /** Const  add class on init */
+        var initClass = 'initialized';
+
+        /** Object  jQuery instance */
+        var $instance = $( selector );
+
+        /** Object array-like */
+        var params = {
+            infinite: true,
             autoplay: true,
             autoplaySpeed: 4000,
-            dots: true,
-            infinite: false,
+            arrows: true,
+            dots: false,
             slidesToShow: 4,
-            slidesToScroll: 4,
-            responsive: [
-            {
-                breakpoint: 576,
-                settings: {}
-            },
-            ]
+            slidesToScroll: 1,
         };
 
-        try {
-            if( !props ) props = {};
-            this.props = Object.assign(_defaults, props);
-        } catch(e) {
-            console.log('Init props is demaged.');
-            this.props = _defaults;
-        }
+        $.each(args, function(index, val) {
+            params[ index ] = val;
+        });
 
-        this.$slider = $( target );
-        this.isInit = false;
-    }
-
-    window.slickSlider.prototype = {
-        init: function( minWidth ) {
-            if( !this.$slider.length ) return false;
-
-            try {
-                if( !this.isInit ) {
-                    if( undefined !== this.$slider.slick ) {
-                        this.$slider.slick( this.props );
-                        this.isInit = this.$slider.hasClass('slick-initialized');
-                    }
-                    else {
-                        console.error('Slick library is not available!');
-                    }
+        $(window).on('resize', function(e) {
+            if( 768 > $(window).width() ) {
+                /** Is not inited */
+                if( !$instance.hasClass( initClass ) ) {
+                    $instance.slick( params ).addClass( initClass );
                 }
-            } catch(e) {
-                console.error(e);
             }
-        },
-        responsive: function( minWidth ) {
-            var self = this;
-
-            if( !minWidth ) minWidth = 992;
-            if( !this.$slider.length ) return false;
-
-            $(window).on('load resize', function(e) {
-                if( minWidth < $(window).width() ) {
-                    if( self.isInit ) {
-                        self.$slider.slick('unslick');
-                        self.isInit = false;
-                    }
+            else {
+                if( $instance.hasClass( initClass ) ) {
+                    $instance.slick('unslick').removeClass( initClass );
                 }
-                else {
-                    self.init();
-                }
-            });
-        }
-    };
-
-    var slick = new slickSlider('.slider', {slidesToShow: 3, slidesToScroll: 1, responsive: [{
-            breakpoint: 576,
-            settings: {
-                slidesToShow: 1
             }
-        }]});
-    slick.responsive();
+        });
 
-    /********************************* Custom *********************************/
-    // On front page only
-    if( 3 == window.location.href.match(/\//g).length ) {
-        // Preloader demonstration
-        showPreloader( 'What is love?' );
-
-        // Hide after 3 sec
         setTimeout(function() {
-            hidePreloader();
-
-            // $.fancybox.open({
-            //     content  : 'Hello world!',
-            //     type     : 'html',
-            // });
-        }, 3000);
+            $(window).trigger('resize');
+        }, 500);
     }
+
+    slickResponsive('.slick', {
+        dots: true,
+        responsive: [
+        {
+            breakpoint: 576,
+            settings: {}
+        },
+        ]
+    });
 });
