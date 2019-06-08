@@ -42,22 +42,22 @@ export const assetslist = [
     { // (Required for bootstrap dropdowns)
         name: 'Popper',
         src: './node_modules/popper.js/dist/umd/**/*',
-        dest: 'popper.js/'
+        dest: raw + 'popper.js/'
     },
     {
         name: 'Botstrap js',
         src: './node_modules/bootstrap/js/dist/**/*',
-        dest: 'bootstrap/js/'
+        dest: raw + 'bootstrap/js/'
     },
     {
         name: 'Botstrap scss',
         src: './node_modules/bootstrap/scss/**/*',
-        dest: 'bootstrap/scss/'
+        dest: raw + 'bootstrap/scss/'
     },
     {
         name: 'Hamburgers',
         src: './node_modules/hamburgers/_sass/hamburgers/**/*',
-        dest: 'hamburgers/'
+        dest: raw + 'hamburgers/'
     },
 ];
 

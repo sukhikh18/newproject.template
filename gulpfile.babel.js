@@ -234,8 +234,8 @@ export const buildAssetsStyle = () => src([dist + assets + raw + '*.scss', '!' +
 export const moveAssets = (e) => {
     assetslist.forEach(function(item, i, arr) {
         src(item.src, { allowEmpty: true })
-            .pipe(newer(dist + assets + raw + item.dest))
-            .pipe(dest(dist + assets + raw + item.dest))
+            .pipe(newer(dist + assets + item.dest))
+            .pipe(dest(dist + assets + item.dest))
             .pipe(debug({
                 "title": item.name
             }));
