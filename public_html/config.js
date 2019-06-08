@@ -59,6 +59,16 @@ export const assetslist = [
         src: './node_modules/hamburgers/_sass/hamburgers/**/*',
         dest: raw + 'hamburgers/'
     },
+    {
+        name: 'Animatewithsass',
+        src: './node_modules/animatewithsass/**/*',
+        dest: 'animatewithsass/'
+    },
+    {
+        name: 'Swiper',
+        src: './node_modules/swiper/dist/**/*',
+        dest: 'swiper/'
+    },
 ];
 
 export const autoPrefixerConf = {
