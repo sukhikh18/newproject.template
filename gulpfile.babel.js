@@ -73,10 +73,17 @@ var paths = {
         images:   [ dist + imageSource + '**/' + imgExt ],
         sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
         favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
+    },
+    watch: {
+        html:     [ dist + '**/' + htmlExt ],
+        pug:      [ dist + '**/' + pugExt ],
+        styles:   [ dist + scss + '**/' + scssExt ],
+        scripts:  [ dist + jsSource + jsExt ],
+        images:   [ dist + imageSource + '**/' + imgExt ],
+        sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
+        favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
     }
 };
-
-paths.watch = Object.assign({}, paths.src);
 
 /** Exclude start dashes */
 paths.src.html.push   ('!' + dist + '**/_' + htmlExt);
