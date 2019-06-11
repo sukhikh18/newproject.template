@@ -20,12 +20,12 @@ export const assetslist = [
         dest: 'jquery/'
     },
     {
-        name: 'Fancybox',
+        name: '@Fancyapps/fancybox',
         src: './node_modules/@fancyapps/fancybox/dist/**/*',
         dest: 'fancybox/'
     },
     {
-        name: 'Slick',
+        name: 'Slick-carousel',
         src: './node_modules/slick-carousel/slick/**/*',
         dest: 'slick/',
     },
@@ -40,7 +40,7 @@ export const assetslist = [
         dest: 'lettering/'
     },
     { // (Required for bootstrap dropdowns)
-        name: 'Popper',
+        name: 'Popper.js',
         src: './node_modules/popper.js/dist/umd/**/*',
         dest: raw + 'popper.js/'
     },
