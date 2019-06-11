@@ -4,7 +4,7 @@
 export const domain = '';
 
 /** {String} Path to the root directory */
-export const dir   = './source/';
+export const dir   = './public_html/';
 export const dist = './public_html/';
 
 export const assets = 'assets/';
