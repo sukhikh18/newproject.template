@@ -145,7 +145,7 @@ export const buildStyles = () => src(paths.src.styles, { allowEmpty: true })
 
 export const buildScripts = () => src(paths.src.scripts, { allowEmpty: true })
     .pipe(plumber())
-    // .pipe(rigger())
+    .pipe(rigger())
     .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(gulpif(production, uglify()))
     .pipe(gulpif(production, rename({
