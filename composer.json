@@ -1,12 +1,20 @@
 {
     "name": "nickolays93/project",
-    "require": {
-        "phpmailer/phpmailer": "^6.0"
-    },
+    "description": "",
     "authors": [
         {
             "name": "NikolayS93",
             "email": "nikolays93@ya.ru"
         }
-    ]
+    ],
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/nikolays93/PHPMailInterface"
+        }
+    ],
+    "require": {
+        "phpmailer/phpmailer": "^6.0",
+        "nikolays93/phpmailinterface": "dev-master"
+    }
 }
