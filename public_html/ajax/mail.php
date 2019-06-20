@@ -9,68 +9,81 @@ require __DIR__ . '/../../vendor/autoload.php';
 $is_spam = !empty($_POST["surname"]);
 if( $is_spam ) { header($_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden', true, 403); die(); }
 
-$MailI = new PHPMailInterface();
+$Maili = PHPMailInterface::getInstance( true );
 
 /**
  * User Name who sent message: %s <no-reply@domain.ltd>
  */
-$MailI->fromName = 'Администратор';
+$Maili->fromName = 'Администратор сайта';
 
 /**
  * Mail subject
  */
-$MailI->Subject = 'Сообщение с сайта';
+$Maili->Subject = 'Сообщение с сайта';
 
 /**
  * Address where to send the message
  */
-$MailI->addAddress('izh-host@ya.ru');
+$Maili->addAddress('izh-host@ya.ru');
 
 /**
  * Mail carbon copy
  */
-$MailI->addCC('trashmailsizh@yandex.ru');
+$Maili->addCC('trashmailsizh@ya.ru');
 
-$this->addField('your-org',  'Организация');
+/**
+ * Add new field
+ * @param $key
+ * @param $fieldName
+ */
+$Maili->addField( 'advanced', 'Тестовое поле', 'validateAdvanced' );
+function validateAdvanced( $value, $fieldname ) {
+    $Maili = PHPMailInterface::getInstance();
+
+    if( strlen($value) < 10 ) {
+        $Maili->addError("Поле \"$fieldname\" должно содержать не менее 10 символов.");
+    }
+
+    return "\r\n" . $fieldname;
+}
 
 /**
  * Field with this key must be filled
  */
-$MailI->setRequired('your-phone');
+$Maili->setRequired('your-phone');
+$Maili->setRequired('advanced');
 
 /**
  * @var array List field key => sanitized requested value
  */
-$fields = $MailI->getFields();
+$fields = $Maili->getFields();
 
 /**
  * @var array List field key => field name (title/label)
  */
-$fieldNames = $MailI->getFieldNames();
+$fieldNames = $Maili->getFieldNames();
 
 /**
  * Message is HTML
  */
-// $MailI->isHTML(true);
-
-$MailI->Body = 'Вы получили это письмо, потому что на вашем сайте кто то оставил заявку:' . "\r\n\r\n";
+// $Maili->isHTML(true);
 
 /**
  * Collect information on email body
  */
 foreach ($fields as $key => $value)
 {
-    if( $value ) $MailI->Body.= $fieldNames[$key] . ": $value\r\n";
+    if( $value ) $Maili->Body.= $fieldNames[$key] . ": $value\r\n";
 }
 
 /**
  * Technical additional information
  */
-if( $MailI->Body ) {
-    $MailI->Body.= "\r\n";
-    $MailI->Body.= "URI запроса: ". $_SERVER['REQUEST_URI'] . "\r\n";
-    $MailI->Body.= "URL источника запроса: ". str_replace($MailI::$protocol . ':', '', $_SERVER['HTTP_REFERER']) . "\r\n";
+if( $Maili->Body ) {
+    $Maili->Body.= "\r\n";
+    $Maili->Body.= "URI запроса: ". $_SERVER['REQUEST_URI'] . "\r\n";
+    $Maili->Body.= "URL источника запроса: ". str_replace($Maili::$protocol . ':', '', $_SERVER['HTTP_REFERER']) . "\r\n";
 }
 
-$MailI->sendMail();
-$MailI->showResult();
+$Maili->sendMail();
+$Maili->showResult();
