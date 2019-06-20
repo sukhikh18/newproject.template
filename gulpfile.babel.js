@@ -1,5 +1,8 @@
 "use strict";
 
+/** @type {String} For use proxy */
+const domain = '';
+
 const root = './public_html/';
 
 // import webpack from "webpack";
@@ -35,7 +38,7 @@ import imageminGiflossy from "imagemin-giflossy";
 // import imageminWebp from "imagemin-webp";
 // import webp from "gulp-webp";
 
-const { domain, dist, assets, scss, js, img, raw, assetslist, autoPrefixerConf, cleanCSSConf } = require(root + "config");
+const { dir, dist, assets, scss, js, img, raw, assetslist, autoPrefixerConf, cleanCSSConf } = require(root + "config");
 const production = !!yargs.argv.production;
 
 var serverCfg = {
@@ -66,22 +69,22 @@ var paths = {
         favicons: dist + img + "favicons/",
     },
     src: {
-        html:     [ dist + '**/' + htmlExt ],
-        pug:      [ dist + '**/' + pugExt ],
-        styles:   [ dist + scss + '**/' + scssExt ],
-        scripts:  [ dist + jsSource + jsExt ],
-        images:   [ dist + imageSource + '**/' + imgExt ],
-        sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
-        favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
+        html:     [ dir + '**/' + htmlExt ],
+        pug:      [ dir + '**/' + pugExt ],
+        styles:   [ dir + scss + '**/' + scssExt ],
+        scripts:  [ dir + jsSource + jsExt ],
+        images:   [ dir + imageSource + '**/' + imgExt ],
+        sprites:  [ dir + imageSource + 'icons/**/*.svg' ],
+        favicons: [ dir + imageSource + 'icons/favicon.' + imgExt ],
     },
     watch: {
-        html:     [ dist + '**/' + htmlExt ],
-        pug:      [ dist + '**/' + pugExt ],
-        styles:   [ dist + scss + '**/' + scssExt ],
-        scripts:  [ dist + jsSource + jsExt ],
-        images:   [ dist + imageSource + '**/' + imgExt ],
-        sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
-        favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
+        html:     [ dir + '**/' + htmlExt ],
+        pug:      [ dir + '**/' + pugExt ],
+        styles:   [ dir + scss + '**/' + scssExt ],
+        scripts:  [ dir + jsSource + jsExt ],
+        images:   [ dir + imageSource + '**/' + imgExt ],
+        sprites:  [ dir + imageSource + 'icons/**/*.svg' ],
+        favicons: [ dir + imageSource + 'icons/favicon.' + imgExt ],
     }
 };
 

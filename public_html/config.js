@@ -1,8 +1,5 @@
 "use strict";
 
-/** @type {String} For use proxy */
-export const domain = '';
-
 /** {String} Path to the root directory */
 export const dir   = './public_html/';
 export const dist = './public_html/';

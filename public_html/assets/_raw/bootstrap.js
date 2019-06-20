@@ -1,4 +1,4 @@
-//= popper.js/popper.js
+//= popper-js/popper.js
 
 //= bootstrap/js/util.js
 //  bootstrap/js/alert.js
