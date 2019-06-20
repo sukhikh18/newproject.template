@@ -1,25 +1,13 @@
-
 $spacer: 1rem !default;
 
-$media-sm: 576px !default;
-$media-md: 768px !default;
-$media-lg: 992px !default;
-$media-xl: 1200px !default;
-$media-hd: 1440px !default;
-$media-fhd: 1620px !default;
+// .full {
+//     max-width: 9999px !important;
+// }
 
-.full {
-    max-width: 9999px !important;
-}
-
-.wide {
-    max-width: 9999px !important;
-    width: 100%;
-}
-
-.no-underline { &, &:hover, &:focus {
-    text-decoration: none;
-} }
+// .wide {
+//     max-width: 9999px !important;
+//     width: 100%;
+// }
 
 .clear-list {
     list-style: none;
@@ -37,6 +25,13 @@ $media-fhd: 1620px !default;
 
 //
 // Aligments
+//
+.fll, .float-left, .pull-left { float: left !important; }
+.flr, .float-right, .pull-right { float: right !important; }
+.fln, .float-none, .pull-none  { float: none !important; }
+
+//
+// Wordpress required
 //
 .alignleft, .al, .alignright, .ar {
     display: inline;
@@ -59,10 +54,6 @@ $media-fhd: 1620px !default;
     margin-left: auto;
     margin-right: auto;
 }
-
-.fll, .float-left, .pull-left { float: left !important; }
-.flr, .float-right, .pull-right { float: right !important; }
-.fln, .float-none, .pull-none  { float: none !important; }
 
 //
 // Compatibility only

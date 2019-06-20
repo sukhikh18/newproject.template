@@ -1,0 +1,303 @@
+$vw-fallback: false;
+
+$media-hd: 1680px !default;
+
+$tpl-sm: 320px;
+$tpl-md: $media-md;
+$tpl-lg: $media-lg;
+$tpl-xl: $media-xl;
+$tpl-hd: 1920px;
+
+//  strip units helper function
+@function num($input) {
+    @return $input/($input * 0 + 1);
+}
+
+$wsm: (1 / (num($tpl-sm) * 0.01)) * 1vw;
+$wmd: (1 / (num($tpl-md) * 0.01)) * 1vw;
+$wlg: (1 / (num($tpl-lg) * 0.01)) * 1vw;
+$wxl: (1 / (num($tpl-xl) * 0.01)) * 1vw;
+$whd: (1 / (num($tpl-hd) * 0.01)) * 1vw;
+
+//
+// Media Quires
+//
+@mixin from($min_width) {
+    @media screen and (min-width: $min_width + .02) {
+        @content;
+    }
+}
+
+@mixin to($max_width) {
+    @media screen and (max-width: $max_width) {
+        @content;
+    }
+}
+
+@mixin from-to($min_width, $max_width) {
+    @media screen and (min-width: $min_width + .02) and (max-width: $max_width) {
+        @content;
+    }
+}
+
+@mixin to-from($max_width, $min_width) {
+    @media screen and (max-width: $max_width) and (min-width: $min_width + .02) {
+        @content;
+    }
+}
+
+@mixin vw-hd( $context, $value ) {
+    @if $vw-fallback { #{$context}: $value; }
+    #{$context}: num($value) * $whd;
+}
+
+@mixin vw-xl( $context, $value ) {
+    @if $vw-fallback { #{$context}: $value; }
+    #{$context}: num($value) * $wxl;
+}
+
+@mixin vw-lg( $context, $value ) {
+    @if $vw-fallback { #{$context}: $value; }
+    #{$context}: num($value) * $wlg;
+}
+
+@mixin vw-md( $context, $value ) {
+    @if $vw-fallback { #{$context}: $value; }
+    #{$context}: num($value) * $wmd;
+}
+
+@mixin vw-sm( $context, $value ) {
+    @if $vw-fallback { #{$context}: $value; }
+    #{$context}: num($value) * $wsm;
+}
+
+@mixin vw-font( $size-from, $size-to: null, $min: $media-lg, $max: $media-xl ) {
+    font-size: $size-from;
+
+    @if $size-to {
+        // stretch font size from
+        @include from( $min ) {
+            font-size: calc(
+                #{$size-from} +
+                #{num($size-to) - num($size-from)} *
+                (100vw - #{$min}) /
+                #{num($max) - num($min)}
+            );
+        }
+
+        // ..to
+        @include from( $max ) {
+            font-size: $size-to;
+        }
+    }
+}
+
+@mixin vw( $context, $value-hd, $value-lg: $value-hd, $value-sm: $value-hd ) {
+    @if $value-hd {
+        @include vw-hd( $context, $value-hd );
+
+        // @if $media-hd {
+        //     @include to( $media-hd ) {
+        //         @include vw-hd( $context, $value-hd );
+        //     }
+        // }
+    }
+
+    @if $value-lg {
+        @include to( $media-lg ) {
+            @include vw-lg($context, $value-lg);
+        }
+    }
+
+    @if $media-sm {
+        @include to( $media-sm ) {
+            @include vw-sm($context, $value-sm);
+        }
+    }
+}
+
+@mixin vw-asc( $context, $value-sm, $value-md: $value-sm, $value-lg: $value-md, $value-xl: $value-lg, $value-hd: $value-xl ) {
+    @if $value-sm {
+        @include vw-sm( $context, $value-sm );
+    }
+
+    @if $value-md {
+        @include from( $media-sm ) {
+            @include vw-md( $context, $value-md );
+        }
+    }
+
+    @if $value-lg {
+        @include from( $media-md ) {
+            @include vw-lg( $context, $value-lg );
+        }
+    }
+
+    @if $value-xl {
+        @include from( $media-lg ) {
+            @include vw-xl( $context, $value-xl );
+        }
+    }
+
+    @if $value-hd {
+        @include from( $media-xl ) {
+            @include vw-hd( $context, $value-hd );
+        }
+    }
+}
+
+@mixin vw-desc( $context, $value-sm, $value-md: $value-sm, $value-lg: $value-md, $value-xl: $value-lg, $value-hd: $value-xl ) {
+    @if $value-hd {
+        // @todo think about it (check this)
+        // #{$context}: $value-hd;
+        // @if $media-hd {
+        //     @include to( $media-hd ) {
+        @include vw-hd( $context, $value-hd );
+        //     }
+        // }
+    }
+
+    @if $value-xl {
+        @include to( $media-xl ) {
+            @include vw-xl( $context, $value-xl );
+        }
+    }
+
+    @if $value-lg {
+        @include to( $media-lg ) {
+            @include vw-lg( $context, $value-lg );
+        }
+    }
+
+    @if $value-md {
+        @include to( $media-md ) {
+            @include vw-md( $context, $value-md );
+        }
+    }
+
+    @if $value-sm {
+        @include vw-sm( $context, $value-sm );
+    }
+}
+
+//
+// Blocks
+//
+// Define vertical, horizontal, or both ABSOLUTE* position
+// * Must be in absolute or relative parent
+//
+@mixin absolute-center($position: both) {
+    position: absolute;
+
+    @if $position == 'vertical' {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    @else if $position == 'horizontal' {
+        left: 50%;
+        transform: translate(-50%);
+    }
+    @else if $position == 'both' {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+//
+// Images
+//
+$retina: "only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2/1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx)";
+@mixin retina-background-image($file, $type, $width, $height) {
+    background-image: url($file + '.' + $type);
+    @media #{$retina} {
+        background-image: url($file + '@2x.' + $type);
+        background-size: $width $height;
+    }
+}
+
+@mixin circle() {
+    overflow: hidden;
+    border-radius: 50%;
+
+    img {
+        clip-path: circle(50% at 50% 50%);
+    }
+}
+
+//
+// Advance
+// Are you need this?
+//
+@mixin columns( $count: 2 ) {
+    column-count: $count;
+
+    > div, li {
+        display: inline-block;
+        position: relative;
+        width: 100%;
+    }
+}
+
+@mixin two-columns($direct: horizontal, $min-media: $media-xl) {
+    @media screen and (min-width: $min-media) {
+        @if $direct == vertical {
+            @include columns(2);
+        }
+        @else {
+            position: relative;
+            overflow: hidden;
+
+            > div, li {
+                float: left;
+                width: 49%;
+
+                &:nth-child(2n+1) {
+                    clear: both;
+                }
+                &:nth-child(2n+2) {
+                    float: right;
+                }
+            }
+        }
+    }
+}
+@mixin scale($max-width: 100%, $max-width-hover: 120%, $transition: .25s ease) {
+    & {
+        > img {
+            max-width: $max-width;
+            width: 999%;
+            transition: $transition max-width;
+
+            &:hover {
+                max-width: $max-width-hover;
+            }
+        }
+    }
+
+    .touch & {
+        > img {
+            max-width: $max-width-hover;
+        }
+    }
+}
+
+@mixin thumbnail-center($width, $height) {
+    & {
+        position: relative;
+
+        @if $width {
+            width: $width;
+        }
+
+        @if $height {
+            height: $height;
+        }
+    }
+
+    > img {
+        display: block;
+        width: 100%;
+        @include absolute-center();
+    }
+}
