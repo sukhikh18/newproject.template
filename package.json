@@ -10,6 +10,7 @@
 	"scripts": {
 		"dev": "gulp",
 		"prod": "gulp build --production",
+		"tunnel": "gulp run tunnel",
 		"install": "gulp install"
 	},
 	"devDependencies": {

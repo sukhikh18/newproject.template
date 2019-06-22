@@ -1,9 +1,7 @@
 "use strict";
 
-/** @type {String} For use proxy */
-const domain = '';
-
 const root = './public_html/';
+const subDomain = 'nikolays93';
 
 // import webpack from "webpack";
 // import webpackStream from "webpack-stream";
@@ -38,15 +36,9 @@ import imageminGiflossy from "imagemin-giflossy";
 // import imageminWebp from "imagemin-webp";
 // import webp from "gulp-webp";
 
-const { dir, dist, assets, scss, js, img, raw, assetslist, autoPrefixerConf, cleanCSSConf } = require(root + "config");
+const { domain, dir, dist, assets, scss, js, img, raw, assetslist, autoPrefixerConf, cleanCSSConf } = require(root + "config");
 const production = !!yargs.argv.production;
-
-var serverCfg = {
-    port: 9000,
-    /** @type {Boolean} tunnel is proxy for multiple devices */
-    tunnel: false,
-    notify: false
-}
+const tunnel = !!yargs.argv.tunnel;
 
 /** Prepare config paths */
 const imageSource = img + raw;
@@ -69,22 +61,22 @@ var paths = {
         favicons: dist + img + "favicons/",
     },
     src: {
-        html:     [ dir + '**/' + htmlExt ],
-        pug:      [ dir + '**/' + pugExt ],
-        styles:   [ dir + scss + '**/' + scssExt ],
-        scripts:  [ dir + jsSource + jsExt ],
-        images:   [ dir + imageSource + '**/' + imgExt ],
-        sprites:  [ dir + imageSource + 'icons/**/*.svg' ],
-        favicons: [ dir + imageSource + 'icons/favicon.' + imgExt ],
+        html:     [ dist + '**/' + htmlExt ],
+        pug:      [ dist + '**/' + pugExt ],
+        styles:   [ dist + scss + '**/' + scssExt ],
+        scripts:  [ dist + jsSource + jsExt ],
+        images:   [ dist + imageSource + '**/' + imgExt ],
+        sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
+        favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
     },
     watch: {
-        html:     [ dir + '**/' + htmlExt ],
-        pug:      [ dir + '**/' + pugExt ],
-        styles:   [ dir + scss + '**/' + scssExt ],
-        scripts:  [ dir + jsSource + jsExt ],
-        images:   [ dir + imageSource + '**/' + imgExt ],
-        sprites:  [ dir + imageSource + 'icons/**/*.svg' ],
-        favicons: [ dir + imageSource + 'icons/favicon.' + imgExt ],
+        html:     [ dist + '**/' + htmlExt ],
+        pug:      [ dist + '**/' + pugExt ],
+        styles:   [ dist + scss + '**/' + scssExt ],
+        scripts:  [ dist + jsSource + jsExt ],
+        images:   [ dist + imageSource + '**/' + imgExt ],
+        sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
+        favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
     }
 };
 
@@ -255,6 +247,15 @@ export const moveAssets = (e) => {
 };
 
 export const server = () => {
+    var serverCfg = {
+        port: 9000,
+        notify: false
+    }
+
+    if( tunnel ) {
+        serverCfg.tunnel = subDomain;
+    }
+
     if( '' !== domain ) {
         serverCfg.proxy = domain;
     }
