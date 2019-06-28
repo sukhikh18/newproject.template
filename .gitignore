@@ -13,3 +13,11 @@ package-lock.json
 
 node_modules/
 vendor/
+
+# Remove on dev
+public_html/*.css
+public_html/*.html
+public_html/img/*
+public_html/assets/
+!public_html/assets/_raw/*
+public_html/pages/
