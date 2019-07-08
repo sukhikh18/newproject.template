@@ -17,7 +17,13 @@ vendor/
 # Remove on dev
 public_html/*.css
 public_html/*.html
+
 public_html/img/*
-public_html/assets/
-!public_html/assets/_raw/*
+!public_html/img/_raw/
+
+public_html/assets/*
+!public_html/assets/_raw/
+public_html/assets/_raw/*
+!public_html/assets/_raw/*.*
+
 public_html/pages/
