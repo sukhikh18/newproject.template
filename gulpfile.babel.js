@@ -59,6 +59,7 @@ var paths = {
         images:   dist + img,
         sprites:  dist + img + "sprites/",
         favicons: dist + img + "favicons/",
+        assets: dist + assets,
     },
     src: {
         html:     [ dist + '**/' + htmlExt ],
@@ -68,6 +69,7 @@ var paths = {
         images:   [ dist + imageSource + '**/' + imgExt ],
         sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
         favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
+        assets:   [ dist + assets + raw + '*.scss', '!' + dist + assets + raw + '_*.scss' ],
     },
     watch: {
         html:     [ dist + '**/' + htmlExt ],
@@ -94,34 +96,7 @@ paths.src.styles.push('!' + dist + assets + '**/*');
 paths.src.images.push('!' + paths.src.sprites);
 paths.src.images.push('!' + paths.src.favicons);
 
-export const buildHtml = () => src( paths.src.html, { allowEmpty: true })
-    .pipe(rigger())
-    .pipe(replace("@min", production ? ".min" : ''))
-    .pipe(rename({
-        basename: "index"
-    }))
-    .pipe(dest(paths.build.html))
-    .pipe(debug({
-        "title": "HTML files"
-    }))
-    .on("end", browsersync.reload);
-
-export const buildPug = () => src( paths.src.pug, { allowEmpty: true })
-    .pipe(pug({
-        pretty: '    ',
-        basedir: dist
-    }))
-    .pipe(replace("@min", production ? ".min" : ''))
-    .pipe(rename({
-        basename: "index"
-    }))
-    .pipe(dest(paths.build.pug))
-    .pipe(debug({
-        "title": "HTML files"
-    }))
-    .on("end", browsersync.reload);
-
-export const buildStyles = () => src(paths.src.styles, { allowEmpty: true })
+const buildStyles = (srcPath, buildPath) => src(srcPath, { allowEmpty: true })
     .pipe(plumber())
     // .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(sass())
@@ -132,13 +107,11 @@ export const buildStyles = () => src(paths.src.styles, { allowEmpty: true })
     .pipe(gulpif(production, rename({ suffix: ".min" })))
     .pipe(plumber.stop())
     // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
-    .pipe(dest(paths.build.styles))
-    .pipe(debug({
-        "title": "CSS files"
-    }))
+    .pipe(dest(buildPath))
+    .pipe(debug({ "title": "CSS files" }))
     .on("end", () => production || '' == domain ? browsersync.reload : null);
 
-export const buildScripts = () => src(paths.src.scripts, { allowEmpty: true })
+const buildScripts = (srcPath, buildPath) => src(srcPath, { allowEmpty: true })
     .pipe(plumber())
     .pipe(rigger())
     .pipe(gulpif(!production, sourcemaps.init()))
@@ -147,15 +120,13 @@ export const buildScripts = () => src(paths.src.scripts, { allowEmpty: true })
         suffix: ".min"
     })))
     .pipe(gulpif(!production, sourcemaps.write("./maps/")))
-    // .pipe(plumber.stop())
-    .pipe(dest(paths.build.scripts))
-    .pipe(debug({
-        "title": "JS files"
-    }))
+    .pipe(plumber.stop())
+    .pipe(dest(buildPath))
+    .pipe(debug({ "title": "JS files" }))
     .on("end", browsersync.reload);
 
-export const buildImages = () => src(paths.src.images, { allowEmpty: true })
-    .pipe(newer(paths.build.images))
+const buildImages = (srcPath, buildPath) => src(srcPath, { allowEmpty: true })
+    .pipe(newer(buildPath))
     .pipe(gulpif(production, imagemin([
         imageminGiflossy({
             optimizationLevel: 3,
@@ -186,9 +157,41 @@ export const buildImages = () => src(paths.src.images, { allowEmpty: true })
             ]
         })
     ])))
-    .pipe(dest(paths.build.images))
+    .pipe(dest(buildPath))
+    .pipe(debug({ "title": "Images" }))
+    .on("end", browsersync.reload);
+
+const moveFiles = (srcPath, buildPath, name) => {
+    src(srcPath, { allowEmpty: true })
+        .pipe(newer(buildPath))
+        .pipe(dest(buildPath))
+        .pipe(debug({ "title": name }));
+}
+
+export const buildHtml = () => src( paths.src.html, { allowEmpty: true })
+    .pipe(rigger())
+    .pipe(replace("@min", production ? ".min" : ''))
+    .pipe(rename({
+        basename: "index"
+    }))
+    .pipe(dest(paths.build.html))
     .pipe(debug({
-        "title": "Images"
+        "title": "HTML files"
+    }))
+    .on("end", browsersync.reload);
+
+export const buildPug = () => src( paths.src.pug, { allowEmpty: true })
+    .pipe(pug({
+        pretty: '    ',
+        basedir: dist
+    }))
+    .pipe(replace("@min", production ? ".min" : ''))
+    .pipe(rename({
+        basename: "index"
+    }))
+    .pipe(dest(paths.build.pug))
+    .pipe(debug({
+        "title": "HTML files"
     }))
     .on("end", browsersync.reload);
 
@@ -212,35 +215,13 @@ export const buildFavs = () => src(paths.src.favicons, { allowEmpty: true })
         "title": "Favicons"
     }));
 
-/**
- * Assets
- */
-export const buildAssetsStyle = () => src([dist + assets + raw + '*.scss', '!' + dist + assets + raw + '_*.scss'], { allowEmpty: true })
-    .pipe(plumber())
-    // .pipe(gulpif(!production, sourcemaps.init()))
-    .pipe(sass())
-    // .pipe(groupmediaqueries())
-    .pipe(gulpif(production, autoprefixer(autoPrefixerConf)))
-    .pipe(gulpif(production, mincss(cleanCSSConf)))
-    .pipe(gulpif(production, rename({
-        suffix: ".min"
-    })))
-    .pipe(plumber.stop())
-    // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
-    .pipe(dest(dist + assets))
-    .pipe(debug({
-        "title": "CSS files"
-    }))
-    .on("end", () => browsersync.reload);
-
+export const buildMainStyles  = () => buildStyles(paths.src.styles, paths.build.styles);
+export const buildAssetsStyle = () => buildStyles(paths.src.assets, paths.build.assets);
+export const buildMainScripts = () => buildScripts(paths.src.scripts, paths.build.scripts);
+export const buildMainImages  = () => buildImages(paths.src.images, paths.build.images);
 export const moveAssets = (e) => {
     assetslist.forEach(function(item, i, arr) {
-        src(item.src, { allowEmpty: true })
-            .pipe(newer(dist + assets + item.dest))
-            .pipe(dest(dist + assets + item.dest))
-            .pipe(debug({
-                "title": item.name
-            }));
+        moveFiles(item.src, dist + assets + item.dest);
     });
 
     return e();
@@ -269,9 +250,9 @@ export const server = () => {
 export const watchCode = () => {
     watch(paths.watch.html,    buildHtml);
     watch(paths.watch.pug,     buildPug);
-    watch(paths.watch.styles,  buildStyles);
-    watch(paths.watch.scripts, buildScripts);
-    watch(paths.watch.images,  buildImages);
+    watch(paths.watch.styles,  buildMainStyles);
+    watch(paths.watch.scripts, buildMainScripts);
+    watch(paths.watch.images,  buildMainImages);
 };
 
 export const buildSource = parallel(buildHtml, buildPug);
@@ -284,7 +265,7 @@ export const install = series(moveAssets);
 /**
  * Build and stop
  */
-export const build = series(buildAssetsStyle, parallel(buildSource, buildStyles, buildScripts, buildFavs, buildImages));
+export const build = series(buildAssetsStyle, parallel(buildSource, buildMainStyles, buildMainScripts, buildFavs, buildMainImages));
 
 /**
  * Build and continue with watcher
