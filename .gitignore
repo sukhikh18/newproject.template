@@ -25,5 +25,6 @@ public_html/assets/*
 !public_html/assets/_raw/
 public_html/assets/_raw/*
 !public_html/assets/_raw/*.*
+!public_html/assets/pages/
 
 public_html/pages/

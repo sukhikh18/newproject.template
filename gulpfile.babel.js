@@ -62,23 +62,23 @@ var paths = {
         assets: dist + assets,
     },
     src: {
-        html:     [ dist + '**/' + htmlExt ],
-        pug:      [ dist + '**/' + pugExt ],
-        styles:   [ dist + scss + '**/' + scssExt ],
-        scripts:  [ dist + jsSource + jsExt ],
-        images:   [ dist + imageSource + '**/' + imgExt ],
-        sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
-        favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
-        assets:   [ dist + assets + raw + '*.scss', '!' + dist + assets + raw + '_*.scss' ],
+        html:     [ dir + '**/' + htmlExt ],
+        pug:      [ dir + '**/' + pugExt ],
+        styles:   [ dir + scss + '**/' + scssExt ],
+        scripts:  [ dir + jsSource + jsExt ],
+        images:   [ dir + imageSource + '**/' + imgExt ],
+        sprites:  [ dir + imageSource + 'icons/**/*.svg' ],
+        favicons: [ dir + imageSource + 'icons/favicon.' + imgExt ],
+        assets:   [ dir + assets + raw + '*.scss', '!' + dir + assets + raw + '_*.scss' ],
     },
     watch: {
-        html:     [ dist + '**/' + htmlExt ],
-        pug:      [ dist + '**/' + pugExt ],
-        styles:   [ dist + scss + '**/' + scssExt ],
-        scripts:  [ dist + jsSource + jsExt ],
-        images:   [ dist + imageSource + '**/' + imgExt ],
-        sprites:  [ dist + imageSource + 'icons/**/*.svg' ],
-        favicons: [ dist + imageSource + 'icons/favicon.' + imgExt ],
+        html:     [ dir + '**/' + htmlExt ],
+        pug:      [ dir + '**/' + pugExt ],
+        styles:   [ dir + scss + '**/' + scssExt ],
+        scripts:  [ dir + jsSource + jsExt ],
+        images:   [ dir + imageSource + '**/' + imgExt ],
+        sprites:  [ dir + imageSource + 'icons/**/*.svg' ],
+        favicons: [ dir + imageSource + 'icons/favicon.' + imgExt ],
     }
 };
 
@@ -96,8 +96,9 @@ paths.src.styles.push('!' + dist + assets + '**/*');
 paths.src.images.push('!' + paths.src.sprites);
 paths.src.images.push('!' + paths.src.favicons);
 
-const buildStyles = (srcPath, buildPath) => src(srcPath, { allowEmpty: true })
+const buildStyles = (srcPath, buildPath, needNewer = false) => src(srcPath, { allowEmpty: true })
     .pipe(plumber())
+    .pipe(gulpif(needNewer, newer({dest: buildPath, ext: 'css'})))
     // .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(sass())
     .pipe(groupmediaqueries())
@@ -111,8 +112,9 @@ const buildStyles = (srcPath, buildPath) => src(srcPath, { allowEmpty: true })
     .pipe(debug({ "title": "CSS files" }))
     .on("end", () => production || '' == domain ? browsersync.reload : null);
 
-const buildScripts = (srcPath, buildPath) => src(srcPath, { allowEmpty: true })
+const buildScripts = (srcPath, buildPath, needNewer = false) => src(srcPath, { allowEmpty: true })
     .pipe(plumber())
+    .pipe(gulpif(needNewer, newer(buildPath)))
     .pipe(rigger())
     .pipe(gulpif(!production, sourcemaps.init()))
     .pipe(gulpif(production, uglify()))
@@ -217,8 +219,14 @@ export const buildFavs = () => src(paths.src.favicons, { allowEmpty: true })
 
 export const buildMainStyles  = () => buildStyles(paths.src.styles, paths.build.styles);
 export const buildAssetsStyle = () => buildStyles(paths.src.assets, paths.build.assets);
-export const buildMainScripts = () => buildScripts(paths.src.scripts, paths.build.scripts);
+export const buildPagesStyle = () => buildStyles(dir + assets + 'pages/**/' + scssExt, dist + 'pages/', true);
+
+export const buildMainScripts = () => buildScripts(paths.src.scripts, paths.build.scripts, true);
+export const buildPagesScripts = () => buildScripts(dir + assets + 'pages/**/' + jsExt, dist + 'pages/', true);
+
 export const buildMainImages  = () => buildImages(paths.src.images, paths.build.images);
+export const buildPagesImages  = () => buildImages(dir + assets + 'pages/**/' + imgExt, dist + 'pages/');
+
 export const moveAssets = (e) => {
     assetslist.forEach(function(item, i, arr) {
         moveFiles(item.src, dist + assets + item.dest, item.name);
@@ -253,6 +261,10 @@ export const watchCode = () => {
     watch(paths.watch.styles,  buildMainStyles);
     watch(paths.watch.scripts, buildMainScripts);
     watch(paths.watch.images,  buildMainImages);
+
+    watch(dir + assets + 'pages/**/' + scssExt,  buildPagesStyle);
+    watch(dir + assets + 'pages/**/' + jsExt,  buildPagesScripts);
+    watch(dir + assets + 'pages/**/' + imgExt,  buildPagesImages);
 };
 
 export const buildSource = parallel(buildHtml, buildPug);
@@ -265,7 +277,10 @@ export const install = series(moveAssets);
 /**
  * Build and stop
  */
-export const build = series(buildAssetsStyle, parallel(buildSource, buildMainStyles, buildMainScripts, buildFavs, buildMainImages));
+export const build = series(buildAssetsStyle,
+    parallel(buildPagesStyle, buildPagesScripts, buildPagesImages),
+    parallel(buildSource, buildMainStyles, buildMainScripts, buildFavs, buildMainImages)
+);
 
 /**
  * Build and continue with watcher
