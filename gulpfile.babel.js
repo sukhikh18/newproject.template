@@ -221,7 +221,7 @@ export const buildMainScripts = () => buildScripts(paths.src.scripts, paths.buil
 export const buildMainImages  = () => buildImages(paths.src.images, paths.build.images);
 export const moveAssets = (e) => {
     assetslist.forEach(function(item, i, arr) {
-        moveFiles(item.src, dist + assets + item.dest);
+        moveFiles(item.src, dist + assets + item.dest, item.name);
     });
 
     return e();
