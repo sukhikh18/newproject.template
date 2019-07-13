@@ -96,21 +96,25 @@ paths.src.styles.push('!' + dist + assets + '**/*');
 paths.src.images.push('!' + paths.src.sprites);
 paths.src.images.push('!' + paths.src.favicons);
 
-const buildStyles = (srcPath, buildPath, needNewer = false) => src(srcPath, { allowEmpty: true })
-    .pipe(plumber())
-    .pipe(gulpif(needNewer, newer({dest: buildPath, ext: 'css'})))
-    // .pipe(gulpif(!production, sourcemaps.init()))
-    .pipe(sass())
-    .pipe(groupmediaqueries())
-    .pipe(gulpif(production, autoprefixer(autoPrefixerConf)))
-    .pipe(gulpif(!production, browsersync.stream()))
-    .pipe(gulpif(production, mincss(cleanCSSConf)))
-    .pipe(gulpif(production, rename({ suffix: ".min" })))
-    .pipe(plumber.stop())
-    // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
-    .pipe(dest(buildPath))
-    .pipe(debug({ "title": "CSS files" }))
-    .on("end", () => production || '' == domain ? browsersync.reload : null);
+const buildStyles = (srcPath, buildPath, needNewer = false) => {
+    console.log(buildPath, needNewer);
+
+    return src(srcPath, { allowEmpty: true })
+        .pipe(plumber())
+        .pipe(gulpif(needNewer, newer({dest: buildPath, ext: '.css'})))
+        // .pipe(gulpif(!production, sourcemaps.init()))
+        .pipe(sass())
+        .pipe(groupmediaqueries())
+        .pipe(gulpif(production, autoprefixer(autoPrefixerConf)))
+        .pipe(gulpif(!production, browsersync.stream()))
+        .pipe(gulpif(production, mincss(cleanCSSConf)))
+        .pipe(gulpif(production, rename({ suffix: ".min" })))
+        .pipe(plumber.stop())
+        // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
+        .pipe(dest(buildPath))
+        .pipe(debug({ "title": "CSS files" }))
+        .on("end", () => production || '' == domain ? browsersync.reload : null);
+}
 
 const buildScripts = (srcPath, buildPath, needNewer = false) => src(srcPath, { allowEmpty: true })
     .pipe(plumber())
