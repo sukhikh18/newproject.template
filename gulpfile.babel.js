@@ -97,8 +97,6 @@ paths.src.images.push('!' + paths.src.sprites);
 paths.src.images.push('!' + paths.src.favicons);
 
 const buildStyles = (srcPath, buildPath, needNewer = false) => {
-    console.log(buildPath, needNewer);
-
     return src(srcPath, { allowEmpty: true })
         .pipe(plumber())
         .pipe(gulpif(needNewer, newer({dest: buildPath, ext: '.css'})))
