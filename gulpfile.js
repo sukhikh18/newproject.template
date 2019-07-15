@@ -177,7 +177,7 @@ const buildHtml = function () {
         .pipe(replace("@min", production ? ".min" : ''))
         .pipe(rename({ basename: "index" }))
         .pipe(dest(dist))
-        .pipe(debug({ "title": "HTML files" }))
+        .pipe(debug({ "title": "RAW to HTML" }))
         .on("end", browsersync.reload);
 }
 
@@ -195,7 +195,7 @@ const buildPug = function () {
         .pipe(replace("@min", production ? ".min" : ''))
         .pipe(rename({ basename: "index" }))
         .pipe(dest(dist))
-        .pipe(debug({ "title": "HTML files" }))
+        .pipe(debug({ "title": "PUG to HTML" }))
         .on("end", browsersync.reload);
 }
 
