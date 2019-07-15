@@ -1,9 +1,6 @@
 "use strict";
 
 module.exports = {
-    /** {String} For use proxy */
-    domain: '',
-
     /** {String} Path to the directory */
     dir: './public_html/',
     dist: './public_html/',

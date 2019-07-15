@@ -3,6 +3,9 @@
 const root = './public_html/';
 const subDomain = 'nikolays93';
 
+/** {String} Domain for use local server proxy */
+const domain = '';
+
 // const webpack = require("webpack");
 // const webpackStream = require("webpack-stream");
 const gulp = require("gulp");
@@ -43,7 +46,6 @@ const imageminGiflossy = require("imagemin-giflossy");
 // const webp = require("gulp-webp");
 
 const config  = require(root + "config");
-const domain  = config.domain;
 const dir     = config.dir;
 const dist    = config.dist;
 const assets  = config.assets;
