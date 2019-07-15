@@ -348,7 +348,7 @@ gulp.task("install", series(function() {
         { // (Required for bootstrap dropdowns)
             name: 'Popper.js',
             src: './node_modules/popper.js/dist/umd/**/*',
-            dest: raw + 'popper-js/'
+            dest: raw + 'popper.js.umd/'
         },
         {
             name: 'Botstrap js',
