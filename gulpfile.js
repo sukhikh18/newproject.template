@@ -42,17 +42,17 @@ const imageminGiflossy = require("imagemin-giflossy");
 // const imageminWebp = require("imagemin-webp");
 // const webp = require("gulp-webp");
 
-const config = require(root + "config");
-const domain = config.domain;
-const dir    = config.dir;
-const dist   = config.dist;
-const assets = config.assets;
-const vendor = config.vendor;
-const module = config.module;
-const pages  = config.pages;
-const script = config.script;
-const images = config.images;
-const raw    = config.raw;
+const config  = require(root + "config");
+const domain  = config.domain;
+const dir     = config.dir;
+const dist    = config.dist;
+const assets  = config.assets;
+const vendor  = config.vendor;
+const modules = config.modules;
+const pages   = config.pages;
+const script  = config.script;
+const images  = config.images;
+const raw     = config.raw;
 
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
@@ -65,7 +65,6 @@ const imgExt  = '*.{jpg,jpeg,png,gif,svg}';
 
 const buildStyles = function (srcPath, buildPath, needNewer = false) {
     srcPath.push ('!' + dir + '**/_' + scssExt);
-    srcPath.push ('!' + dir + vendor + raw + '**/' + scssExt);
 
     return src(srcPath, { allowEmpty: true })
         .pipe(plumber())
@@ -104,11 +103,10 @@ const buildStyles = function (srcPath, buildPath, needNewer = false) {
 
 const buildScripts = function (srcPath, buildPath, needNewer = false) {
     srcPath.push('!' + dir + '**/_' + jsExt);
-    srcPath.push('!' + dir + vendor + raw + '**/' + jsExt);
 
     return src(srcPath, { allowEmpty: true })
         .pipe(plumber())
-        .pipe(gulpif(needNewer, newer(buildPath)))
+        .pipe(gulpif(needNewer, newer({dest: buildPath, ext: production ? '.min.js' : '.js'})))
         .pipe(rigger())
         .pipe(gulpif(!production, sourcemaps.init()))
         .pipe(gulpif(production, uglify()))
@@ -201,11 +199,11 @@ const buildPug = function () {
         .on("end", browsersync.reload);
 }
 
-const buildVendorStyle   = function () { return buildStyles([ dir + vendor + raw   + '**/' + scssExt ], dist + vendor, true); }
-const buildMainStyles    = function () { return buildStyles([ dir + assets + raw   + '**/' + scssExt ], dist + assets); }
+const buildVendorStyle   = function () { return buildStyles([ dir + vendor + raw   + scssExt ], dist + vendor, true); }
+const buildMainStyles    = function () { return buildStyles([ dir + assets + raw   + '**/' + scssExt ], dist + assets, true); }
 const buildPagesStyle    = function () { return buildStyles([ dir + assets + pages + '**/' + scssExt ], dist + pages, true); }
 
-const buildVendorScripts = function () { return buildScripts([ dir + vendor + raw   + '**/' + jsExt ], dist + vendor, true); }
+const buildVendorScripts = function () { return buildScripts([ dir + vendor + raw   + jsExt ], dist + vendor, true); }
 const buildMainScripts   = function () { return buildScripts([ dir + assets + raw   + '**/' + jsExt ], dist + assets, true); }
 const buildPagesScripts  = function () { return buildScripts([ dir + assets + pages + '**/' + jsExt ], dist + pages,  true); }
 
@@ -237,15 +235,15 @@ const buildPagesImages   = function () { return buildImages([ dir + assets + pag
 
 const watchAll = function () {
     watch([ dir + '**/' + htmlExt ], buildHtml);
-    watch([ dir + '**/' + PugExt ], buildPug);
+    watch([ dir + '**/' + pugExt ], buildPug);
 
     watch([ dir + vendor + raw + '**/' + jsExt ], buildVendorScripts );
     watch([ dir + assets + raw + '**/' + jsExt ], buildMainScripts );
     watch([ dir + assets + pages + '**/' + jsExt ], buildPagesScripts );
 
     watch( [ dir + assets + raw + '_site-settings.scss' ], buildVendorStyle )
-    watch( [ dir + assets + raw + '**/' + scssExt, dir + module + '**/' + scssExt ], buildMainStyles );
-    watch( [ dir + assets + pages + '**/' + scssExt, dir + module + '**/' + scssExt ], buildPagesStyle );
+    watch( [ dir + assets + raw + '**/' + scssExt, dir + modules + '**/' + scssExt ], buildMainStyles );
+    watch( [ dir + assets + pages + '**/' + scssExt, dir + modules + '**/' + scssExt ], buildPagesStyle );
 
     watch( [ dir + images + raw + '**/' + imgExt ], buildMainImages );
     watch( [ dir + assets + pages + '**/' + imgExt ], buildPagesImages );
@@ -279,12 +277,12 @@ gulp.task("buildImages", parallel(buildPagesImages, buildMainImages)); // buildV
 /**
  * Build only
  */
-gulp.task("build", parallel(buildCode, buildStyles, buildScripts, buildImages));
+gulp.task("build", parallel("buildCode", "buildStyles", "buildScripts", "buildImages"));
 
 /**
  * Move assets (if yarn/npm installed them)
  */
-gulp.task("install", series(function() {
+gulp.task("install", function(e) {
     const assetslist = [
         {
             name: 'Jquery',
@@ -348,7 +346,7 @@ gulp.task("install", series(function() {
     });
 
     return e();
-}));
+});
 
 /**
  * Build with start serve/watcher

@@ -40,16 +40,8 @@ textarea {
     padding: 0.2em 0;
 }
 
-h1 {
-    @include vw(font-size, 60, 40, 24);
-}
-
-.archive-description {
-    @include vw(font-size, 20);
-}
-
 @include to($media-lg) {
     h1 {
-        margin-top: 1.5rem;
+        margin-top: rem(24px);
     }
 }
