@@ -99,7 +99,7 @@ paths.src.images.push('!' + paths.src.favicons);
 const buildStyles = (srcPath, buildPath, needNewer = false) => {
     return src(srcPath, { allowEmpty: true })
         .pipe(plumber())
-        .pipe(gulpif(needNewer, newer({dest: buildPath, ext: '.css'})))
+        .pipe(gulpif(needNewer, newer({dest: buildPath, ext: production ? '.min.css' : '.css'})))
         // .pipe(gulpif(!production, sourcemaps.init()))
         .pipe(sass())
         .pipe(groupmediaqueries())

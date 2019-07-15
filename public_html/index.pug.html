@@ -37,6 +37,8 @@ html.no-js(lang='ru-RU')
         script(src="/assets/main@min.js")
         link(rel="stylesheet", href="template_styles@min.css")
 
+        link(rel="stylesheet", href="/pages/index/style@min.css")
+
         <!-- IE compatibility -->
         <!--[if lt IE 9]>
             <script data-skip-moving="true" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
@@ -134,8 +136,8 @@ html.no-js(lang='ru-RU')
                         .row
                             article#the_ID.col
                                 .media.post
-                                    .post__thmb
-                                        img.pr-3(src="/img/placeholder.png", alt="", width="180", height="180")
+                                    .post__thmb.mr-3
+                                        img(src="/pages/index/img/placeholder.png", alt="", width="180", height="180")
 
                                     .media-body.article-content
                                         h4.post__name Post name

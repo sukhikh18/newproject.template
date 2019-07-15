@@ -5,3 +5,49 @@
 // Modules
 // @import "../../../scss/module/slick";
 // @import "../../../scss/module/slider";
+
+.slider.row {
+    > div {
+        transition: .4s ease all;
+    }
+
+    > div:nth-child(1) {
+        clip-path: circle(50% at 50% 50%);
+
+        &:hover {
+            clip-path: circle(100% at 50% 50%);
+        }
+    }
+
+    > div:nth-child(2) {
+        clip-path: polygon(50% 0, 50% 0, 100% 100%, 0 100%);
+
+        &:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+    }
+
+    > div:nth-child(3) {
+        clip-path: polygon(50% 0%, 63% 38%, 100% 38%, 69% 59%, 82% 100%, 50% 75%, 18% 100%, 31% 59%, 0 38%, 37% 38%);
+
+        &:hover {
+            clip-path: polygon(0% 0%, 0% 0%, 0% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 100%, 100% 100%, 100% 100%, 0% 100%);
+        }
+    }
+
+    > div:nth-child(4) {
+        clip-path: inset(0 0 round 0 20%);
+
+        &:hover {
+            clip-path: inset(0 0 round 0 0%);
+        }
+    }
+
+    > div:nth-child(5) {
+        clip-path: polygon(0 0, 100% 0, 75% 50%, 100% 100%, 0 100%);
+
+        &:hover {
+            clip-path: polygon(0 0, 100% 0, 100% 50%, 100% 100%, 0 100%);
+        }
+    }
+}
