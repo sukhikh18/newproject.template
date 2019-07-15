@@ -1,6 +1,6 @@
 "use strict";
 
-const root = './public_html/';
+const public = './public_html/';
 const subDomain = 'nikolays93';
 
 /** {String} Domain for use local server proxy */
@@ -45,25 +45,24 @@ const imageminGiflossy = require("imagemin-giflossy");
 // const imageminWebp = require("imagemin-webp");
 // const webp = require("gulp-webp");
 
-const config  = require(root + "config");
-const dir     = config.dir;
-const dist    = config.dist;
-const assets  = config.assets;
-const vendor  = config.vendor;
-const modules = config.modules;
-const pages   = config.pages;
-const script  = config.script;
-const images  = config.images;
-const raw     = config.raw;
+/** @type Object {
+    String:  assets, module,
+    Object:  blocks, vendor, styles, script, images
+} */
+const config  = require(public + "config");
+const paths = config.paths;
 
+/** @type String */
+const dir   = config.src;
+const dist  = config.dest;
+
+const scssExt = config.scssExt;
+const jsExt   = config.jsExt;
+const imgExt  = config.imgExt;
+
+/** @type bool */
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
-
-const htmlExt = 'index.raw.html';
-const pugExt  = 'index.pug.html';
-const scssExt = '*.scss';
-const jsExt   = '*.js';
-const imgExt  = '*.{jpg,jpeg,png,gif,svg}';
 
 const buildStyles = function (srcPath, buildPath, needNewer = false) {
     srcPath.push ('!' + dir + '**/_' + scssExt);
@@ -168,11 +167,13 @@ const moveFiles = function (srcPath, buildPath, name) {
         .pipe(debug({ "title": name }));
 }
 
-const buildHtml = function () {
-    var srcPath = [ dir + '**/' + htmlExt ];
+const buildHtml = function (e) {
+    if( !paths.html ) return e;
 
-    srcPath.push('!' + dir + '**/_' + htmlExt);
-    srcPath.push('!' + dir + assets + '**/' + htmlExt);
+    var srcPath = [ dir + '**/' + paths.html ];
+
+    srcPath.push('!' + dir + '**/_' + paths.html);
+    srcPath.push('!' + dir + assets + '**/' + paths.html);
 
     return src( srcPath, { allowEmpty: true })
         .pipe(rigger())
@@ -183,11 +184,13 @@ const buildHtml = function () {
         .on("end", browsersync.reload);
 }
 
-const buildPug = function () {
-    var srcPath = [ dir + '**/' + pugExt ];
+const buildPug = function (e) {
+    if( !paths.pug ) return e;
 
-    srcPath.push('!' + dir + '**/_' + pugExt);
-    srcPath.push('!' + dir + assets + '**/' + pugExt);
+    var srcPath = [ dir + '**/' + paths.pug ];
+
+    srcPath.push('!' + dir + '**/_' + paths.pug);
+    srcPath.push('!' + dir + assets + '**/' + paths.pug);
 
     return src( srcPath, { allowEmpty: true })
         .pipe(pug({
@@ -201,16 +204,16 @@ const buildPug = function () {
         .on("end", browsersync.reload);
 }
 
-const buildVendorStyle   = function () { return buildStyles([ dir + vendor + raw   + scssExt ], dist + vendor, true); }
-const buildMainStyles    = function () { return buildStyles([ dir + assets + raw   + '**/' + scssExt ], dist + assets, true); }
-const buildPagesStyle    = function () { return buildStyles([ dir + assets + pages + '**/' + scssExt ], dist + pages, true); }
+const buildVendorStyle   = function () { return buildStyles([  dir + paths.vendor.src + scssExt ], paths.vendor.dest, true); }
+const buildMainStyles    = function () { return buildStyles([  dir + paths.styles.src + '**/' + scssExt ], paths.styles.dest, true); }
+const buildBlocksStyle    = function () { return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], paths.blocks.dest, true); }
 
-const buildVendorScripts = function () { return buildScripts([ dir + vendor + raw   + jsExt ], dist + vendor, true); }
-const buildMainScripts   = function () { return buildScripts([ dir + assets + raw   + '**/' + jsExt ], dist + assets, true); }
-const buildPagesScripts  = function () { return buildScripts([ dir + assets + pages + '**/' + jsExt ], dist + pages,  true); }
+const buildVendorScripts = function () { return buildScripts([ dir + paths.vendor.src + jsExt ], paths.vendor.dest, true); }
+const buildMainScripts   = function () { return buildScripts([ dir + paths.script.src + '**/' + jsExt ], paths.script.dest, true); }
+const buildBlocksScripts  = function () { return buildScripts([dir + paths.blocks.src + '**/' + jsExt ], paths.blocks.dest,  true); }
 
-const buildMainImages    = function () { return buildImages([ dir + images + raw + '**/' + imgExt ], dist + images); }
-const buildPagesImages   = function () { return buildImages([ dir + assets + pages + '**/' + imgExt ], dist + pages); }
+const buildMainImages    = function () { return buildImages([  dir + paths.images.src + '**/' + imgExt ], paths.images.dest); }
+const buildBlocksImages   = function () { return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], paths.blocks.dest); }
 
 
 // const buildFaviconImages = function () {
@@ -236,19 +239,19 @@ const buildPagesImages   = function () { return buildImages([ dir + assets + pag
 // }
 
 const watchAll = function () {
-    watch([ dir + '**/' + htmlExt ], buildHtml);
-    watch([ dir + '**/' + pugExt ], buildPug);
+    if( paths.html ) watch([ dir + '**/' + paths.html ], buildHtml);
+    if( paths.pug ) watch([ dir + '**/' + paths.pug ], buildPug);
 
-    watch([ dir + vendor + raw + '**/' + jsExt ], buildVendorScripts );
-    watch([ dir + assets + raw + '**/' + jsExt ], buildMainScripts );
-    watch([ dir + assets + pages + '**/' + jsExt ], buildPagesScripts );
+    watch([ dir + paths.vendor.src + '**/' + jsExt ], buildVendorScripts );
+    watch([ dir + paths.script.src + '**/' + jsExt ], buildMainScripts );
+    watch([ dir + paths.blocks.src + '**/' + jsExt ], buildBlocksScripts );
 
-    watch( [ dir + assets + raw + '_site-settings.scss' ], buildVendorStyle )
-    watch( [ dir + assets + raw + '**/' + scssExt, dir + modules + '**/' + scssExt ], buildMainStyles );
-    watch( [ dir + assets + pages + '**/' + scssExt, dir + modules + '**/' + scssExt ], buildPagesStyle );
+    watch( [ dir + paths.styles.src + '_site-settings.scss' ], buildVendorStyle )
+    watch( [ dir + paths.styles.src + '**/' + scssExt, dir + modules + '**/' + scssExt ], buildMainStyles );
+    watch( [ dir + paths.blocks.src + '**/' + scssExt, dir + modules + '**/' + scssExt ], buildBlocksStyle );
 
-    watch( [ dir + images + raw + '**/' + imgExt ], buildMainImages );
-    watch( [ dir + assets + pages + '**/' + imgExt ], buildPagesImages );
+    watch( [ dir + paths.images.src + '**/' + imgExt ], buildMainImages );
+    watch( [ dir + paths.blocks.src + '**/' + imgExt ], buildBlocksImages );
 };
 
 const serve = function () {
@@ -272,9 +275,9 @@ const serve = function () {
 };
 
 gulp.task("buildCode", parallel(buildHtml, buildPug));
-gulp.task("buildStyles", parallel(buildVendorStyle, buildPagesStyle, buildMainStyles));
-gulp.task("buildScripts", parallel(buildVendorScripts, buildPagesScripts, buildMainScripts));
-gulp.task("buildImages", parallel(buildPagesImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
+gulp.task("buildStyles", parallel(buildVendorStyle, buildBlocksStyle, buildMainStyles));
+gulp.task("buildScripts", parallel(buildVendorScripts, buildBlocksScripts, buildMainScripts));
+gulp.task("buildImages", parallel(buildBlocksImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
 
 /**
  * Build only
@@ -344,7 +347,7 @@ gulp.task("install", function(e) {
     ];
 
     assetslist.forEach(function(item, i, arr) {
-        moveFiles(item.src, dist + vendor + item.dest, item.name);
+        moveFiles(item.src, dist + paths.vendor.dest + item.dest, item.name);
     });
 
     return e();

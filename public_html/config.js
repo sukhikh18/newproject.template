@@ -2,15 +2,43 @@
 
 module.exports = {
     /** {String} Path to the directory */
-    dir: './public_html/',
-    dist: './public_html/',
+    src: './public_html/',
+    dest: './public_html/',
 
-    raw: '_source/',
+    scssExt: '*.scss',
+    jsExt:   '*.js',
+    imgExt:  '*.{jpg,jpeg,png,gif,svg}',
 
-    assets: 'assets/',
-    vendor: 'assets/vendor/',
-    module: 'assets/module/',
-    pages:  'pages/',
-    script: 'assets/',
-    images: 'img/',
+    paths = {
+        assets: 'assets/',
+        module: 'assets/module/',
+
+        html: false, // index.raw.html
+        pug: 'index.pug',
+
+        blocks: {
+            src: 'assets/pages/',
+            dest: 'pages/',
+        }
+
+        vendor: {
+            src:  'assets/vendor/_source',
+            dest: 'assets/vendor/',
+        },
+
+        styles: {
+            src:  'assets/_source/',
+            dest: 'assets/',
+        },
+
+        script: {
+            src:  'assets/_source',
+            dest: 'assets/',
+        },
+
+        images: {
+            src:  'img/_source',
+            dest: 'img/',
+        },
+    }
 }
