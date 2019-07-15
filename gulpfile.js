@@ -6,6 +6,12 @@ const subDomain = 'nikolays93';
 // const webpack = require("webpack");
 // const webpackStream = require("webpack-stream");
 const gulp = require("gulp");
+const src = gulp.src;
+const dest = gulp.dest;
+const watch = gulp.watch;
+const parallel = gulp.parallel;
+const series = gulp.series;
+
 const gulpif = require("gulp-if");
 const browsersync = require("browser-sync");
 const rename = require("gulp-rename");
@@ -36,13 +42,16 @@ const imageminGiflossy = require("imagemin-giflossy");
 // const imageminWebp = require("imagemin-webp");
 // const webp = require("gulp-webp");
 
-const src = gulp.src;
-const dest = gulp.dest;
-const watch = gulp.watch;
-const parallel = gulp.parallel;
-const series = gulp.series;
+const config = require(root + "config");
+const domain = config.domain;
+const dir    = config.dir;
+const dist   = config.dist;
+const assets = config.assets;
+const scss   = config.scss;
+const js     = config.js;
+const img    = config.img;
+const raw    = config.raw;
 
-const { domain, dir, dist, assets, scss, js, img, raw, assetslist, autoPrefixerConf, cleanCSSConf } = require(root + "config");
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
@@ -109,9 +118,27 @@ const buildStyles = function (srcPath, buildPath, needNewer = false) {
         // .pipe(gulpif(!production, sourcemaps.init()))
         .pipe(sass())
         .pipe(groupmediaqueries())
-        .pipe(gulpif(production, autoprefixer(autoPrefixerConf)))
+        .pipe(gulpif(production, autoprefixer({ browsers: ["last 12 versions", "> 1%", "ie 8", "ie 7"] })))
         .pipe(gulpif(!production, browsersync.stream()))
-        .pipe(gulpif(production, mincss(cleanCSSConf)))
+        .pipe(gulpif(production, mincss({
+            compatibility: "ie8",
+            level: {
+                1: {
+                    specialComments: 0,
+                    removeEmpty: true,
+                    removeWhitespace: true
+                },
+                2: {
+                    mergeMedia: true,
+                    removeEmpty: true,
+                    removeDuplicateFontRules: true,
+                    removeDuplicateMediaBlocks: true,
+                    removeDuplicateRules: true,
+                    removeUnusedAtRules: false
+                }
+            },
+            rebase: false
+        })))
         .pipe(gulpif(production, rename({ suffix: ".min" })))
         .pipe(plumber.stop())
         // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
@@ -243,14 +270,6 @@ const buildPagesScripts = function () { return buildScripts(dir + assets + 'page
 const buildMainImages   = function () { return buildImages(paths.src.images, paths.build.images); }
 const buildPagesImages  = function () { return buildImages(dir + assets + 'pages/**/' + imgExt, dist + 'pages/'); }
 
-const moveAssets = function (e) {
-    assetslist.forEach(function(item, i, arr) {
-        moveFiles(item.src, dist + assets + item.dest, item.name);
-    });
-
-    return e();
-};
-
 const server = function () {
     var serverCfg = {
         port: 9000,
@@ -284,11 +303,6 @@ const watchCode = function () {
 };
 
 /**
- * Move assets
- */
-gulp.task("install", series(moveAssets));
-
-/**
  * Build and stop
  */
 gulp.task("build", series(buildAssetsStyle,
@@ -300,3 +314,72 @@ gulp.task("build", series(buildAssetsStyle,
  * Build and continue with watcher
  */
 gulp.task("default", series("build", parallel(watchCode, server)));
+
+/**
+ * Move assets (if yarn/npm installed them)
+ */
+gulp.task("install", series(function() {
+    const assetslist = [
+        {
+            name: 'Jquery',
+            src: './node_modules/jquery/dist/**/*',
+            dest: 'jquery/'
+        },
+        {
+            name: '@Fancyapps/fancybox',
+            src: './node_modules/@fancyapps/fancybox/dist/**/*',
+            dest: 'fancybox/'
+        },
+        {
+            name: 'Slick-carousel',
+            src: './node_modules/slick-carousel/slick/**/*',
+            dest: 'slick/',
+        },
+        {
+            name: 'Appear',
+            src: './node_modules/appear/dist/**/*',
+            dest: 'appear/'
+        },
+        {
+            name: 'Lettering',
+            src: './node_modules/lettering/dist/**/*',
+            dest: 'lettering/'
+        },
+        { // (Required for bootstrap dropdowns)
+            name: 'Popper.js',
+            src: './node_modules/popper.js/dist/umd/**/*',
+            dest: raw + 'popper-js/'
+        },
+        {
+            name: 'Botstrap js',
+            src: './node_modules/bootstrap/js/dist/**/*',
+            dest: raw + 'bootstrap/js/'
+        },
+        {
+            name: 'Botstrap scss',
+            src: './node_modules/bootstrap/scss/**/*',
+            dest: raw + 'bootstrap/scss/'
+        },
+        {
+            name: 'Hamburgers',
+            src: './node_modules/hamburgers/_sass/hamburgers/**/*',
+            dest: raw + 'hamburgers/'
+        },
+        {
+            name: 'Animatewithsass',
+            src: './node_modules/animatewithsass/**/*',
+            dest: 'animatewithsass/'
+        },
+        {
+            name: 'Swiper',
+            src: './node_modules/swiper/dist/**/*',
+            dest: 'swiper/'
+        },
+    ];
+
+    assetslist.forEach(function(item, i, arr) {
+        moveFiles(item.src, dist + assets + item.dest, item.name);
+    });
+
+    return e();
+}));
