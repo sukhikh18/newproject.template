@@ -1,19 +1,20 @@
 "use strict";
 
 /** @type {String} For use proxy */
-export const domain = '';
+module.exports.domain = '';
+
 
 /** {String} Path to the root directory */
-export const dir   = './public_html/';
-export const dist = './public_html/';
+module.exports.dir   = './public_html/';
+module.exports.dist = './public_html/';
 
-export const assets = 'assets/';
-export const scss   = 'scss/';
-export const js     = 'assets/';
-export const img    = 'img/';
-export const raw    = '_raw/';
+module.exports.assets = 'assets/';
+module.exports.scss   = 'scss/';
+module.exports.js     = 'assets/';
+module.exports.img    = 'img/';
+module.exports.raw    = '_raw/';
 
-export const assetslist = [
+module.exports.assetslist = [
     {
         name: 'Jquery',
         src: './node_modules/jquery/dist/**/*',
@@ -42,22 +43,22 @@ export const assetslist = [
     { // (Required for bootstrap dropdowns)
         name: 'Popper.js',
         src: './node_modules/popper.js/dist/umd/**/*',
-        dest: raw + 'popper-js/'
+        dest: module.exports.raw + 'popper-js/'
     },
     {
         name: 'Botstrap js',
         src: './node_modules/bootstrap/js/dist/**/*',
-        dest: raw + 'bootstrap/js/'
+        dest: module.exports.raw + 'bootstrap/js/'
     },
     {
         name: 'Botstrap scss',
         src: './node_modules/bootstrap/scss/**/*',
-        dest: raw + 'bootstrap/scss/'
+        dest: module.exports.raw + 'bootstrap/scss/'
     },
     {
         name: 'Hamburgers',
         src: './node_modules/hamburgers/_sass/hamburgers/**/*',
-        dest: raw + 'hamburgers/'
+        dest: module.exports.raw + 'hamburgers/'
     },
     {
         name: 'Animatewithsass',
@@ -71,11 +72,11 @@ export const assetslist = [
     },
 ];
 
-export const autoPrefixerConf = {
+module.exports.autoPrefixerConf = {
     browsers: ["last 12 versions", "> 1%", "ie 8", "ie 7"]
 };
 
-export const cleanCSSConf = {
+module.exports.cleanCSSConf = {
     compatibility: "ie8",
     level: {
         1: {

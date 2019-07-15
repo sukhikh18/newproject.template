@@ -13,10 +13,12 @@
 		"tunnel": "gulp run tunnel",
 		"install": "gulp install"
 	},
-	"devDependencies": {
+	"~devDependencies": {
 		"@babel/core": "^7.3.4",
 		"@babel/preset-env": "^7.3.4",
-		"@babel/register": "^7.0.0",
+		"@babel/register": "^7.0.0"
+	},
+	"devDependencies": {
 		"browser-sync": "^2.23.6",
 		"gulp": "^4.0.0",
 		"gulp-autoprefixer": "^5.0.0",
@@ -52,7 +54,7 @@
 		"jquery": "^3.3.1",
 		"popper.js": "^1.14.6"
 	},
-	"_dependencies": {
+	"~dependencies": {
 		"@fancyapps/fancybox": "^3.5.6",
 		"appear": "^1.0.1",
 		"lettering": "^0.4.1",
