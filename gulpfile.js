@@ -47,17 +47,15 @@ const domain = config.domain;
 const dir    = config.dir;
 const dist   = config.dist;
 const assets = config.assets;
-const scss   = config.scss;
-const js     = config.js;
-const img    = config.img;
+const vendor = config.vendor;
+const module = config.module;
+const pages  = config.pages;
+const script = config.script;
+const images = config.images;
 const raw    = config.raw;
 
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
-
-/** Prepare config paths */
-const imageSource = img + raw;
-const jsSource    = js  + raw;
 
 const htmlExt = 'index.raw.html';
 const pugExt  = 'index.pug.html';
@@ -65,53 +63,10 @@ const scssExt = '*.scss';
 const jsExt   = '*.js';
 const imgExt  = '*.{jpg,jpeg,png,gif,svg}';
 
-var paths = {
-    build: {
-        html:     dist,
-        pug:      dist,
-        styles:   dist,
-        scripts:  dist + assets,
-        images:   dist + img,
-        sprites:  dist + img + "sprites/",
-        favicons: dist + img + "favicons/",
-        assets: dist + assets,
-    },
-    src: {
-        html:     [ dir + '**/' + htmlExt ],
-        pug:      [ dir + '**/' + pugExt ],
-        styles:   [ dir + scss + '**/' + scssExt ],
-        scripts:  [ dir + jsSource + jsExt ],
-        images:   [ dir + imageSource + '**/' + imgExt ],
-        sprites:  [ dir + imageSource + 'icons/**/*.svg' ],
-        favicons: [ dir + imageSource + 'icons/favicon.' + imgExt ],
-        assets:   [ dir + assets + raw + '*.scss', '!' + dir + assets + raw + '_*.scss' ],
-    },
-    watch: {
-        html:     [ dir + '**/' + htmlExt ],
-        pug:      [ dir + '**/' + pugExt ],
-        styles:   [ dir + scss + '**/' + scssExt ],
-        scripts:  [ dir + jsSource + jsExt ],
-        images:   [ dir + imageSource + '**/' + imgExt ],
-        sprites:  [ dir + imageSource + 'icons/**/*.svg' ],
-        favicons: [ dir + imageSource + 'icons/favicon.' + imgExt ],
-    }
-};
-
-/** Exclude start dashes */
-paths.src.html.push   ('!' + dist + '**/_' + htmlExt);
-paths.src.pug.push    ('!' + dist + '**/_' + pugExt);
-paths.src.styles.push ('!' + dist + scss + '**/_' + scssExt);
-paths.src.scripts.push('!' + dist + jsSource + '**/_' + jsExt);
-
-/** Exclude assets */
-paths.src.html.push  ('!' + dist + assets + '**/*');
-paths.src.styles.push('!' + dist + assets + '**/*');
-
-/** Exclude to be compiled images */
-paths.src.images.push('!' + paths.src.sprites);
-paths.src.images.push('!' + paths.src.favicons);
-
 const buildStyles = function (srcPath, buildPath, needNewer = false) {
+    srcPath.push ('!' + dir + '**/_' + scssExt);
+    srcPath.push ('!' + dir + vendor + raw + '**/' + scssExt);
+
     return src(srcPath, { allowEmpty: true })
         .pipe(plumber())
         .pipe(gulpif(needNewer, newer({dest: buildPath, ext: production ? '.min.css' : '.css'})))
@@ -148,6 +103,9 @@ const buildStyles = function (srcPath, buildPath, needNewer = false) {
 }
 
 const buildScripts = function (srcPath, buildPath, needNewer = false) {
+    srcPath.push('!' + dir + '**/_' + jsExt);
+    srcPath.push('!' + dir + vendor + raw + '**/' + jsExt);
+
     return src(srcPath, { allowEmpty: true })
         .pipe(plumber())
         .pipe(gulpif(needNewer, newer(buildPath)))
@@ -163,6 +121,9 @@ const buildScripts = function (srcPath, buildPath, needNewer = false) {
 }
 
 const buildImages = function (srcPath, buildPath) {
+    // srcPath.images.push('!' + paths.src.sprites);
+    // srcPath.images.push('!' + paths.src.favicons);
+
     return src(srcPath, { allowEmpty: true })
         .pipe(newer(buildPath))
         .pipe(gulpif(production, imagemin([
@@ -208,69 +169,89 @@ const moveFiles = function (srcPath, buildPath, name) {
 }
 
 const buildHtml = function () {
-    return src( paths.src.html, { allowEmpty: true })
+    var srcPath = [ dir + '**/' + htmlExt ];
+
+    srcPath.push('!' + dir + '**/_' + htmlExt);
+    srcPath.push('!' + dir + assets + '**/' + htmlExt);
+
+    return src( srcPath, { allowEmpty: true })
         .pipe(rigger())
         .pipe(replace("@min", production ? ".min" : ''))
-        .pipe(rename({
-            basename: "index"
-        }))
-        .pipe(dest(paths.build.html))
-        .pipe(debug({
-            "title": "HTML files"
-        }))
+        .pipe(rename({ basename: "index" }))
+        .pipe(dest(dist))
+        .pipe(debug({ "title": "HTML files" }))
         .on("end", browsersync.reload);
 }
 
 const buildPug = function () {
-    return src( paths.src.pug, { allowEmpty: true })
+    var srcPath = [ dir + '**/' + pugExt ];
+
+    srcPath.push('!' + dir + '**/_' + pugExt);
+    srcPath.push('!' + dir + assets + '**/' + pugExt);
+
+    return src( srcPath, { allowEmpty: true })
         .pipe(pug({
-            pretty: '    ',
-            basedir: dist
+            pretty: "    ",
+            basedir: dir
         }))
         .pipe(replace("@min", production ? ".min" : ''))
-        .pipe(rename({
-            basename: "index"
-        }))
-        .pipe(dest(paths.build.pug))
-        .pipe(debug({
-            "title": "HTML files"
-        }))
+        .pipe(rename({ basename: "index" }))
+        .pipe(dest(dist))
+        .pipe(debug({ "title": "HTML files" }))
         .on("end", browsersync.reload);
 }
 
-const buildFavs = function () {
-    return src(paths.src.favicons, { allowEmpty: true })
-        .pipe(newer(paths.build.favicons))
-        .pipe(favicons({
-            icons: {
-                appleIcon: true,
-                favicons: true,
-                online: false,
-                appleStartup: false,
-                android: false,
-                firefox: false,
-                yandex: false,
-                windows: false,
-                coast: false
-            }
-        }))
-        .pipe(dest(paths.build.favicons))
-        .pipe(debug({
-            "title": "Favicons"
-        }));
-}
+const buildVendorStyle   = function () { return buildStyles([ dir + vendor + raw   + '**/' + scssExt ], dist + vendor, true); }
+const buildMainStyles    = function () { return buildStyles([ dir + assets + raw   + '**/' + scssExt ], dist + assets); }
+const buildPagesStyle    = function () { return buildStyles([ dir + assets + pages + '**/' + scssExt ], dist + pages, true); }
 
-const buildMainStyles   = function () { return buildStyles(paths.src.styles, paths.build.styles); }
-const buildAssetsStyle  = function () { return buildStyles(paths.src.assets, paths.build.assets); }
-const buildPagesStyle   = function () { return buildStyles(dir + assets + 'pages/**/' + scssExt, dist + 'pages/', true); }
+const buildVendorScripts = function () { return buildScripts([ dir + vendor + raw   + '**/' + jsExt ], dist + vendor, true); }
+const buildMainScripts   = function () { return buildScripts([ dir + assets + raw   + '**/' + jsExt ], dist + assets, true); }
+const buildPagesScripts  = function () { return buildScripts([ dir + assets + pages + '**/' + jsExt ], dist + pages,  true); }
 
-const buildMainScripts  = function () { return buildScripts(paths.src.scripts, paths.build.scripts, true); }
-const buildPagesScripts = function () { return buildScripts(dir + assets + 'pages/**/' + jsExt, dist + 'pages/', true); }
+const buildMainImages    = function () { return buildImages([ dir + images + raw + '**/' + imgExt ], dist + images); }
+const buildPagesImages   = function () { return buildImages([ dir + assets + pages + '**/' + imgExt ], dist + pages); }
 
-const buildMainImages   = function () { return buildImages(paths.src.images, paths.build.images); }
-const buildPagesImages  = function () { return buildImages(dir + assets + 'pages/**/' + imgExt, dist + 'pages/'); }
 
-const server = function () {
+// const buildFaviconImages = function () {
+//     return src(paths.src.favicons, { allowEmpty: true })
+//         .pipe(newer(paths.build.favicons))
+//         .pipe(favicons({
+//             icons: {
+//                 appleIcon: true,
+//                 favicons: true,
+//                 online: false,
+//                 appleStartup: false,
+//                 android: false,
+//                 firefox: false,
+//                 yandex: false,
+//                 windows: false,
+//                 coast: false
+//             }
+//         }))
+//         .pipe(dest(paths.build.favicons))
+//         .pipe(debug({
+//             "title": "Favicons"
+//         }));
+// }
+
+const watchAll = function () {
+    watch([ dir + '**/' + htmlExt ], buildHtml);
+    watch([ dir + '**/' + PugExt ], buildPug);
+
+    watch([ dir + vendor + raw + '**/' + jsExt ], buildVendorScripts );
+    watch([ dir + assets + raw + '**/' + jsExt ], buildMainScripts );
+    watch([ dir + assets + pages + '**/' + jsExt ], buildPagesScripts );
+
+    watch( [ dir + assets + raw + '_site-settings.scss' ], buildVendorStyle )
+    watch( [ dir + assets + raw + '**/' + scssExt, dir + module + '**/' + scssExt ], buildMainStyles );
+    watch( [ dir + assets + pages + '**/' + scssExt, dir + module + '**/' + scssExt ], buildPagesStyle );
+
+    watch( [ dir + images + raw + '**/' + imgExt ], buildMainImages );
+    watch( [ dir + assets + pages + '**/' + imgExt ], buildPagesImages );
+};
+
+const serve = function () {
     var serverCfg = {
         port: 9000,
         notify: false
@@ -290,30 +271,15 @@ const server = function () {
     browsersync.init(serverCfg);
 };
 
-const watchCode = function () {
-    watch(paths.watch.html,    buildHtml);
-    watch(paths.watch.pug,     buildPug);
-    watch(paths.watch.styles,  buildMainStyles);
-    watch(paths.watch.scripts, buildMainScripts);
-    watch(paths.watch.images,  buildMainImages);
-
-    watch(dir + assets + 'pages/**/' + scssExt,  buildPagesStyle);
-    watch(dir + assets + 'pages/**/' + jsExt,  buildPagesScripts);
-    watch(dir + assets + 'pages/**/' + imgExt,  buildPagesImages);
-};
+gulp.task("buildCode", parallel(buildHtml, buildPug));
+gulp.task("buildStyles", parallel(buildVendorStyle, buildPagesStyle, buildMainStyles));
+gulp.task("buildScripts", parallel(buildVendorScripts, buildPagesScripts, buildMainScripts));
+gulp.task("buildImages", parallel(buildPagesImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
 
 /**
- * Build and stop
+ * Build only
  */
-gulp.task("build", series(buildAssetsStyle,
-    parallel(buildPagesStyle, buildPagesScripts, buildPagesImages),
-    parallel(buildHtml, buildPug, buildMainStyles, buildMainScripts, buildFavs, buildMainImages)
-));
-
-/**
- * Build and continue with watcher
- */
-gulp.task("default", series("build", parallel(watchCode, server)));
+gulp.task("build", parallel(buildCode, buildStyles, buildScripts, buildImages));
 
 /**
  * Move assets (if yarn/npm installed them)
@@ -378,8 +344,13 @@ gulp.task("install", series(function() {
     ];
 
     assetslist.forEach(function(item, i, arr) {
-        moveFiles(item.src, dist + assets + item.dest, item.name);
+        moveFiles(item.src, dist + vendor + item.dest, item.name);
     });
 
     return e();
 }));
+
+/**
+ * Build with start serve/watcher
+ */
+gulp.task("default", series("install", "build", parallel(watchAll, serve)));

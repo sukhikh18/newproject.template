@@ -1,14 +1,19 @@
 "use strict";
 
-/** @type {String} For use proxy */
-module.exports.domain = '';
+module.exports = {
+    /** {String} For use proxy */
+    domain: '',
 
-/** {String} Path to the root directory */
-module.exports.dir   = './public_html/';
-module.exports.dist = './public_html/';
+    /** {String} Path to the directory */
+    dir: './public_html/',
+    dist: './public_html/',
 
-module.exports.assets = 'assets/';
-module.exports.scss   = 'scss/';
-module.exports.js     = 'assets/';
-module.exports.img    = 'img/';
-module.exports.raw    = '_raw/';
+    raw: '_source/',
+
+    assets: 'assets/',
+    vendor: 'assets/vendor/',
+    module: 'assets/module/',
+    pages:  'pages/',
+    script: 'assets/',
+    images: 'img/',
+}

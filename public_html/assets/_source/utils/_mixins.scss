@@ -13,6 +13,19 @@ $tpl-hd: 1920px;
     @return $input/($input * 0 + 1);
 }
 
+$baseFontSize : 16;
+@function rem($pixels, $context: $baseFontSize) {
+    @if (unitless($pixels)) {
+        $pixels: $pixels * 1px;
+    }
+
+    @if (unitless($context)) {
+        $context: $context * 1px;
+    }
+
+    @return $pixels / $context * 1rem;
+}
+
 $wsm: (1 / (num($tpl-sm) * 0.01)) * 1vw;
 $wmd: (1 / (num($tpl-md) * 0.01)) * 1vw;
 $wlg: (1 / (num($tpl-lg) * 0.01)) * 1vw;
@@ -47,27 +60,27 @@ $whd: (1 / (num($tpl-hd) * 0.01)) * 1vw;
 }
 
 @mixin vw-hd( $context, $value ) {
-    @if $vw-fallback { #{$context}: $value; }
+    @if $vw-fallback { #{$context}: num($value) * 1px; }
     #{$context}: num($value) * $whd;
 }
 
 @mixin vw-xl( $context, $value ) {
-    @if $vw-fallback { #{$context}: $value; }
+    @if $vw-fallback { #{$context}: num($value) * 1px; }
     #{$context}: num($value) * $wxl;
 }
 
 @mixin vw-lg( $context, $value ) {
-    @if $vw-fallback { #{$context}: $value; }
+    @if $vw-fallback { #{$context}: num($value) * 1px; }
     #{$context}: num($value) * $wlg;
 }
 
 @mixin vw-md( $context, $value ) {
-    @if $vw-fallback { #{$context}: $value; }
+    @if $vw-fallback { #{$context}: num($value) * 1px; }
     #{$context}: num($value) * $wmd;
 }
 
 @mixin vw-sm( $context, $value ) {
-    @if $vw-fallback { #{$context}: $value; }
+    @if $vw-fallback { #{$context}: num($value) * 1px; }
     #{$context}: num($value) * $wsm;
 }
 
@@ -88,30 +101,6 @@ $whd: (1 / (num($tpl-hd) * 0.01)) * 1vw;
         // ..to
         @include from( $max ) {
             font-size: $size-to;
-        }
-    }
-}
-
-@mixin vw( $context, $value-hd, $value-lg: $value-hd, $value-sm: $value-hd ) {
-    @if $value-hd {
-        @include vw-hd( $context, $value-hd );
-
-        // @if $media-hd {
-        //     @include to( $media-hd ) {
-        //         @include vw-hd( $context, $value-hd );
-        //     }
-        // }
-    }
-
-    @if $value-lg {
-        @include to( $media-lg ) {
-            @include vw-lg($context, $value-lg);
-        }
-    }
-
-    @if $media-sm {
-        @include to( $media-sm ) {
-            @include vw-sm($context, $value-sm);
         }
     }
 }

@@ -20,12 +20,14 @@ public_html/*.css
 public_html/*.html
 
 public_html/img/*
-!public_html/img/_raw/
+!public_html/img/_source/
 
 public_html/assets/*
-!public_html/assets/_raw/
-public_html/assets/_raw/*
-!public_html/assets/_raw/*.*
+!public_html/assets/_source/
 !public_html/assets/pages/
+!public_html/assets/module/
+
+public_html/assets/vendor/*
+!public_html/assets/vendor/_source/*.*
 
 public_html/pages/
