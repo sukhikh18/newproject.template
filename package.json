@@ -4,7 +4,7 @@
 	"author": "Nikolay Shukhikh",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/nikolays93/gulppack-scss.git"
+		"url": "https://github.com/nikolays93/newproject.boilerplate.git"
 	},
 	"license": "MIT",
 	"scripts": {
