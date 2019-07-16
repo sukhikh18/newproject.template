@@ -64,7 +64,7 @@ const imgExt  = config.imgExt;
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
-const buildStyles = function (srcPath, buildPath, needNewer = false) {
+const buildStyles = function (srcPath, buildPath, needNewer) {
     srcPath.push ('!' + dir + '**/_' + scssExt);
 
     return src(srcPath, { allowEmpty: true })
@@ -102,7 +102,7 @@ const buildStyles = function (srcPath, buildPath, needNewer = false) {
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 }
 
-const buildScripts = function (srcPath, buildPath, needNewer = false) {
+const buildScripts = function (srcPath, buildPath, needNewer) {
     srcPath.push('!' + dir + '**/_' + jsExt);
 
     return src(srcPath, { allowEmpty: true })
@@ -204,16 +204,16 @@ const buildPug = function (done) {
         .on("end", browsersync.reload);
 }
 
-const buildVendorStyle   = function () { return buildStyles([  dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, true); }
-const buildMainStyles    = function () { return buildStyles([  dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, true); }
-const buildBlocksStyle    = function () { return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, true); }
+const buildVendorStyles    = function ($cb, $n=1) { return buildStyles([ dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, $n); }
+const buildMainStyles      = function ($cb, $n=1) { return buildStyles([ dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, $n); }
+const buildBlocksStyles    = function ($cb, $n=1) { return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, $n); }
 
 const buildVendorScripts = function () { return buildScripts([ dir + paths.vendor.src + jsExt ], dist + paths.vendor.dest, true); }
 const buildMainScripts   = function () { return buildScripts([ dir + paths.script.src + '**/' + jsExt ], dist + paths.script.dest, true); }
-const buildBlocksScripts  = function () { return buildScripts([dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest,  true); }
+const buildBlocksScripts = function () { return buildScripts([ dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest,  true); }
 
-const buildMainImages    = function () { return buildImages([  dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
-const buildBlocksImages   = function () { return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
+const buildMainImages    = function () { return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
+const buildBlocksImages  = function () { return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
 
 // const buildFaviconImages = function () {
 //     return src(paths.src.favicons, { allowEmpty: true })
@@ -245,9 +245,27 @@ const watchAll = function () {
     watch([ dir + paths.script.src + '**/' + jsExt ], buildMainScripts );
     watch([ dir + paths.blocks.src + '**/' + jsExt ], buildBlocksScripts );
 
-    watch( [ dir + paths.styles.src + '_site-settings.scss' ], buildVendorStyle )
-    watch( [ dir + paths.styles.src + '**/' + scssExt, dir + paths.modules + '**/' + scssExt ], buildMainStyles );
-    watch( [ dir + paths.blocks.src + '**/' + scssExt, dir + paths.modules + '**/' + scssExt ], buildBlocksStyle );
+    const settings = dir + paths.styles.src + '_site-settings.scss';
+
+    watch( [ settings ], function(cb) {
+        buildVendorStyles(cb, 0);
+        buildMainStyles(cb, 0);
+        buildBlocksStyles(cb, 0);
+        return cb();
+    } );
+
+    watch( [ dir + paths.styles.src + '**/' + scssExt, '!' + settings ], function reBuildMainStyles(cb) {
+        buildMainStyles(cb, 0);
+        return cb();
+    } );
+
+    watch( [ dir + paths.modules + '**/' + scssExt ], function(cb) {
+        buildMainStyles(cb, 0);
+        buildBlocksStyles(cb, 0);
+        return cb();
+    } );
+
+    watch( [ dir + paths.blocks.src + '**/' + scssExt ], buildBlocksStyles );
 
     watch( [ dir + paths.images.src + '**/' + imgExt ], buildMainImages );
     watch( [ dir + paths.blocks.src + '**/' + imgExt ], buildBlocksImages );
@@ -274,7 +292,7 @@ const serve = function () {
 };
 
 gulp.task("buildCode", parallel(buildHtml, buildPug));
-gulp.task("buildStyles", parallel(buildVendorStyle, buildBlocksStyle, buildMainStyles));
+gulp.task("buildStyles", parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
 gulp.task("buildScripts", parallel(buildVendorScripts, buildBlocksScripts, buildMainScripts));
 gulp.task("buildImages", parallel(buildBlocksImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
 

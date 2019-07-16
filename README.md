@@ -1,4 +1,4 @@
-﻿# New project Boilerplate
+﻿# Заготовка нового проекта
 
 ## Установка
 1. Установите [node.js](https://nodejs.org/en/download/).

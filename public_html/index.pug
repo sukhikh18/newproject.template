@@ -16,7 +16,6 @@ html.no-js(lang='ru-RU')
         script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js", crossorigin="anonymous", type="text/javascript")
         script.
             window.jQuery || document.write('<script src="\/assets\/vendor\/jquery\/jquery.min.js"><\/script>');
-
         link(rel="stylesheet", type="text/css", href="/assets/vendor/hamburgers@min.css")
 
         // bootstrap
@@ -82,7 +81,7 @@ html.no-js(lang='ru-RU')
             section.site-navigation.navbar-default
                 nav.navbar.navbar-expand-lg.navbar-light.bg-light
                     .container
-                        .navbar-brand.hidden-lg-up.text-center.text-primary Brand name
+                        .navbar-brand.hidden-lg-up.text-center.text-primary Мой блог
 
                         button.navbar-toggler.hamburger.hamburger--elastic(type="button", data-toggle="collapse", data-target="#site-nav", aria-controls="site-nav", aria-expanded="false", aria-label="Toggle navigation")
                             span.hamburger-box
@@ -92,68 +91,59 @@ html.no-js(lang='ru-RU')
                             ul.navbar-nav.mr-auto
                                 li.nav-item.active
                                     a.nav-link(href="#")
-                                        | Home
-                                        span(class="sr-only") (current)
+                                        | Домой
+                                        span(class="sr-only")  (Главная)
                                 li.nav-item
-                                    a.nav-link(href="#") Link
+                                    a.nav-link(href="#") О нас
 
                                 li.nav-item.dropdown
-                                    a#navbarDropdown.nav-link.dropdown-toggle(href="#", role="button", data-toggle="dropdown", aria-haspopup="true",aria-expanded="false") Dropdown
+                                    a#navbarDropdown.nav-link.dropdown-toggle(href="#", role="button", data-toggle="dropdown", aria-haspopup="true",aria-expanded="false") Выпадающее меню
 
                                     .dropdown-menu(aria-labelledby="navbarDropdown")
-                                        a.dropdown-item(href="#") Action
-                                        a.dropdown-item(href="#") Another action
+                                        a.dropdown-item(href="#") Действие
+                                        a.dropdown-item(href="#") Другое действие
                                         .dropdown-divider
-                                        a.dropdown-item(href="#") Something else here
+                                        a.dropdown-item(href="#") Еще какое то действие
 
                                 li.nav-item
-                                    a.nav-link.disabled Disabled
+                                    a.nav-link.disabled Заблокированное меню
 
                             form.form-inline.my-2.my-lg-0
                                 input.form-control.mr-sm-2(type="search", laceholder="Search", aria-label="Search")
-                                button.btn.btn-outline-success.my-2.my-sm-0(type="submit") Search
+                                button.btn.btn-primary.my-2.my-sm-0(type="submit") Поиск
             // .site-navigation
             section.breadcrumb
                 .container
+            // section.breadcrumb
 
             #content.site-content.container
                 .row
                     aside#secondary.sidebar.col-12.col-lg-3.order-lg-2(role="complementary")
-                        h3.sidebar__title Sidebar title
+                        h3.sidebar__title Боковая панель
 
                         .sidebar__body
                             .sidebar__text.
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                                quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                                consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-                                cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                                proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                                Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.
+
                     main#primary.main.content.col-12.col-lg-9(role="main")
-                        h1.archive-title Archive name
-                        .archive-description.mb-2 Some any description text here.
+                        h1.archive-title.mb-0 Заготовка нового проекта
+                        .archive-description.mb-5 Скоро это будет грандиозный проект
 
-                        .row
-                            article#the_ID.col
-                                .media.post
-                                    .post__thmb.mr-3
-                                        img(src="/pages/index/img/placeholder.png", alt="", width="180", height="180")
+                        article#the_ID
+                            .media.post
+                                .post__thmb.mr-3
+                                    img(src="/pages/index/img/placeholder.png", alt="", width="180", height="180")
 
-                                    .media-body.article-content
-                                        h4.post__name Post name
-                                        .post__text
-                                            .two-columns
-                                                div.
-                                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                                                    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                                                    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-                                                    consequat.
-                                                div.
-                                                    Duis aute irure dolor in reprehenderit in voluptate velit esse
-                                                    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-                                                    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                                                br
-                                                a.more.meta-nav(href="#") More..
+                                .media-body.article-content
+                                    h4.post__name Заголовок записи
+                                    .post__text
+                                        .two-columns
+                                            div.
+                                                Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.
+                                            div#the_ID-more.collapse.
+                                                Текст генерируется абзацами случайным образом от двух до десяти предложений в абзаце, что позволяет сделать текст более привлекательным и живым для визуально-слухового восприятия.
+                                            br
+                                            a.more.meta-nav(href="#", data-toggle="collapse", data-target="#the_ID-more", onclick="this.className='hidden'") Читать еще..
 
                         // the_template_pagination()
             // #content
