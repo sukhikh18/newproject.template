@@ -1,4 +1,4 @@
-﻿# Заготовка нового проекта
+![](https://github.com/nikolays93/newproject.boilerplate/raw/master/public_html/screenshot.png)
 
 ## Установка
 1. Установите [node.js](https://nodejs.org/en/download/).
