@@ -1,6 +1,6 @@
 "use strict";
 
-const public = './public_html/';
+const root = './public_html/';
 const subDomain = 'nikolays93';
 
 /** {String} Domain for use local server proxy */
@@ -49,7 +49,7 @@ const imageminGiflossy = require("imagemin-giflossy");
     String:  assets, module,
     Object:  blocks, vendor, styles, script, images
 } */
-const config  = require(public + "config");
+const config  = require(root + "config");
 const paths = config.paths;
 
 /** @type String */
@@ -167,13 +167,13 @@ const moveFiles = function (srcPath, buildPath, name) {
         .pipe(debug({ "title": name }));
 }
 
-const buildHtml = function (e) {
-    if( !paths.html ) return e;
+const buildHtml = function (done) {
+    if( !paths.html ) return done();
 
     var srcPath = [ dir + '**/' + paths.html ];
 
     srcPath.push('!' + dir + '**/_' + paths.html);
-    srcPath.push('!' + dir + assets + '**/' + paths.html);
+    srcPath.push('!' + dir + paths.assets + '**/' + paths.html);
 
     return src( srcPath, { allowEmpty: true })
         .pipe(rigger())
@@ -184,13 +184,13 @@ const buildHtml = function (e) {
         .on("end", browsersync.reload);
 }
 
-const buildPug = function (e) {
-    if( !paths.pug ) return e;
+const buildPug = function (done) {
+    if( !paths.pug ) return done();
 
     var srcPath = [ dir + '**/' + paths.pug ];
 
     srcPath.push('!' + dir + '**/_' + paths.pug);
-    srcPath.push('!' + dir + assets + '**/' + paths.pug);
+    srcPath.push('!' + dir + paths.assets + '**/' + paths.pug);
 
     return src( srcPath, { allowEmpty: true })
         .pipe(pug({
@@ -204,17 +204,16 @@ const buildPug = function (e) {
         .on("end", browsersync.reload);
 }
 
-const buildVendorStyle   = function () { return buildStyles([  dir + paths.vendor.src + scssExt ], paths.vendor.dest, true); }
-const buildMainStyles    = function () { return buildStyles([  dir + paths.styles.src + '**/' + scssExt ], paths.styles.dest, true); }
-const buildBlocksStyle    = function () { return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], paths.blocks.dest, true); }
+const buildVendorStyle   = function () { return buildStyles([  dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, true); }
+const buildMainStyles    = function () { return buildStyles([  dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, true); }
+const buildBlocksStyle    = function () { return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, true); }
 
-const buildVendorScripts = function () { return buildScripts([ dir + paths.vendor.src + jsExt ], paths.vendor.dest, true); }
-const buildMainScripts   = function () { return buildScripts([ dir + paths.script.src + '**/' + jsExt ], paths.script.dest, true); }
-const buildBlocksScripts  = function () { return buildScripts([dir + paths.blocks.src + '**/' + jsExt ], paths.blocks.dest,  true); }
+const buildVendorScripts = function () { return buildScripts([ dir + paths.vendor.src + jsExt ], dist + paths.vendor.dest, true); }
+const buildMainScripts   = function () { return buildScripts([ dir + paths.script.src + '**/' + jsExt ], dist + paths.script.dest, true); }
+const buildBlocksScripts  = function () { return buildScripts([dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest,  true); }
 
-const buildMainImages    = function () { return buildImages([  dir + paths.images.src + '**/' + imgExt ], paths.images.dest); }
-const buildBlocksImages   = function () { return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], paths.blocks.dest); }
-
+const buildMainImages    = function () { return buildImages([  dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
+const buildBlocksImages   = function () { return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
 
 // const buildFaviconImages = function () {
 //     return src(paths.src.favicons, { allowEmpty: true })
@@ -247,8 +246,8 @@ const watchAll = function () {
     watch([ dir + paths.blocks.src + '**/' + jsExt ], buildBlocksScripts );
 
     watch( [ dir + paths.styles.src + '_site-settings.scss' ], buildVendorStyle )
-    watch( [ dir + paths.styles.src + '**/' + scssExt, dir + modules + '**/' + scssExt ], buildMainStyles );
-    watch( [ dir + paths.blocks.src + '**/' + scssExt, dir + modules + '**/' + scssExt ], buildBlocksStyle );
+    watch( [ dir + paths.styles.src + '**/' + scssExt, dir + paths.modules + '**/' + scssExt ], buildMainStyles );
+    watch( [ dir + paths.blocks.src + '**/' + scssExt, dir + paths.modules + '**/' + scssExt ], buildBlocksStyle );
 
     watch( [ dir + paths.images.src + '**/' + imgExt ], buildMainImages );
     watch( [ dir + paths.blocks.src + '**/' + imgExt ], buildBlocksImages );
@@ -287,70 +286,70 @@ gulp.task("build", parallel("buildCode", "buildStyles", "buildScripts", "buildIm
 /**
  * Move assets (if yarn/npm installed them)
  */
-gulp.task("install", function(e) {
+gulp.task("install", function(done) {
     const assetslist = [
         {
             name: 'Jquery',
             src: './node_modules/jquery/dist/**/*',
-            dest: 'jquery/'
+            dest: paths.vendor.dest + 'jquery/'
         },
         {
             name: '@Fancyapps/fancybox',
             src: './node_modules/@fancyapps/fancybox/dist/**/*',
-            dest: 'fancybox/'
+            dest: paths.vendor.dest + 'fancybox/'
         },
         {
             name: 'Slick-carousel',
             src: './node_modules/slick-carousel/slick/**/*',
-            dest: 'slick/',
+            dest: paths.vendor.dest + 'slick/',
         },
         {
             name: 'Appear',
             src: './node_modules/appear/dist/**/*',
-            dest: 'appear/'
+            dest: paths.vendor.dest + 'appear/'
         },
         {
             name: 'Lettering',
             src: './node_modules/lettering/dist/**/*',
-            dest: 'lettering/'
+            dest: paths.vendor.dest + 'lettering/'
         },
         { // (Required for bootstrap dropdowns)
             name: 'Popper.js',
             src: './node_modules/popper.js/dist/umd/**/*',
-            dest: raw + 'popper.js.umd/'
+            dest: paths.vendor.src + 'popper.js.umd/'
         },
         {
             name: 'Botstrap js',
             src: './node_modules/bootstrap/js/dist/**/*',
-            dest: raw + 'bootstrap/js/'
+            dest: paths.vendor.src + 'bootstrap/js/'
         },
         {
             name: 'Botstrap scss',
             src: './node_modules/bootstrap/scss/**/*',
-            dest: raw + 'bootstrap/scss/'
+            dest: paths.vendor.src + 'bootstrap/scss/'
         },
         {
             name: 'Hamburgers',
             src: './node_modules/hamburgers/_sass/hamburgers/**/*',
-            dest: raw + 'hamburgers/'
+            dest: paths.vendor.src + 'hamburgers/'
         },
         {
             name: 'Animatewithsass',
             src: './node_modules/animatewithsass/**/*',
-            dest: 'animatewithsass/'
+            dest: paths.vendor.dest + 'animatewithsass/'
         },
         {
             name: 'Swiper',
             src: './node_modules/swiper/dist/**/*',
-            dest: 'swiper/'
+            dest: paths.vendor.dest + 'swiper/'
         },
     ];
 
     assetslist.forEach(function(item, i, arr) {
-        moveFiles(item.src, dist + paths.vendor.dest + item.dest, item.name);
+        moveFiles(item.src, dist + item.dest, item.name);
     });
 
-    return e();
+    return done();
 });
 
 /**

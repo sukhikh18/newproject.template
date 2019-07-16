@@ -9,7 +9,7 @@ module.exports = {
     jsExt:   '*.js',
     imgExt:  '*.{jpg,jpeg,png,gif,svg}',
 
-    paths = {
+    paths: {
         assets: 'assets/',
         module: 'assets/module/',
 
@@ -19,10 +19,10 @@ module.exports = {
         blocks: {
             src: 'assets/pages/',
             dest: 'pages/',
-        }
+        },
 
         vendor: {
-            src:  'assets/vendor/_source',
+            src:  'assets/vendor/_source/',
             dest: 'assets/vendor/',
         },
 
@@ -32,12 +32,12 @@ module.exports = {
         },
 
         script: {
-            src:  'assets/_source',
+            src:  'assets/_source/',
             dest: 'assets/',
         },
 
         images: {
-            src:  'img/_source',
+            src:  'img/_source/',
             dest: 'img/',
         },
     }
