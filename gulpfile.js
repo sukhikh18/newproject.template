@@ -287,7 +287,7 @@ const watchAll = function () {
         return buildMainStyles(cb, 0);
     } );
 
-    watch( [ dir + paths.modules + '**/' + scssExt ], function reBuildStylesByModules(cb) {
+    watch( [ dir + paths.module + '**/' + scssExt ], function reBuildStylesByModules(cb) {
         buildMainStyles(cb, 0);
         buildBlocksStyles(cb, 0);
         return cb();

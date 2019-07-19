@@ -2,24 +2,41 @@
     display: flex;
     justify-content: space-between;
 
-    a {
-        display: block;
-        margin: 0 auto 1rem;
-        @include circle();
-        @include thumbnail-center(200px, 200px);
-        @include scale(120%, 100%);
-    }
-
-    .slick-slide, a {
-        &:focus {
+    > div {
+        a:focus {
             outline: none;
         }
-    }
 
-    @media screen and (max-width: $media-xl) {
-        a {
+        img {
+            transition: .4s ease all;
+            border-radius: 8px;
             width: 150px;
             height: 150px;
         }
+    }
+
+    > div:nth-child(1) {
+        img { clip-path: circle(100% at 50% 50%); }
+        &:hover img { clip-path: circle(50% at 50% 50%); }
+    }
+
+    > div:nth-child(2) {
+        img { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+        &:hover img { clip-path: polygon(50% 0, 50% 0, 100% 100%, 0 100%); }
+    }
+
+    > div:nth-child(3) {
+        img { clip-path: polygon(0% 0%, 0% 0%, 0% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 100%, 100% 100%, 100% 100%, 0% 100%); }
+        &:hover img { clip-path: polygon(50% 0%, 63% 38%, 100% 38%, 69% 59%, 82% 100%, 50% 75%, 18% 100%, 31% 59%, 0 38%, 37% 38%); }
+    }
+
+    > div:nth-child(4) {
+        img { clip-path: inset(0 0 round 0 0%); }
+        &:hover img { clip-path: inset(0 0 round 0 20%); }
+    }
+
+    > div:nth-child(5) {
+        img { clip-path: polygon(0 0, 100% 0, 100% 50%, 100% 100%, 0 100%); }
+        &:hover img { clip-path: polygon(0 0, 100% 0, 75% 50%, 100% 100%, 0 100%); }
     }
 }
