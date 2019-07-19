@@ -208,18 +208,19 @@ const buildPug = function (done) {
         .on("end", browsersync.reload);
 }
 
-const buildVendorStyles    = function ($cb, $n=1) { return buildStyles([ dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, $n); }
-const buildMainStyles      = function ($cb, $n=1) { return buildStyles([ dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, $n); }
-const buildBlocksStyles    = function ($cb, $n=1) { return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, $n); }
+const buildVendorStyles    = function (cb, $n=1) { if(false === paths.vendor.src) return cb(); return buildStyles([ dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, $n); }
+const buildMainStyles      = function (cb, $n=1) { if(false === paths.styles.src) return cb(); return buildStyles([ dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, $n); }
+const buildBlocksStyles    = function (cb, $n=1) { if(false === paths.blocks.src) return cb(); return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, $n); }
 
-const buildVendorScripts = function () { return buildScripts([ dir + paths.vendor.src + jsExt ], dist + paths.vendor.dest, true); }
-const buildMainScripts   = function () { return buildScripts([ dir + paths.script.src + '**/' + jsExt ], dist + paths.script.dest, true); }
-const buildBlocksScripts = function () { return buildScripts([ dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest,  true); }
+const buildVendorScripts = function (cb) { if(false === paths.vendor.src) return cb(); return buildScripts([ dir + paths.vendor.src + jsExt ], dist + paths.vendor.dest, true); }
+const buildMainScripts   = function (cb) { if(false === paths.script.src) return cb(); return buildScripts([ dir + paths.script.src + '**/' + jsExt ], dist + paths.script.dest, true); }
+const buildBlocksScripts = function (cb) { if(false === paths.blocks.src) return cb(); return buildScripts([ dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest,  true); }
 
-const buildMainImages    = function () { return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
-const buildBlocksImages  = function () { return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
+const buildMainImages    = function (cb) { if(false === paths.images.src) return cb(); return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
+const buildBlocksImages  = function (cb) { if(false === paths.blocks.src) return cb(); return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
 
-gulp.task("buildScriptsWebpack", function() {
+gulp.task("buildScriptsWebpack", function(cb) {
+    if( false === paths.webpack.src ) return cb();
     return src(dir + paths.webpack.src + '**/' + jsExt, { allowEmpty: true })
         .pipe(webpackStream(webpackConfig), webpack)
         .pipe(gulpif(production, rename({ suffix: ".min" })))
