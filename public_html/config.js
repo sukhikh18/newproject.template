@@ -37,12 +37,12 @@ module.exports = {
         },
 
         webpack: {
-            src:  'assets/webpack/',
+            src:  '', // assets/webpack/
             dest: 'assets/',
         },
 
         images: {
-            src:  'img/_source/',
+            src:  'img/HD/',
             dest: 'img/',
         },
     }

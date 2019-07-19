@@ -21,7 +21,7 @@ public_html/*.html
 public_html/pages/
 
 public_html/img/*
-!public_html/img/_source/
+!public_html/img/HD/
 
 public_html/assets/*
 !public_html/assets/_source/
