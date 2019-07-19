@@ -37,7 +37,7 @@ module.exports = {
         },
 
         webpack: {
-            src:  '', // assets/webpack/
+            src:  false, // assets/webpack/
             dest: 'assets/',
         },
 
