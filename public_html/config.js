@@ -36,6 +36,11 @@ module.exports = {
             dest: 'assets/',
         },
 
+        webpack: {
+            src:  'assets/webpack/',
+            dest: 'assets/',
+        },
+
         images: {
             src:  'img/_source/',
             dest: 'img/',

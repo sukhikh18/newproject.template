@@ -9,6 +9,7 @@
 ## Как пользоваться
 * Клонируйте репозиторий ```git clone https://github.com/nikolays93/newproject.boilerplate.git``` или скачайте сборку из этого репозитория ```Clone or download > Download ZIP```;
 * Перейдите в папку командой ```cd newproject.boilerplate``` или откройте консоль в папке скачанной сборки;
-* Введите команду ```yarn``` для установки/сборки проекта;
+* Введите команду ```yarn``` для установки проекта;
+* Воспользуйтесь командой ```yarn vendor``` для переноса библиотек скачанных yarn'ом (popper, bootstrap, jQuery и т.д.)
 * Введите ```yarn run dev``` или ```gulp``` для разработки;
 * Введите ```yarn run prod``` или ```gulp build --production``` для завершения разработки;

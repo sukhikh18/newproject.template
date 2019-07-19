@@ -6,8 +6,6 @@ const subDomain = 'nikolays93';
 /** {String} Domain for use local server proxy */
 const domain = '';
 
-// const webpack = require("webpack");
-// const webpackStream = require("webpack-stream");
 const gulp = require("gulp");
 const src = gulp.src;
 const dest = gulp.dest;
@@ -44,6 +42,12 @@ const imageminMozjpeg = require("imagemin-mozjpeg");
 const imageminGiflossy = require("imagemin-giflossy");
 // const imageminWebp = require("imagemin-webp");
 // const webp = require("gulp-webp");
+const webpack = require("webpack");
+const webpackStream = require("webpack-stream");
+
+/** @type bool */
+const production = !!yargs.argv.production;
+const tunnel = !!yargs.argv.tunnel;
 
 /** @type Object {
     String:  assets, module,
@@ -52,6 +56,10 @@ const imageminGiflossy = require("imagemin-giflossy");
 const config  = require(root + "config");
 const paths = config.paths;
 
+const webpackConfig = require('./webpack.config.js');
+webpackConfig.mode = production ? 'production' : 'development';
+webpackConfig.devtool = production ? false : "source-map";
+
 /** @type String */
 const dir   = config.src;
 const dist  = config.dest;
@@ -59,10 +67,6 @@ const dist  = config.dest;
 const scssExt = config.scssExt;
 const jsExt   = config.jsExt;
 const imgExt  = config.imgExt;
-
-/** @type bool */
-const production = !!yargs.argv.production;
-const tunnel = !!yargs.argv.tunnel;
 
 const buildStyles = function (srcPath, buildPath, needNewer) {
     srcPath.push ('!' + dir + '**/_' + scssExt);
@@ -215,6 +219,15 @@ const buildBlocksScripts = function () { return buildScripts([ dir + paths.block
 const buildMainImages    = function () { return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
 const buildBlocksImages  = function () { return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
 
+gulp.task("buildScriptsWebpack", function() {
+    return src(dir + paths.webpack.src + '**/' + jsExt, { allowEmpty: true })
+        .pipe(webpackStream(webpackConfig), webpack)
+        .pipe(gulpif(production, rename({ suffix: ".min" })))
+        .pipe(dest(dist + paths.webpack.dest))
+        .pipe(debug({ "title": "Webpack" }))
+        .on("end", browsersync.reload);
+});
+
 // const buildFaviconImages = function () {
 //     return src(paths.src.favicons, { allowEmpty: true })
 //         .pipe(newer(paths.build.favicons))
@@ -244,6 +257,7 @@ const watchAll = function () {
     watch([ dir + paths.vendor.src + '**/' + jsExt ], buildVendorScripts );
     watch([ dir + paths.script.src + '**/' + jsExt ], buildMainScripts );
     watch([ dir + paths.blocks.src + '**/' + jsExt ], buildBlocksScripts );
+    watch([ dir + paths.webpack.src + '**/' + jsExt ], series("buildScriptsWebpack") );
 
     const settings = dir + paths.styles.src + '_site-settings.scss';
 
@@ -254,12 +268,15 @@ const watchAll = function () {
         return cb();
     } );
 
-    watch( [ dir + paths.styles.src + '**/' + scssExt, '!' + settings ], function reBuildMainStyles(cb) {
-        buildMainStyles(cb, 0);
-        return cb();
+    watch([ dir + paths.vendor.src + '**/' + scssExt ], function reBuildVendorStyles(cb) {
+        return buildVendorStyles(cb, 0);
     } );
 
-    watch( [ dir + paths.modules + '**/' + scssExt ], function(cb) {
+    watch( [ dir + paths.styles.src + '**/' + scssExt, '!' + settings ], function reBuildMainStyles(cb) {
+        return buildMainStyles(cb, 0);
+    } );
+
+    watch( [ dir + paths.modules + '**/' + scssExt ], function reBuildStylesByModules(cb) {
         buildMainStyles(cb, 0);
         buildBlocksStyles(cb, 0);
         return cb();
@@ -293,7 +310,7 @@ const serve = function () {
 
 gulp.task("buildCode", parallel(buildHtml, buildPug));
 gulp.task("buildStyles", parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
-gulp.task("buildScripts", parallel(buildVendorScripts, buildBlocksScripts, buildMainScripts));
+gulp.task("buildScripts", parallel(buildVendorScripts, buildBlocksScripts, buildMainScripts, series("buildScriptsWebpack")));
 gulp.task("buildImages", parallel(buildBlocksImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
 
 /**
@@ -373,4 +390,4 @@ gulp.task("install", function(done) {
 /**
  * Build with start serve/watcher
  */
-gulp.task("default", series("install", "build", parallel(watchAll, serve)));
+gulp.task("default", series("build", parallel(watchAll, serve)));
