@@ -1,9 +1,10 @@
 "use strict";
 
 module.exports = {
-    /** {String} Path to the directory */
-    src: './public_html/',
-    dest: './public_html/',
+    /** {String} Path to the source directory. Target is root + src + ${*.*} */
+    src: '',
+    /** {String} Path to the destination directory. Target is root + dest + ${*.*} */
+    dest: '',
 
     scssExt: '*.scss',
     jsExt:   '*.js',

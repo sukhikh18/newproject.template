@@ -54,7 +54,10 @@ const tunnel = !!yargs.argv.tunnel;
     String:  assets, module,
     Object:  blocks, vendor, styles, script, images
 } */
-const config  = require(root + "config");
+let config  = require(root + "config");
+config.src = root + config.src;
+config.dest = root + config.dest;
+
 const paths = config.paths;
 
 const webpackConfig = require('./webpack.config.js');
