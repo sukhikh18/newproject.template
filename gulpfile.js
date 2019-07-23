@@ -17,6 +17,7 @@ const gulpif = require("gulp-if");
 const browsersync = require("browser-sync");
 const rename = require("gulp-rename");
 const replace = require("gulp-replace");
+const merge = require('merge-stream');
 const plumber = require("gulp-plumber");
 const debug = require("gulp-debug");
 const clean = require("gulp-clean");
@@ -172,13 +173,6 @@ const buildImages = function (srcPath, buildPath) {
         .pipe(dest(buildPath))
         .pipe(debug({ "title": "Images" }))
         .on("end", browsersync.reload);
-}
-
-const moveFiles = function (srcPath, buildPath, name) {
-    return src(srcPath, { allowEmpty: true })
-        .pipe(newer(buildPath))
-        .pipe(dest(buildPath))
-        .pipe(debug({ "title": name }));
 }
 
 const buildHtml = function (done) {
@@ -340,7 +334,7 @@ gulp.task("build", parallel("buildCode", "buildStyles", "buildScripts", "buildIm
  * Move assets (if yarn/npm installed them)
  */
 gulp.task("install", function(done) {
-    const assetslist = [
+    const assetsList = [
         {
             name: 'Jquery',
             src: './node_modules/jquery/dist/**/*',
@@ -398,11 +392,14 @@ gulp.task("install", function(done) {
         },
     ];
 
-    assetslist.forEach(function(item, i, arr) {
-        moveFiles(item.src, dist + item.dest, item.name);
+    let tasks = assetsList.map(function (element) {
+        return src(element.src)
+            .pipe(newer(dist + element.dest))
+            .pipe(dest(dist + element.dest))
+            .pipe(debug({ "title": element.name }));
     });
 
-    return done();
+    return merge(tasks);
 });
 
 /**
