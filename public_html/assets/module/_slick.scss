@@ -14,3 +14,13 @@ $slick-opacity-not-active: 0.25 !default;
 
 @import "../vendor/slick/slick.scss";
 @import "../vendor/slick/slick-theme.scss";
+
+.slick-row {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.slick-col {
+    padding-left: 10px;
+    padding-right: 10px;
+}
