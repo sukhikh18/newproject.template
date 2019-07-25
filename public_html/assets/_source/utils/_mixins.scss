@@ -84,88 +84,21 @@ $whd: (1 / (num($tpl-hd) * 0.01)) * 1vw;
     #{$context}: num($value) * $wsm;
 }
 
-@mixin vw-font( $size-from, $size-to: null, $min: $media-lg, $max: $media-xl ) {
+// for example: fsize: 14px, sm-hd: 14 to 32 proportional, from hd: 32;
+@mixin font-size( $size-from, $size-to: null, $min: $media-sm, $max: $media-hd ) {
     font-size: $size-from;
 
     @if $size-to {
-        // stretch font size from
+        // start stretch from
         @include from( $min ) {
-            font-size: calc(
-                #{$size-from} +
-                #{num($size-to) - num($size-from)} *
-                (100vw - #{$min}) /
-                #{num($max) - num($min)}
-            );
+            // from + ={to - from} * (100vw - min) / ={max - min}
+            font-size: calc( #{$size-from} + #{num($size-to) - num($size-from)} *
+                (100vw - #{$min}) / #{num($max) - num($min)} );
         }
-
-        // ..to
+        // end stretch from
         @include from( $max ) {
             font-size: $size-to;
         }
-    }
-}
-
-@mixin vw-asc( $context, $value-sm, $value-md: $value-sm, $value-lg: $value-md, $value-xl: $value-lg, $value-hd: $value-xl ) {
-    @if $value-sm {
-        @include vw-sm( $context, $value-sm );
-    }
-
-    @if $value-md {
-        @include from( $media-sm ) {
-            @include vw-md( $context, $value-md );
-        }
-    }
-
-    @if $value-lg {
-        @include from( $media-md ) {
-            @include vw-lg( $context, $value-lg );
-        }
-    }
-
-    @if $value-xl {
-        @include from( $media-lg ) {
-            @include vw-xl( $context, $value-xl );
-        }
-    }
-
-    @if $value-hd {
-        @include from( $media-xl ) {
-            @include vw-hd( $context, $value-hd );
-        }
-    }
-}
-
-@mixin vw-desc( $context, $value-sm, $value-md: $value-sm, $value-lg: $value-md, $value-xl: $value-lg, $value-hd: $value-xl ) {
-    @if $value-hd {
-        // @todo think about it (check this)
-        // #{$context}: $value-hd;
-        // @if $media-hd {
-        //     @include to( $media-hd ) {
-        @include vw-hd( $context, $value-hd );
-        //     }
-        // }
-    }
-
-    @if $value-xl {
-        @include to( $media-xl ) {
-            @include vw-xl( $context, $value-xl );
-        }
-    }
-
-    @if $value-lg {
-        @include to( $media-lg ) {
-            @include vw-lg( $context, $value-lg );
-        }
-    }
-
-    @if $value-md {
-        @include to( $media-md ) {
-            @include vw-md( $context, $value-md );
-        }
-    }
-
-    @if $value-sm {
-        @include vw-sm( $context, $value-sm );
     }
 }
 
