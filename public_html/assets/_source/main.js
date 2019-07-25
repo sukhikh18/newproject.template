@@ -105,40 +105,53 @@ jQuery(document).ready(function($) {
     };
 
     /********************************* Slick **********************************/
+    var initSlick = function( $slick, args ) {
+        if(!$slick.length || $slick.hasClass('slick-initialized')) return;
 
-    window.slickResponsive = function(selector, args) {
-        /** Const  add class on init */
-        var initClass = 'initialized';
-
-        /** Object  jQuery instance */
-        var $instance = $( selector );
-
-        /** Object array-like */
-        var params = {
-            infinite: true,
-            autoplay: true,
-            autoplaySpeed: 4000,
-            arrows: true,
-            dots: false,
-            slidesToShow: 4,
-            slidesToScroll: 1,
-        };
-
-        $.each(args, function(index, val) {
-            params[ index ] = val;
+        // change classes for compatability
+        $slick.closest('.row').each(function() {
+            $(this).attr('data-restore-class', $(this).attr('class'))
+                .removeAttr('class')
+                .addClass('slick-row');
         });
 
+        $('> [class^="col"]', $slick).each(function() {
+            $(this).attr('data-restore-class', $(this).attr('class'))
+                .removeAttr('class')
+                .addClass('slick-col');
+        });
+
+        $slick.slick( args );
+    }
+
+    var stopSlick = function( $slick ) {
+        if(!$slick.length || !$slick.hasClass('slick-initialized')) return;
+
+        // return classes for css columns rules
+        $slick.closest('.slick-row').each(function() {
+            $(this).attr('class', $(this).attr('data-restore-class'));
+        });
+
+        $('.slick-col', $slick).each(function() {
+            $(this).attr('class', $(this).attr('data-restore-class'))
+        });
+
+        $slick.slick('unslick');
+    }
+
+    var slickResponsive = function( target, args = {}, maxWidth = 768 ) {
+        var $slick = target instanceof jQuery ? target : $(target);
+        if( !$().slick ) {
+            if( $(this).width() < maxWidth ) console.error('"Slick" is not loaded');
+            else console.log('"Slick" required for mobile devices');
+            return;
+        }
+
         $(window).on('resize', function(e) {
-            if( 768 > $(window).width() ) {
-                /** Is not inited */
-                if( !$instance.hasClass( initClass ) ) {
-                    $instance.slick( params ).addClass( initClass );
-                }
-            }
-            else {
-                if( $instance.hasClass( initClass ) ) {
-                    $instance.slick('unslick').removeClass( initClass );
-                }
+            if( $(this).width() < maxWidth ) {
+                initSlick( $slick, args );
+            } else {
+                stopSlick( $slick );
             }
         });
 
@@ -148,12 +161,25 @@ jQuery(document).ready(function($) {
     }
 
     slickResponsive('.slick', {
-        dots: true,
-        responsive: [
-        {
+        infinite: true,
+        autoplay: false,
+        autoplaySpeed: 4000,
+        arrows: true,
+        dots: false,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        responsive: [{
             breakpoint: 576,
-            settings: {}
+            settings: {
+                autoplay: true,
+                slidesToShow: 1,
+            }
         },
-        ]
-    });
+        {
+            breakpoint: 768,
+            settings: {
+                slidesToShow: 2,
+            }
+        }]
+    }, 992);
 });

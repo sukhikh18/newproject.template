@@ -12,8 +12,8 @@ html.no-js(lang='ru-RU')
         // Place favicon.ico in the root directory
 
         // include function or replace to footer
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js", crossorigin="anonymous", type="text/javascript")
-        script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery.min.js", crossorigin="anonymous", type="text/javascript")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr@min.js", crossorigin="anonymous", type="text/javascript")
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.0/jquery@min.js", crossorigin="anonymous", type="text/javascript")
         script.
             window.jQuery || document.write('<script src="\/assets\/vendor\/jquery\/jquery.min.js"><\/script>');
         link(rel="stylesheet", type="text/css", href="/assets/vendor/hamburgers@min.css")
@@ -21,16 +21,14 @@ html.no-js(lang='ru-RU')
         // bootstrap
         link(rel="stylesheet", type="text/css", href="/assets/vendor/bootstrap@min.css")
         script(type="text/javascript", src="/assets/vendor/bootstrap@min.js")
-        // /
 
         // slick
         // link(rel="stylesheet", type="text/css", href="/assets/vendor/slick/slick.css")
-        // script(type="text/javascript", src="/assets/vendor/slick/slick.min.js")
-        // /
+        script(type="text/javascript", src="/assets/vendor/slick/slick@min.js")
 
         // fancybox
-        // link(rel="stylesheet", type="text/css", href="/assets/vendor/fancybox/jquery.fancybox.min.css")
-        // script(type="text/javascript", src="/assets/vendor/fancybox/jquery.fancybox.min.js")
+        // link(rel="stylesheet", type="text/css", href="/assets/vendor/fancybox/jquery.fancybox@min.css")
+        // script(type="text/javascript", src="/assets/vendor/fancybox/jquery.fancybox@min.js")
         // /
 
         script(src="/assets/main@min.js")
@@ -39,7 +37,7 @@ html.no-js(lang='ru-RU')
 
         <!-- IE compatibility -->
         <!--[if lt IE 9]>
-            <script data-skip-moving="true" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+            <script data-skip-moving="true" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv@min.js"></script>
             //- <script data-skip-moving="true">var isIE = true;</script>
         <![endif]-->
         //-
@@ -147,23 +145,23 @@ html.no-js(lang='ru-RU')
 
                         // the_template_pagination()
             // #content
-            section.site-prefix.container
-                .slider.justify-content-between.mt-5
-                    div
-                        a(href="/img/placeholder.png", data-fancybox="gallery")
-                            img.ac(src="img/placeholder.png", alt="", width="150")
-                    div
-                        a(href="/img/placeholder.png", data-fancybox="gallery")
-                            img.ac(src="img/placeholder.png", alt="", width="150")
-                    div
-                        a(href="/img/placeholder.png", data-fancybox="gallery")
-                            img.ac(src="img/placeholder.png", alt="", width="150")
-                    div
-                        a(href="/img/placeholder.png", data-fancybox="gallery")
-                            img.ac(src="img/placeholder.png", alt="", width="150")
-                    div
-                        a(href="/img/placeholder.png", data-fancybox="gallery")
-                            img.ac(src="img/placeholder.png", alt="", width="150")
+            section.site-prefix.container.mt-5
+                .slick.row.justify-content-between
+                    div.col-2-4.mb-3
+                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                            img.ac(src="img/placeholder.png", alt="")
+                    div.col-2-4.mb-3
+                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                            img.ac(src="img/placeholder.png", alt="")
+                    div.col-2-4.mb-3
+                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                            img.ac(src="img/placeholder.png", alt="")
+                    div.col-2-4.mb-3
+                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                            img.ac(src="img/placeholder.png", alt="")
+                    div.col-2-4.mb-3
+                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                            img.ac(src="img/placeholder.png", alt="")
 
             footer.site-footer
                 .container
