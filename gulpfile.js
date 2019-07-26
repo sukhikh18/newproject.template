@@ -191,8 +191,7 @@ const buildHtml = function (done) {
         .pipe(replace("@min", production ? ".min" : ''))
         .pipe(rename({ basename: "index" }))
         .pipe(dest(dist))
-        .pipe(debug({ "title": "RAW to HTML" }))
-        .on("end", browsersync.reload);
+        .pipe(debug({ "title": "RAW to HTML" }));
 }
 
 const buildPug = function (done) {
@@ -211,8 +210,7 @@ const buildPug = function (done) {
         .pipe(replace("@min", production ? ".min" : ''))
         .pipe(rename({ basename: "index" }))
         .pipe(dest(dist))
-        .pipe(debug({ "title": "PUG to HTML" }))
-        .on("end", browsersync.reload);
+        .pipe(debug({ "title": "PUG to HTML" }));
 }
 
 const buildVendorStyles    = function (cb, $n=1) { if(!paths.vendor.src) return cb(); return buildStyles([ dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, $n); }
@@ -261,6 +259,10 @@ gulp.task("buildScriptsWebpack", function(cb) {
 const watchAll = function () {
     if( paths.html ) watch([ dir + '**/' + paths.html ], buildHtml);
     if( paths.pug ) watch([ dir + '**/' + paths.pug ], buildPug);
+    watch([ dir + '**/*.html' ], function htmlChangedReload(cb) {
+        browsersync.reload();
+        return cb();
+    });
 
     watch([ dir + paths.vendor.src + '**/' + jsExt ], buildVendorScripts );
     watch([ dir + paths.script.src + '**/' + jsExt ], buildMainScripts );
