@@ -137,6 +137,16 @@ const buildScripts = function (srcPath, buildPath, needNewer) {
         .on("end", browsersync.reload);
 }
 
+gulp.task("buildScriptsWebpack", function(cb) {
+    if( !paths.webpack.src ) return cb();
+    return src(dir + paths.webpack.src + 'main.js', { allowEmpty: true })
+        .pipe(webpackStream(webpackConfig), webpack)
+        .pipe(gulpif(production, rename({ suffix: ".min" })))
+        .pipe(dest(dist + paths.webpack.dest))
+        .pipe(debug({ "title": "Webpack" }))
+        .on("end", browsersync.reload);
+});
+
 const buildImages = function (srcPath, buildPath) {
     // srcPath.images.push('!' + paths.src.sprites);
     // srcPath.images.push('!' + paths.src.favicons);
@@ -223,16 +233,6 @@ const buildBlocksScripts = function (cb) { if(!paths.blocks.src) return cb(); re
 
 const buildMainImages    = function (cb) { if(!paths.images.src) return cb(); return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
 const buildBlocksImages  = function (cb) { if(!paths.blocks.src) return cb(); return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
-
-gulp.task("buildScriptsWebpack", function(cb) {
-    if( !paths.webpack.src ) return cb();
-    return src(dir + paths.webpack.src + '**/' + jsExt, { allowEmpty: true })
-        .pipe(webpackStream(webpackConfig), webpack)
-        .pipe(gulpif(production, rename({ suffix: ".min" })))
-        .pipe(dest(dist + paths.webpack.dest))
-        .pipe(debug({ "title": "Webpack" }))
-        .on("end", browsersync.reload);
-});
 
 // const buildFaviconImages = function () {
 //     return src(paths.src.favicons, { allowEmpty: true })

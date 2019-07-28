@@ -1,6 +1,6 @@
 module.exports = {
     output: {
-        filename: "bundle.js",
+        filename: "main.js",
     },
     module: {
         rules: [

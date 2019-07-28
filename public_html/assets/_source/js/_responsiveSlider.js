@@ -1,65 +1,74 @@
-jQuery(document).ready(function($) {
-    /**
-     * @how to use it
-     * var slickGallery = new ResponsiveSlider('.row', { props: {
-     *     infinite: true,
-     *     autoplay: false,
-     *     autoplaySpeed: 4000,
-     *     arrows: true,
-     *     dots: false,
-     *     slidesToShow: 4,
-     *     slidesToScroll: 1,
-     *     responsive: [{
-     *         breakpoint: 576,
-     *         settings: {
-     *             autoplay: true,
-     *             slidesToShow: 1,
-     *         }
-     *     }]
-     * }}).init();
-     */
+const ResponsiveSlider = (($) => {
 
-    window.ResponsiveSlider = function( target, args ) {
-        if( !args.maxWidth ) args.maxWidth = 768;
+    const NAME = 'ResponsiveSlider'
+    const JQUERY_NO_CONFLICT = $.fn[NAME]
 
-        this.$slider = target instanceof jQuery ? target : $(target);
-        this.props = args.props || {};
-        this.maxWidth = 0 + args.maxWidth;
+    const __default = {
+        maxWidth: 768,
+        initClass: 'slick-initialized', // 'owl-loaded'
 
-        this.onInit = function() {};
-        this.onBeforeStart = function() {};
-        this.onAfterStart = function() {};
-        this.onBeforeStop = function() {};
-        this.onAfterStop = function() {};
-    }
-
-    window.ResponsiveSlider.prototype = {
-        isInited: function() {
-            return this.$slider.hasClass('slick-initialized'); // 'owl-loaded'
+        opts: {
+            infinite: true,
+            autoplay: false,
+            autoplaySpeed: 4000,
+            arrows: true,
+            dots: false,
+            slidesToShow: 4,
+            slidesToScroll: 1,
+            responsive: [{
+                breakpoint: 576,
+                settings: {
+                    autoplay: true,
+                    slidesToShow: 1,
+                }
+            }]
         },
 
-        init: function() {
+        onInit: () => {},
+        onBeforeStart: () => {},
+        onAfterStart: () => {},
+        onBeforeStop: () => {},
+        onAfterStop: () => {},
+    }
+
+    class ResponsiveSlider
+    {
+        static get Default() {
+            return Default
+        }
+
+        isInited() {
+            return this.$slider.hasClass(this.config.initClass)
+        }
+
+        constructor(target, config) {
+            this.config = $.extend({}, __default, config)
+
+            this.$slider = target instanceof jQuery ? target : $(target)
+            this.config.maxWidth = parseFloat( this.config.maxWidth );
+
             if( !this.$slider.length ) return;
+            if(this.isInited()) return;
 
-            this.onInit.call(this);
-            var i = this;
+            this.config.onInit.call(this);
 
-            $(window).on('resize', function(e) {
-                if( $(this).width() < i.maxWidth ) {
-                    i.start();
+            let $window = $(window);
+            $window.on('resize', (event) => {
+                if( $window.width() < this.config.maxWidth ) {
+                    this.start();
                 } else {
-                    i.stop();
+                    this.stop();
                 }
             });
 
             setTimeout(function() {
-                $(window).trigger('resize');
+                $window.trigger('resize');
             }, 500);
-        },
+        }
 
-        start: function() {
+        start() {
             if(this.isInited()) return;
-            this.onBeforeStart.call(this);
+            this.config.onBeforeStart.call(this);
 
             // change classes for compatability
             this.$slider.closest('.row').each(function() {
@@ -74,13 +83,13 @@ jQuery(document).ready(function($) {
                     .addClass('slider-col');
             });
 
-            this.$slider.slick( this.props ); // or this.$slider.owlCarousel( this.props );
-            this.onAfterStart.call(this);
-        },
+            this.$slider.slick( this.config.opts ); // or this.$slider.owlCarousel( thisconfig..opts );
+            this.config.onAfterStart.call(this);
+        }
 
-        stop: function() {
+        stop() {
             if(!this.isInited()) return;
-            this.onBeforeStop.call(this);
+            this.config.onBeforeStop.call(this);
 
             // return classes for css columns rules
             this.$slider.closest('.slider-row').each(function() {
@@ -92,7 +101,29 @@ jQuery(document).ready(function($) {
             });
 
             this.$slider.slick('unslick'); // or this.$slider.trigger('destroy.owl.carousel');
-            this.onAfterStop.call(this);
+            this.config.onAfterStop.call(this);
+        }
+
+        static _jQueryInterface(config) {
+            config = config || {}
+            return this.each(() => {
+                let $this = $(this)
+                let config = $.extend({}, ResponsiveSlider.__default, $this.data(), typeof config === 'object' && config )
+
+                new ResponsiveSlider(this, config)
+            })
         }
     }
-});
+
+    $.fn[NAME]             = ResponsiveSlider._jQueryInterface
+    $.fn[NAME].Constructor = ResponsiveSlider
+
+    $.fn[NAME].noConflict  = () => {
+        $.fn[NAME] = JQUERY_NO_CONFLICT
+        return ResponsiveSlider._jQueryInterface
+    }
+
+    return ResponsiveSlider
+})(jQuery);
+
+export default ResponsiveSlider

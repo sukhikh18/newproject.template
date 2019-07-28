@@ -33,12 +33,12 @@ module.exports = {
         },
 
         script: {
-            src:  'assets/_source/',
+            src:  false,
             dest: 'assets/',
         },
 
         webpack: {
-            src:  false, // assets/webpack/
+            src:  'assets/_source/',
             dest: 'assets/',
         },
 
