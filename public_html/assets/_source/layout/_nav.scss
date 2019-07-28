@@ -36,4 +36,11 @@
                     flex-direction: row;
         }
     }
+
+    .navbar-toggler {
+        // reset bootstrap defaults
+        padding: 0 10px;
+        border: 0;
+        border-radius: 0;
+    }
 }
