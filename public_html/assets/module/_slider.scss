@@ -13,18 +13,18 @@
     }
 
     > div:nth-child(1) {
-        img { clip-path: circle(100% at 50% 50%); }
-        &:hover img { clip-path: circle(50% at 50% 50%); }
+        img { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+        &:hover img { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
     }
 
     > div:nth-child(2) {
-        img { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
-        &:hover img { clip-path: polygon(50% 0, 50% 0, 100% 100%, 0 100%); }
+        img { clip-path: polygon(0 100%, 0 0%, 0% 0, 100% 0%, 100% 0%, 100% 100%, 100% 100%, 0% 100%); }
+        &:hover img { clip-path: polygon(0 75%, 0 25%, 25% 0, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%); }
     }
 
     > div:nth-child(3) {
-        img { clip-path: polygon(0% 0%, 0% 0%, 0% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 100%, 100% 100%, 100% 100%, 0% 100%); }
-        &:hover img { clip-path: polygon(50% 0%, 63% 38%, 100% 38%, 69% 59%, 82% 100%, 50% 75%, 18% 100%, 31% 59%, 0 38%, 37% 38%); }
+        img { clip-path: circle(100% at 50% 50%); }
+        &:hover img { clip-path: circle(50% at 50% 50%); }
     }
 
     > div:nth-child(4) {
