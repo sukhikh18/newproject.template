@@ -43,7 +43,7 @@ const ResponsiveSlider = (($) => {
                             .addClass(this.config.rowClass)
 
                         let id = this.$slider.attr('id');
-                        if( id ) this.$slider.attr('id', id + '-cloned' );
+                        if( id ) this.$slider.attr('id', `${id}--cloned` );
 
                         // remove column class
                         $('> [class*="col"]', this.$slider).each((index, el) => {
@@ -51,6 +51,10 @@ const ResponsiveSlider = (($) => {
                         });
 
                         this.$target.after( this.$slider ).hide();
+                        if( this.config.wrapClass ) {
+                            this.$slider.wrap(`<div class="${this.config.wrapClass}"></div>`)
+                        }
+
                         this.config.init.call(this, this.$slider);
                     }
                 } else {
