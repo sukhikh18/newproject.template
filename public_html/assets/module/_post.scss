@@ -1,24 +1,13 @@
 .post {
-    &__thumb {
-        padding-right: 1rem;
+    &__thmb {
+        margin-right: 1rem;
     }
 
     @include to($media-sm) {
-        &__thumb {
-            width: 100%;
-            padding-right: 0;
-        }
+        flex-direction: column;
 
-        img {
-            width: 100%;
-            max-height: 220px;
-            object-fit: cover;
-            object-position: top;
-            margin-bottom: 1rem;
-        }
-
-        &.media {
-            flex-direction: column;
+        &__thmb {
+            margin: 0 auto .5rem;
         }
     }
 }
