@@ -5,30 +5,14 @@ const ResponsiveSlider = (($) => {
 
     const __default = {
         maxWidth: 768,
-        initClass: 'slick-initialized', // 'owl-loaded'
 
-        opts: {
-            infinite: true,
-            autoplay: false,
-            autoplaySpeed: 4000,
-            arrows: true,
-            dots: false,
-            slidesToShow: 4,
-            slidesToScroll: 1,
-            responsive: [{
-                breakpoint: 576,
-                settings: {
-                    autoplay: true,
-                    slidesToShow: 1,
-                }
-            }]
-        },
+        wrapClass: '',
+        rowClass: 'slider-row',
+        colClass: 'slider-col',
 
-        onInit: () => {},
-        onBeforeStart: () => {},
-        onAfterStart: () => {},
-        onBeforeStop: () => {},
-        onAfterStop: () => {},
+        onBeforeInit: () => {},
+        init: ($slider) => {},
+        destroy: ($slider) => {},
     }
 
     class ResponsiveSlider
@@ -37,78 +21,58 @@ const ResponsiveSlider = (($) => {
             return Default
         }
 
-        isInited() {
-            return this.$slider.hasClass(this.config.initClass)
-        }
-
         constructor(target, config) {
             this.config = $.extend({}, __default, config)
-
-            this.$slider = target instanceof jQuery ? target : $(target)
             this.config.maxWidth = parseFloat( this.config.maxWidth );
+            this.$target = target instanceof jQuery ? target : $(target);
+            this.$slider = null;
 
-            if( !this.$slider.length ) return;
-            if(this.isInited()) return;
+            if( !this.$target.length ) return;
 
-            this.config.onInit.call(this);
+            this.config.onBeforeInit.call(this);
 
             let $window = $(window);
             $window.on('resize', (event) => {
                 if( $window.width() < this.config.maxWidth ) {
-                    this.start();
+                    if( !this.$slider ) {
+                        this.$slider = this.$target.clone(true);
+
+                        // remove bootstrap row
+                        this.$slider
+                            .removeClass('row')
+                            .addClass(this.config.rowClass)
+
+                        let id = this.$slider.attr('id');
+                        if( id ) this.$slider.attr('id', id + '-cloned' );
+
+                        // remove column class
+                        $('> [class*="col"]', this.$slider).each((index, el) => {
+                            $(el).removeAttr('class').addClass(this.config.colClass);
+                        });
+
+                        this.$target.after( this.$slider ).hide();
+                        this.config.init.call(this, this.$slider);
+                    }
                 } else {
-                    this.stop();
+                    if( this.$slider ) {
+                        this.config.destroy.call(this, this.$slider);
+                        this.$slider.remove();
+                        this.$slider = null;
+
+                        this.$target.show();
+                    }
                 }
             });
 
-            setTimeout(function() {
-                $window.trigger('resize');
-            }, 500);
-        }
-
-        start() {
-            if(this.isInited()) return;
-            this.config.onBeforeStart.call(this);
-
-            // change classes for compatability
-            this.$slider.closest('.row').each(function() {
-                $(this).attr('data-restore-class', $(this).attr('class'))
-                    .removeAttr('class')
-                    .addClass('slider-row');
-            });
-
-            $('> [class^="col"]', this.$slider).each(function() {
-                $(this).attr('data-restore-class', $(this).attr('class'))
-                    .removeAttr('class')
-                    .addClass('slider-col');
-            });
-
-            this.$slider.slick( this.config.opts ); // or this.$slider.owlCarousel( thisconfig..opts );
-            this.config.onAfterStart.call(this);
-        }
-
-        stop() {
-            if(!this.isInited()) return;
-            this.config.onBeforeStop.call(this);
-
-            // return classes for css columns rules
-            this.$slider.closest('.slider-row').each(function() {
-                $(this).attr('class', $(this).attr('data-restore-class'));
-            });
-
-            $('.slider-col', this.$slider).each(function() {
-                $(this).attr('class', $(this).attr('data-restore-class'))
-            });
-
-            this.$slider.slick('unslick'); // or this.$slider.trigger('destroy.owl.carousel');
-            this.config.onAfterStop.call(this);
+            $window.trigger('resize');
         }
 
         static _jQueryInterface(config) {
             config = config || {}
-            return this.each(() => {
+
+            return this.each(function () {
                 let $this = $(this)
-                let config = $.extend({}, ResponsiveSlider.__default, $this.data(), typeof config === 'object' && config )
+                config = $.extend({}, ResponsiveSlider.__default, $this.data(), typeof config === 'object' && config )
 
                 new ResponsiveSlider(this, config)
             })

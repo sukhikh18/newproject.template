@@ -11,21 +11,24 @@ jQuery(document).ready(function($) {
 
     $('.slider').ResponsiveSlider({
         maxWidth: 992,
-        opts: {
-            infinite: true,
-            autoplay: false,
-            autoplaySpeed: 4000,
-            arrows: true,
-            dots: false,
-            slidesToShow: 4,
-            slidesToScroll: 1,
-            responsive: [{
-                breakpoint: 576,
-                settings: {
-                    autoplay: true,
-                    slidesToShow: 1,
-                }
-            }]
+
+        init: function($slider) {
+            $slider.slick({
+                infinite: true,
+                autoplay: false,
+                autoplaySpeed: 4000,
+                arrows: true,
+                dots: false,
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                responsive: [{
+                    breakpoint: 576,
+                    settings: {
+                        autoplay: true,
+                        slidesToShow: 1,
+                    }
+                }]
+            }); // or this.$slider.owlCarousel( thisconfig..opts );
         }
     });
 });
