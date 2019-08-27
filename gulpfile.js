@@ -339,65 +339,7 @@ gulp.task("build", parallel("buildCode", "buildStyles", "buildScripts", "buildIm
  * Move assets (if yarn/npm installed them)
  */
 gulp.task("install", function(done) {
-    const assetsList = [
-        {
-            name: 'Jquery',
-            src: './node_modules/jquery/dist/**/*',
-            dest: paths.vendor.dest + 'jquery/'
-        },
-        {
-            name: '@Fancyapps/fancybox',
-            src: './node_modules/@fancyapps/fancybox/dist/**/*',
-            dest: paths.vendor.dest + 'fancybox/'
-        },
-        {
-            name: 'Slick-carousel',
-            src: './node_modules/slick-carousel/slick/**/*',
-            dest: paths.vendor.dest + 'slick/',
-        },
-        {
-            name: 'Appear',
-            src: './node_modules/appear/dist/**/*',
-            dest: paths.vendor.dest + 'appear/'
-        },
-        {
-            name: 'Lettering',
-            src: './node_modules/lettering/dist/**/*',
-            dest: paths.vendor.dest + 'lettering/'
-        },
-        { // (Required for bootstrap dropdowns)
-            name: 'Popper.js',
-            src: './node_modules/popper.js/dist/umd/**/*',
-            dest: paths.vendor.src + 'popper.js.umd/'
-        },
-        {
-            name: 'Botstrap js',
-            src: './node_modules/bootstrap/js/dist/**/*',
-            dest: paths.vendor.src + 'bootstrap/js/'
-        },
-        {
-            name: 'Botstrap scss',
-            src: './node_modules/bootstrap/scss/**/*',
-            dest: paths.vendor.src + 'bootstrap/scss/'
-        },
-        {
-            name: 'Hamburgers',
-            src: './node_modules/hamburgers/_sass/hamburgers/**/*',
-            dest: paths.vendor.src + 'hamburgers/'
-        },
-        {
-            name: 'Animatewithsass',
-            src: './node_modules/animatewithsass/**/*',
-            dest: paths.vendor.dest + 'animatewithsass/'
-        },
-        {
-            name: 'Swiper',
-            src: './node_modules/swiper/dist/**/*',
-            dest: paths.vendor.dest + 'swiper/'
-        },
-    ];
-
-    let tasks = assetsList.map(function (element) {
+    let tasks = config.vendor.map(function (element) {
         return src(element.src)
             .pipe(newer(dist + element.dest))
             .pipe(dest(dist + element.dest))
