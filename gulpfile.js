@@ -54,7 +54,7 @@ const tunnel = !!yargs.argv.tunnel;
     String:  assets, module,
     Object:  blocks, vendor, styles, script, images
 } */
-let config  = require(root + "config");
+let config  = require(root + ".config");
 config.src = root + config.src;
 config.dest = root + config.dest;
 
