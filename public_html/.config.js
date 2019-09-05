@@ -99,5 +99,10 @@ var vendor = module.exports.vendor = [
         name: 'Animatewithsass',
         src: './node_modules/animatewithsass/**/*',
         dest: paths.vendor.dest + 'animatewithsass/'
+    },
+    {
+        name: 'Cleave',
+        src: ['./node_modules/cleave.js/dist/cleave.*', './node_modules/cleave.js/dist/addons/*.js'],
+        dest: paths.vendor.dest + 'cleave/'
     }
 ];
