@@ -102,7 +102,7 @@ var vendor = module.exports.vendor = [
     },
     {
         name: 'Cleave',
-        src: ['./node_modules/cleave.js/dist/cleave.*', './node_modules/cleave.js/dist/addons/*.js'],
+        src: './node_modules/cleave.js/dist/**/*',
         dest: paths.vendor.dest + 'cleave/'
     }
 ];
