@@ -13,9 +13,45 @@ $hamburger-hover-use-filter   : false !default;
 $hamburger-hover-filter       : opacity(50%) !default;
 $hamburger-active-hover-filter: $hamburger-hover-filter !default;
 
-$hamburger-types: ( elastic );
+$exists-hamburger-types: (
+    3dx,
+    3dx-r,
+    3dy,
+    3dy-r,
+    3dxy,
+    3dxy-r,
+    arrow,
+    arrow-r,
+    arrowalt,
+    arrowalt-r,
+    arrowturn,
+    arrowturn-r,
+    boring,
+    collapse,
+    collapse-r,
+    elastic,
+    elastic-r,
+    emphatic,
+    emphatic-r,
+    minus,
+    slider,
+    slider-r,
+    spin,
+    spin-r,
+    spring,
+    spring-r,
+    stand,
+    stand-r,
+    squeeze,
+    vortex,
+    vortex-r
+);
 
-@import "hamburgers/hamburgers";
+$hamburger-types: (
+    elastic
+);
+
+@import "../../../../node_modules/hamburgers/_sass/hamburgers/hamburgers.scss";
 
 .hamburger {
     &:focus {

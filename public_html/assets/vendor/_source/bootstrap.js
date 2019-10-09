@@ -1,16 +1,16 @@
-//= popper.js.umd/popper.js
+//= ../../../../node_modules/popper.js/dist/umd/popper.js
 
-//= bootstrap/js/util.js
-//  bootstrap/js/alert.js
-//  bootstrap/js/button.js
-//  bootstrap/js/carousel.js
-//= bootstrap/js/collapse.js
-//  bootstrap/js/modal.js
-//= bootstrap/js/scrollspy.js
-//= bootstrap/js/tab.js
-//  bootstrap/js/toast.js
+//= ../../../../node_modules/bootstrap/js/dist/util.js
+//  ../../../../node_modules/bootstrap/js/dist/alert.js
+//  ../../../../node_modules/bootstrap/js/dist/button.js
+//  ../../../../node_modules/bootstrap/js/dist/carousel.js
+//= ../../../../node_modules/bootstrap/js/dist/collapse.js
+//  ../../../../node_modules/bootstrap/js/dist/modal.js
+//= ../../../../node_modules/bootstrap/js/dist/scrollspy.js
+//= ../../../../node_modules/bootstrap/js/dist/tab.js
+//  ../../../../node_modules/bootstrap/js/dist/toast.js
 
 // ** required popper.js ** //
-//= bootstrap/js/dropdown.js
-//  bootstrap/js/tooltip.js
-//  bootstrap/js/popover.js
+//= ../../../../node_modules/bootstrap/js/dist/dropdown.js
+//  ../../../../node_modules/bootstrap/js/dist/tooltip.js
+//  ../../../../node_modules/bootstrap/js/dist/popover.js
