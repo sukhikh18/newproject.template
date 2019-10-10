@@ -72,23 +72,21 @@ const scssExt = config.scssExt;
 const jsExt   = config.jsExt;
 const imgExt  = config.imgExt;
 
-const buildStyles = function (srcPath, buildPath, needNewer) {
-    srcPath.push ('!' + dir + '**/_' + scssExt);
 
-    if( '' === srcPath ) {
-        srcPath.push( '!' + paths.vendor.src + '**/*' )
-        srcPath.push( '!' + paths.blocks.src + '**/*' )
-    }
-
-    return src(srcPath, { allowEmpty: true })
-        .pipe(plumber())
-        .pipe(gulpif(needNewer, newer({dest: buildPath, ext: production ? '.min.css' : '.css'})))
-        // .pipe(gulpif(!production, sourcemaps.init()))
-        .pipe(sass())
-        .pipe(groupmediaqueries())
-        .pipe(gulpif(production, autoprefixer({ browsers: ["last 12 versions", "> 1%", "ie 8", "ie 7"] })))
-        .pipe(gulpif(!production, browsersync.stream()))
-        .pipe(gulpif(production, mincss({
+const buildStyles = function( srcPath, buildPath, _args ) {
+    var args = {
+        'newerOnly': false,
+        'newer': {
+            dest: buildPath,
+            ext: production ? '.min.css' : '.css'
+        },
+        'plumber': {},
+        'sass': {},
+        'groupmediaqueries': {},
+        'autoprefixer': {
+            browsers: ["last 12 versions", "> 1%", "ie 8", "ie 7"]
+        },
+        'mincss': {
             compatibility: "ie8",
             level: {
                 1: {
@@ -106,18 +104,47 @@ const buildStyles = function (srcPath, buildPath, needNewer) {
                 }
             },
             rebase: false
-        })))
-        .pipe(gulpif(production, rename({ suffix: ".min" })))
-        .pipe(plumber.stop())
+        },
+        'rename': {
+            suffix: ".min"
+        },
+        'debug': {
+            "title": "CSS files"
+        }
+    };
+
+    _args = _args || {};
+    for (var arg in _args) { args[arg] = _args[arg]; }
+
+    srcPath.push ('!' + dir + '**/_' + scssExt);
+
+    // @todo check and do document this;
+    if( '' === srcPath ) {
+        srcPath.push( '!' + paths.vendor.srcPath + '**/*' )
+        srcPath.push( '!' + paths.blocks.srcPath + '**/*' )
+    }
+
+    return src(srcPath, { allowEmpty: true })
+        .pipe(plumber(args['plumber']))
+        .pipe(gulpif(args['newerOnly'], newer(args['newer'])))
+        // .pipe(gulpif(!production, sourcemaps.init()))
+        .pipe(sass(args['sass']))
+        .pipe(groupmediaqueries(args['groupmediaqueries']))
+        .pipe(gulpif(production, autoprefixer(args['autoprefixer'])))
+        .pipe(gulpif(!production, browsersync.stream()))
+        .pipe(gulpif(production, mincss(args['mincss'])))
+        .pipe(gulpif(production, rename(args['rename'])))
         // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
+        .pipe(plumber.stop())
         .pipe(dest(buildPath))
-        .pipe(debug({ "title": "CSS files" }))
+        .pipe(debug())
         .on("end", () => production || '' == domain ? browsersync.reload : null);
-}
+};
 
 const buildScripts = function (srcPath, buildPath, needNewer) {
     srcPath.push('!' + dir + '**/_' + jsExt);
 
+    // @todo check and do document this;
     if( '' === srcPath ) {
         srcPath.push( '!' + paths.vendor.src + '**/*' )
         srcPath.push( '!' + paths.blocks.src + '**/*' )
@@ -223,16 +250,32 @@ const buildPug = function (done) {
         .pipe(debug({ "title": "PUG to HTML" }));
 }
 
-const buildVendorStyles    = function (cb, $n=1) { if(!paths.vendor.src) return cb(); return buildStyles([ dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, $n); }
-const buildMainStyles      = function (cb, $n=1) { if(false === paths.styles.src) return cb(); return buildStyles([ dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, $n); }
-const buildBlocksStyles    = function (cb, $n=1) { if(!paths.blocks.src) return cb(); return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, $n); }
+const buildVendorStyles    = function (cb, $n = 1) { if(!paths.vendor.src) return cb();
+    return buildStyles([ dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, {
+        newerOnly: $n,
+        sass: {
+            includePaths: [
+                'node_modules',
+            ]
+        }
+    });
+}
+const buildMainStyles      = function (cb, $n = 1) { if(false === paths.styles.src) return cb();
+    return buildStyles([ dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, {newerOnly: $n}); }
+const buildBlocksStyles    = function (cb, $n = 1) { if(!paths.blocks.src) return cb();
+    return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, {newerOnly: $n}); }
 
-const buildVendorScripts = function (cb) { if(!paths.vendor.src) return cb(); return buildScripts([ dir + paths.vendor.src + jsExt ], dist + paths.vendor.dest, true); }
-const buildMainScripts   = function (cb) { if(false === paths.script.src) return cb(); return buildScripts([ dir + paths.script.src + '**/' + jsExt ], dist + paths.script.dest, true); }
-const buildBlocksScripts = function (cb) { if(!paths.blocks.src) return cb(); return buildScripts([ dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest,  true); }
+const buildVendorScripts = function (cb) { if(!paths.vendor.src) return cb();
+    return buildScripts([ dir + paths.vendor.src + jsExt ], dist + paths.vendor.dest, true); }
+const buildMainScripts   = function (cb) { if(false === paths.script.src) return cb();
+    return buildScripts([ dir + paths.script.src + '**/' + jsExt ], dist + paths.script.dest, true); }
+const buildBlocksScripts = function (cb) { if(!paths.blocks.src) return cb();
+    return buildScripts([ dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest,  true); }
 
-const buildMainImages    = function (cb) { if(!paths.images.src) return cb(); return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
-const buildBlocksImages  = function (cb) { if(!paths.blocks.src) return cb(); return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
+const buildMainImages    = function (cb) { if(!paths.images.src) return cb();
+    return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
+const buildBlocksImages  = function (cb) { if(!paths.blocks.src) return cb();
+    return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
 
 // const buildFaviconImages = function () {
 //     return src(paths.src.favicons, { allowEmpty: true })
