@@ -23,7 +23,6 @@
 		"gulp-clean": "^0.4.0",
 		"gulp-clean-css": "^3.9.2",
 		"gulp-debug": "^3.2.0",
-		"gulp-favicons": "^2.2.7",
 		"gulp-group-css-media-queries": "^1.2.2",
 		"gulp-if": "^2.0.2",
 		"gulp-imagemin": "^5.0.3",
@@ -35,7 +34,6 @@
 		"gulp-rigger": "^0.5.8",
 		"gulp-sass": "^3.1.0",
 		"gulp-sourcemaps": "^2.6.4",
-		"gulp-svg-sprite": "^1.5.0",
 		"gulp-uglify": "^3.0.0",
 		"gulp-watch": "^5.0.0",
 		"imagemin-giflossy": "^5.1.10",
@@ -48,6 +46,10 @@
 		"webpack": "^4.36.1",
 		"webpack-stream": "^5.2.1",
 		"yargs": "^12.0.5"
+	},
+	"~devDependencies": {
+		"gulp-favicons": "^2.2.7",
+		"gulp-svg-sprite": "^1.5.0"
 	},
 	"dependencies": {
 		"animatewithsass": "^3.2.1",

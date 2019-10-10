@@ -34,8 +34,8 @@ const mincss = require("gulp-clean-css");
 const uglify = require("gulp-uglify");
 const sourcemaps = require("gulp-sourcemaps");
 const newer = require("gulp-newer");
-const favicons = require("gulp-favicons");
-const svgSprite = require("gulp-svg-sprite");
+// const favicons = require("gulp-favicons");
+// const svgSprite = require("gulp-svg-sprite");
 const imagemin = require("gulp-imagemin");
 const imageminPngquant = require("imagemin-pngquant");
 const imageminZopfli = require("imagemin-zopfli");
@@ -142,6 +142,49 @@ const buildStyles = function( srcPath, buildPath, _args ) {
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
+const buildScripts = function (srcPath, buildPath, _args) {
+    var args = {
+        'newerOnly': false,
+        'newer': {
+            dest: buildPath,
+            ext: production ? '.min.js' : '.js'
+        },
+        'plumber': {},
+        'rigger': {},
+        'uglify': {},
+        'rename': {
+            suffix: ".min"
+        },
+        'sourcemaps': "./maps/",
+        'debug': {
+            "title": "JS files"
+        }
+    };
+
+    _args = _args || {};
+    for (var arg in _args) { args[arg] = _args[arg]; }
+
+    srcPath.push('!' + dir + '**/_' + jsExt);
+
+    if( '' === srcPath ) {
+        srcPath.push( '!' + paths.vendor.src + '**/*' )
+        srcPath.push( '!' + paths.blocks.src + '**/*' )
+    }
+
+    return src(srcPath, { allowEmpty: true })
+        .pipe(plumber(args['plumber']))
+        .pipe(gulpif(args['newerOnly'], newer(args['newer'])))
+        .pipe(rigger(args['rigger']))
+        .pipe(gulpif(!production, sourcemaps.init()))
+        .pipe(gulpif(production, uglify(args['uglify'])))
+        .pipe(gulpif(production, rename(args['rename'])))
+        .pipe(gulpif(!production, sourcemaps.write(args['sourcemaps'])))
+        .pipe(plumber.stop())
+        .pipe(dest(buildPath))
+        .pipe(debug(args['debug']))
+        .on("end", browsersync.reload);
+}
+
 gulp.task("buildScriptsWebpack", function(cb) {
     if( !paths.webpack.src ) return cb();
 
@@ -247,6 +290,10 @@ const buildBlocksStyles    = function (cb, $n = 1) {
     if(!paths.blocks.src) return cb();
     return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, {newerOnly: $n});
 }
+const buildBlocksScripts = function (cb) {
+    if(!paths.blocks.src) return cb();
+    return buildScripts([ dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest, {newerOnly: true});
+}
 const buildMainImages    = function (cb) {
     if(!paths.images.src) return cb();
     return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest);
@@ -291,6 +338,7 @@ const watchAll = function () {
     });
 
     watch(paths.webpack.src, series("buildScriptsWebpack") );
+    watch([ dir + paths.blocks.src + '**/' + jsExt ], buildBlocksScripts );
 
     const settings = dir + paths.styles.src + '_site-settings.scss';
 
@@ -351,11 +399,12 @@ const serve = function () {
 gulp.task("buildCode", parallel(buildHtml, buildPug));
 gulp.task("buildStyles", parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
 gulp.task("buildImages", parallel(buildBlocksImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
+gulp.task("buildScripts", parallel(buildBlocksScripts, "buildScriptsWebpack"));
 
 /**
  * Build only
  */
-gulp.task("build", parallel("buildCode", "buildStyles", series("buildScriptsWebpack"), "buildImages"));
+gulp.task("build", parallel("buildCode", "buildStyles", "buildScripts", "buildImages"));
 
 /**
  * Move assets (if yarn/npm installed them)
