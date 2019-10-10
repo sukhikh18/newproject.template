@@ -18,6 +18,16 @@ var paths = module.exports.paths = {
     html: false, // index.raw.html
     pug: 'index.pug',
 
+    styles: {
+        src:  'assets/scss/',
+        dest: 'assets/',
+    },
+
+    images: {
+        src:  'img/HD/',
+        dest: 'img/',
+    },
+
     blocks: {
         src: 'assets/pages/',
         dest: 'pages/',
@@ -28,19 +38,9 @@ var paths = module.exports.paths = {
         dest: 'assets/vendor/',
     },
 
-    styles: {
-        src:  'assets/scss/',
-        dest: 'assets/',
-    },
-
-    script: {
-        src:  false,
-        dest: 'assets/',
-    },
-
     webpack: {
         // how can i compile page's scripts?
-        src:  ['assets/js-source/*.js', 'assets/vendor/_source/*.js'],
+        src:  ['assets/babel/*.js', 'assets/vendor/_source/*.js'],
         dest: 'assets/',
         config: {
             entry: {
@@ -64,11 +64,6 @@ var paths = module.exports.paths = {
             },
         },
     },
-
-    images: {
-        src:  'img/HD/',
-        dest: 'img/',
-    },
 };
 
 var vendor = module.exports.vendor = [
@@ -83,12 +78,12 @@ var vendor = module.exports.vendor = [
         dest: paths.vendor.dest + 'cleave/'
     },
     {
-        name: 'Slick-carousel',
+        name: 'Slick',
         src: './node_modules/slick-carousel/slick/**/*',
         dest: paths.vendor.dest + 'slick/',
     },
     {
-        name: '@Fancyapps/fancybox',
+        name: 'Fancybox',
         src: './node_modules/@fancyapps/fancybox/dist/**/*',
         dest: paths.vendor.dest + 'fancybox/'
     },
