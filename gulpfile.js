@@ -148,10 +148,13 @@ gulp.task("buildScriptsWebpack", function(cb) {
     paths.webpack.config.mode = production ? 'production' : 'development';
     paths.webpack.config.devtool = production ? false : "source-map";
 
-    return src(dir + paths.webpack.src + jsExt, { allowEmpty: true }) // + 'main.js'
+    return src(dir + paths.webpack.src + jsExt, { allowEmpty: true })
         .pipe(webpackStream(paths.webpack.config), webpack)
         .pipe(gulpif(production, rename({ suffix: ".min" })))
-        .pipe(dest(dist + paths.webpack.dest))
+        .pipe(rename(function (currentPath) {
+            currentPath.dirname = currentPath.basename.match(/^main/i) ? paths.webpack.dest : paths.vendor.dest;
+        }))
+        .pipe(dest(dist))
         .pipe(debug({ "title": "Webpack" }))
         .on("end", browsersync.reload);
 });

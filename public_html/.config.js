@@ -41,7 +41,6 @@ var paths = module.exports.paths = {
     webpack: {
         // how can i compile page's scripts?
         src:  ['assets/js-source/*.js', 'assets/vendor/_source/*.js'],
-        // how can i move bootstrap to vendor folder?
         dest: 'assets/',
         config: {
             entry: {
