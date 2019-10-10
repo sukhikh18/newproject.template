@@ -29,7 +29,7 @@ var paths = module.exports.paths = {
     },
 
     styles: {
-        src:  'assets/_source/',
+        src:  'assets/scss/',
         dest: 'assets/',
     },
 
@@ -39,8 +39,31 @@ var paths = module.exports.paths = {
     },
 
     webpack: {
-        src:  'assets/_source/',
+        // how can i compile page's scripts?
+        src:  ['assets/js-source/*.js', 'assets/vendor/_source/*.js'],
+        // how can i move bootstrap to vendor folder?
         dest: 'assets/',
+        config: {
+            entry: {
+                main: './public_html/assets/babel/main',
+                bootstrap: './public_html/assets/vendor/_source/bootstrap'
+            },
+            output: {
+                filename: "[name].js",
+            },
+            module: {
+                rules: [
+                {
+                    test: /\.(js|jsx)$/,
+                    exclude: /(node_modules)/,
+                    loader: 'babel-loader',
+                    query: {
+                        presets: ["@babel/preset-env"],
+                    },
+                },
+                ],
+            },
+        },
     },
 
     images: {

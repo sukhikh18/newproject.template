@@ -60,10 +60,6 @@ config.dest = root + config.dest;
 
 const paths = config.paths;
 
-const webpackConfig = require('./webpack.config.js');
-webpackConfig.mode = production ? 'production' : 'development';
-webpackConfig.devtool = production ? false : "source-map";
-
 /** @type String */
 const dir   = config.src;
 const dist  = config.dest;
@@ -81,7 +77,12 @@ const buildStyles = function( srcPath, buildPath, _args ) {
             ext: production ? '.min.css' : '.css'
         },
         'plumber': {},
-        'sass': {},
+        'sass': {
+            includePaths: [
+                'node_modules',
+                'public_html/assets/scss'
+            ]
+        },
         'groupmediaqueries': {},
         'autoprefixer': {
             browsers: ["last 12 versions", "> 1%", "ie 8", "ie 7"]
@@ -141,33 +142,14 @@ const buildStyles = function( srcPath, buildPath, _args ) {
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
-const buildScripts = function (srcPath, buildPath, needNewer) {
-    srcPath.push('!' + dir + '**/_' + jsExt);
-
-    // @todo check and do document this;
-    if( '' === srcPath ) {
-        srcPath.push( '!' + paths.vendor.src + '**/*' )
-        srcPath.push( '!' + paths.blocks.src + '**/*' )
-    }
-
-    return src(srcPath, { allowEmpty: true })
-        .pipe(plumber())
-        .pipe(gulpif(needNewer, newer({dest: buildPath, ext: production ? '.min.js' : '.js'})))
-        .pipe(rigger())
-        .pipe(gulpif(!production, sourcemaps.init()))
-        .pipe(gulpif(production, uglify()))
-        .pipe(gulpif(production, rename({ suffix: ".min" })))
-        .pipe(gulpif(!production, sourcemaps.write("./maps/")))
-        .pipe(plumber.stop())
-        .pipe(dest(buildPath))
-        .pipe(debug({ "title": "JS files" }))
-        .on("end", browsersync.reload);
-}
-
 gulp.task("buildScriptsWebpack", function(cb) {
     if( !paths.webpack.src ) return cb();
-    return src(dir + paths.webpack.src + 'main.js', { allowEmpty: true })
-        .pipe(webpackStream(webpackConfig), webpack)
+
+    paths.webpack.config.mode = production ? 'production' : 'development';
+    paths.webpack.config.devtool = production ? false : "source-map";
+
+    return src(dir + paths.webpack.src + jsExt, { allowEmpty: true }) // + 'main.js'
+        .pipe(webpackStream(paths.webpack.config), webpack)
         .pipe(gulpif(production, rename({ suffix: ".min" })))
         .pipe(dest(dist + paths.webpack.dest))
         .pipe(debug({ "title": "Webpack" }))
@@ -250,32 +232,26 @@ const buildPug = function (done) {
         .pipe(debug({ "title": "PUG to HTML" }));
 }
 
-const buildVendorStyles    = function (cb, $n = 1) { if(!paths.vendor.src) return cb();
-    return buildStyles([ dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, {
-        newerOnly: $n,
-        sass: {
-            includePaths: [
-                'node_modules',
-            ]
-        }
-    });
+const buildVendorStyles    = function (cb, $n = 1) {
+    if(!paths.vendor.src) return cb();
+    return buildStyles([ dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, {newerOnly: $n});
 }
-const buildMainStyles      = function (cb, $n = 1) { if(false === paths.styles.src) return cb();
-    return buildStyles([ dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, {newerOnly: $n}); }
-const buildBlocksStyles    = function (cb, $n = 1) { if(!paths.blocks.src) return cb();
-    return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, {newerOnly: $n}); }
-
-const buildVendorScripts = function (cb) { if(!paths.vendor.src) return cb();
-    return buildScripts([ dir + paths.vendor.src + jsExt ], dist + paths.vendor.dest, true); }
-const buildMainScripts   = function (cb) { if(false === paths.script.src) return cb();
-    return buildScripts([ dir + paths.script.src + '**/' + jsExt ], dist + paths.script.dest, true); }
-const buildBlocksScripts = function (cb) { if(!paths.blocks.src) return cb();
-    return buildScripts([ dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest,  true); }
-
-const buildMainImages    = function (cb) { if(!paths.images.src) return cb();
-    return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest); }
-const buildBlocksImages  = function (cb) { if(!paths.blocks.src) return cb();
-    return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest); }
+const buildMainStyles      = function (cb, $n = 1) {
+    if(false === paths.styles.src) return cb();
+    return buildStyles([ dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, {newerOnly: $n});
+}
+const buildBlocksStyles    = function (cb, $n = 1) {
+    if(!paths.blocks.src) return cb();
+    return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, {newerOnly: $n});
+}
+const buildMainImages    = function (cb) {
+    if(!paths.images.src) return cb();
+    return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest);
+}
+const buildBlocksImages  = function (cb) {
+    if(!paths.blocks.src) return cb();
+    return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest);
+}
 
 // const buildFaviconImages = function () {
 //     return src(paths.src.favicons, { allowEmpty: true })
@@ -307,10 +283,11 @@ const watchAll = function () {
         return cb();
     });
 
-    watch([ dir + paths.vendor.src + '**/' + jsExt ], buildVendorScripts );
-    watch([ dir + paths.script.src + '**/' + jsExt ], buildMainScripts );
-    watch([ dir + paths.blocks.src + '**/' + jsExt ], buildBlocksScripts );
-    watch([ dir + paths.webpack.src + '**/' + jsExt ], series("buildScriptsWebpack") );
+    paths.webpack.src.forEach( function(element, index) {
+        paths.webpack.src[ index ] = dir + element;
+    });
+
+    watch(paths.webpack.src, series("buildScriptsWebpack") );
 
     const settings = dir + paths.styles.src + '_site-settings.scss';
 
@@ -370,13 +347,12 @@ const serve = function () {
 
 gulp.task("buildCode", parallel(buildHtml, buildPug));
 gulp.task("buildStyles", parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
-gulp.task("buildScripts", parallel(buildVendorScripts, buildBlocksScripts, buildMainScripts, series("buildScriptsWebpack")));
 gulp.task("buildImages", parallel(buildBlocksImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
 
 /**
  * Build only
  */
-gulp.task("build", parallel("buildCode", "buildStyles", "buildScripts", "buildImages"));
+gulp.task("build", parallel("buildCode", "buildStyles", series("buildScriptsWebpack"), "buildImages"));
 
 /**
  * Move assets (if yarn/npm installed them)
