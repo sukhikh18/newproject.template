@@ -24,9 +24,9 @@ public_html/img/*
 !public_html/img/HD/
 
 public_html/assets/*
-!public_html/assets/_source/
+!public_html/assets/babel/
 !public_html/assets/pages/
-!public_html/assets/module/
+!public_html/assets/scss/
 !public_html/assets/vendor/
 
 public_html/assets/vendor/*
