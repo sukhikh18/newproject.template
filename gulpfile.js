@@ -94,7 +94,7 @@ const buildStyles = function( srcPath, buildPath, _args ) {
         'sass': {
             includePaths: [
                 'node_modules',
-                'public_html/assets/scss'
+                dir + paths.assets + 'scss'
             ]
         },
         'groupmediaqueries': {},
