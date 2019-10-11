@@ -1,15 +1,11 @@
 "use strict";
 
-module.exports = {
+var main = module.exports = {
     /** {String} Path to the source directory. Target is root + src + ${*.*} */
-    src: '',
+    src: 'wp-content/themes/project/',
     /** {String} Path to the destination directory. Target is root + dest + ${*.*} */
-    dest: '',
-
-    scssExt: '*.scss',
-    jsExt:   '*.js',
-    imgExt:  '*.{jpg,jpeg,png,gif,svg}',
-}
+    dest: 'wp-content/themes/project/',
+};
 
 var paths = module.exports.paths = {
     assets: 'assets/',
@@ -42,27 +38,28 @@ var paths = module.exports.paths = {
         // how can i compile page's scripts?
         src:  ['assets/babel/*.js', 'assets/vendor/_source/*.js'],
         dest: 'assets/',
-        config: {
-            entry: {
-                main: './public_html/assets/babel/main',
-                bootstrap: './public_html/assets/vendor/_source/bootstrap'
-            },
-            output: {
-                filename: "[name].js",
-            },
-            module: {
-                rules: [
-                {
-                    test: /\.(js|jsx)$/,
-                    exclude: /(node_modules)/,
-                    loader: 'babel-loader',
-                    query: {
-                        presets: ["@babel/preset-env"],
-                    },
-                },
-                ],
+    },
+};
+
+var webpack = module.exports.webpack = {
+    entry: {
+        main: paths.assets + 'babel/main',
+        bootstrap: paths.vendor.src + 'bootstrap'
+    },
+    output: {
+        filename: "[name].js",
+    },
+    module: {
+        rules: [
+        {
+            test: /\.(js|jsx)$/,
+            exclude: /(node_modules)/,
+            loader: 'babel-loader',
+            query: {
+                presets: ["@babel/preset-env"],
             },
         },
+        ],
     },
 };
 

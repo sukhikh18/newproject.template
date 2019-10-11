@@ -50,24 +50,38 @@ const webpackStream = require("webpack-stream");
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
-/** @type Object {
-    String:  assets, module,
-    Object:  blocks, vendor, styles, script, images
-} */
-let config  = require(root + ".config");
-config.src = root + config.src;
-config.dest = root + config.dest;
+const scssExt = '*.scss';
+const jsExt   = '*.js';
+const imgExt  = '*.{jpg,jpeg,png,gif,svg}';
 
-const paths = config.paths;
+const config  = (function() {
+    let conf = require(root + ".config");
 
-/** @type String */
-const dir   = config.src;
-const dist  = config.dest;
+    // prepare webpack config
+    conf.webpack = (function( webpack ) {
+        webpack.mode = production ? 'production' : 'development';
+        webpack.devtool = production ? false : "source-map";
 
-const scssExt = config.scssExt;
-const jsExt   = config.jsExt;
-const imgExt  = config.imgExt;
+        for (var key in webpack.entry) {
+            webpack.entry[ key ] = root + conf.src + webpack.entry[ key ];
+        }
 
+        return webpack;
+    })( conf.webpack );
+
+    return conf;
+})();
+
+const dir = root + config.src;
+const dist = root + config.dest;
+
+const paths = (function( paths ) {
+    paths.webpack.src.forEach( function(element, index) {
+        paths.webpack.src[ index ] = dir + element;
+    });
+
+    return paths;
+})( config.paths );
 
 const buildStyles = function( srcPath, buildPath, _args ) {
     var args = {
@@ -188,11 +202,8 @@ const buildScripts = function (srcPath, buildPath, _args) {
 gulp.task("buildScriptsWebpack", function(cb) {
     if( !paths.webpack.src ) return cb();
 
-    paths.webpack.config.mode = production ? 'production' : 'development';
-    paths.webpack.config.devtool = production ? false : "source-map";
-
-    return src(dir + paths.webpack.src + jsExt, { allowEmpty: true })
-        .pipe(webpackStream(paths.webpack.config), webpack)
+    return src(paths.webpack.src, { allowEmpty: true })
+        .pipe(webpackStream(config.webpack), webpack)
         .pipe(gulpif(production, rename({ suffix: ".min" })))
         .pipe(rename(function (currentPath) {
             currentPath.dirname = currentPath.basename.match(/^main/i) ? paths.webpack.dest : paths.vendor.dest;
@@ -331,10 +342,6 @@ const watchAll = function () {
     watch([ dir + '**/*.html' ], function htmlChangedReload(cb) {
         browsersync.reload();
         return cb();
-    });
-
-    paths.webpack.src.forEach( function(element, index) {
-        paths.webpack.src[ index ] = dir + element;
     });
 
     watch(paths.webpack.src, series("buildScriptsWebpack") );
