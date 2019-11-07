@@ -7,9 +7,13 @@
 4. Рекомендую так же установить [git-scm](https://git-scm.com) для клонирования репозиториев командой ```git clone```.
 
 ## Как пользоваться
-* Клонируйте репозиторий ```git clone https://github.com/nikolays93/newproject.boilerplate.git``` или скачайте сборку из этого репозитория ```Clone or download > Download ZIP```;
-* Перейдите в папку командой ```cd newproject.boilerplate``` или откройте консоль в папке скачанной сборки;
+* Клонируйте репозиторий ```git clone https://github.com/nikolays93/newproject.template.git``` или скачайте сборку из этого репозитория ```Clone or download > Download ZIP```;
+* Перейдите в папку командой ```cd newproject.template``` или откройте консоль в папке скачанной сборки;
 * Введите команду ```yarn``` для установки проекта;
 * Воспользуйтесь командой ```yarn run vendor``` или ```gulp install``` для переноса скачанных библиотек (bootstrap, jQuery и т.д.)
 * Введите ```yarn run dev``` или ```gulp``` для разработки;
 * Введите ```yarn run prod``` или ```gulp build --production``` для завершения разработки;
+
+### Так же рекомендую
+https://github.com/andreyalexeich/gulp-scss-starter  
+https://github.com/agragregra/OptimizedHTML-5
