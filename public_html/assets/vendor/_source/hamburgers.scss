@@ -51,7 +51,7 @@ $hamburger-types: (
     elastic
 );
 
-@import "../../../../node_modules/hamburgers/_sass/hamburgers/hamburgers.scss";
+@import "hamburgers/_sass/hamburgers/hamburgers.scss";
 
 .hamburger {
     &:focus {
