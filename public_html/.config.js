@@ -2,9 +2,9 @@
 
 var main = module.exports = {
     /** {String} Path to the source directory. Target is root + src + ${*.*} */
-    src: 'wp-content/themes/project/',
+    src: '', // for ex. wp-content/themes/project/
     /** {String} Path to the destination directory. Target is root + dest + ${*.*} */
-    dest: 'wp-content/themes/project/',
+    dest: '', // for ex. wp-content/themes/project/
 };
 
 var paths = module.exports.paths = {
