@@ -9,13 +9,13 @@ html.no-js(lang='ru-RU')
 
         // <link rel="manifest" href="site.webmanifest">
         // <link rel="apple-touch-icon" href="icon.png">
-        // Place favicon.ico in the root directory
+        //- Place favicon.ico in the root directory
 
         link(rel="stylesheet", type="text/css", href="/assets/vendor/hamburgers@min.css")
         link(rel="stylesheet", type="text/css", href="/assets/vendor/bootstrap@min.css")
 
-        // link(rel="stylesheet", type="text/css", href="/assets/vendor/slick/slick.css")
-        // link(rel="stylesheet", type="text/css", href="/assets/vendor/fancybox/jquery.fancybox@min.css")
+        //- link(rel="stylesheet", type="text/css", href="/assets/vendor/slick/slick.css")
+        //- link(rel="stylesheet", type="text/css", href="/assets/vendor/fancybox/jquery.fancybox@min.css")
 
         link(rel="stylesheet", href="/assets/template@min.css")
         link(rel="stylesheet", href="/pages/index/style@min.css")
@@ -131,20 +131,20 @@ html.no-js(lang='ru-RU')
                         // the_template_pagination()
             // #content
             section.site-prefix.container.mt-5
-                #slider.slick.slider.row.justify-content-between
-                    div.col-2-4.mb-3
+                #slider.slick.slider
+                    div.mb-3.slider__slide
                         a(href="/img/placeholder.png", data-gallery="gallery1")
                             img.ac(data-lazy="https://picsum.photos/400/400/", src="img/placeholder.png", alt="")
-                    div.col-2-4.mb-3
+                    div.mb-3.slider__slide
                         a(href="/img/placeholder.png", data-gallery="gallery1")
                             img.ac(src="img/placeholder.png", alt="")
-                    div.col-2-4.mb-3
+                    div.mb-3.slider__slide
                         a(href="/img/placeholder.png", data-gallery="gallery1")
                             img.ac(src="img/placeholder.png", alt="")
-                    div.col-2-4.mb-3
+                    div.mb-3.slider__slide
                         a(href="/img/placeholder.png", data-gallery="gallery1")
                             img.ac(src="img/placeholder.png", alt="")
-                    div.col-2-4.mb-3
+                    div.mb-3.slider__slide
                         a(href="/img/placeholder.png", data-gallery="gallery1")
                             img.ac(src="img/placeholder.png", alt="")
 
@@ -162,11 +162,12 @@ html.no-js(lang='ru-RU')
             window.jQuery || document.write('<script src="\/assets\/vendor\/jquery\/jquery.min.js"><\/script>');
 
         script(type="text/javascript", src="/assets/vendor/bootstrap@min.js")
-        // script(type="text/javascript", src="/assets/vendor/waypoints/jquery.waypoints@min.js")
-        // script(type="text/javascript", src="/assets/vendor/slick/slick@min.js")
-        // script(type="text/javascript", src="/assets/vendor/fancybox/jquery.fancybox@min.js")
+        //- script(type="text/javascript", src="/assets/vendor/waypoints/jquery.waypoints@min.js")
+        script(type="text/javascript", src="/assets/vendor/slick/slick@min.js")
+        //- script(type="text/javascript", src="/assets/vendor/fancybox/jquery.fancybox@min.js")
 
         script(src="/assets/main@min.js")
+        script(src="/pages/index/script@min.js")
 
         // Google Analytics: change UA-XXXXX-Y to be your site's ID.
         //

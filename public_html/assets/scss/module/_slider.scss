@@ -1,8 +1,13 @@
 .slider {
     display: flex;
     justify-content: space-between;
+    margin-left: -15px;
+    margin-right: -15px;
 
-    > div {
+    &__slide {
+        padding-left: 15px;
+        padding-right: 15px;
+
         a:focus {
             outline: none;
         }
