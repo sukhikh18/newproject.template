@@ -15,7 +15,7 @@ html.no-js(lang='ru-RU')
         link(rel="stylesheet", type="text/css", href="/assets/vendor/bootstrap@min.css")
 
         //- link(rel="stylesheet", type="text/css", href="/assets/vendor/slick/slick.css")
-        //- link(rel="stylesheet", type="text/css", href="/assets/vendor/fancybox/jquery.fancybox@min.css")
+        link(rel="stylesheet", type="text/css", href="/assets/vendor/fancybox/jquery.fancybox@min.css")
 
         link(rel="stylesheet", href="/assets/template@min.css")
         link(rel="stylesheet", href="/pages/index/style@min.css")
@@ -133,27 +133,56 @@ html.no-js(lang='ru-RU')
             section.site-prefix.container.mt-5
                 #slider.slick.slider
                     div.mb-3.slider__slide
-                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                        a(href="/img/placeholder.png", data-fancybox="gallery1")
                             img.ac(data-lazy="https://picsum.photos/400/400/", src="img/placeholder.png", alt="")
                     div.mb-3.slider__slide
-                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                        a(href="/img/placeholder.png", data-fancybox="gallery1")
                             img.ac(src="img/placeholder.png", alt="")
                     div.mb-3.slider__slide
-                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                        a(href="/img/placeholder.png", data-fancybox="gallery1")
                             img.ac(src="img/placeholder.png", alt="")
                     div.mb-3.slider__slide
-                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                        a(href="/img/placeholder.png", data-fancybox="gallery1")
                             img.ac(src="img/placeholder.png", alt="")
                     div.mb-3.slider__slide
-                        a(href="/img/placeholder.png", data-gallery="gallery1")
+                        a(href="/img/placeholder.png", data-fancybox="gallery1")
                             img.ac(src="img/placeholder.png", alt="")
 
             footer.site-footer
-                .container
-                    .row
-                        .col-12
+                .container.text-center
+                    a(href="javascript:;", data-fancybox, data-src="#hidden-content") Отрыть модальное окно
             // .site-footer
-        // #page
+            // #page
+
+        #hidden-content(style="display: none;")
+            h2 Обратный звонок
+            p Мы перезвоним вам в течение 15 минут
+
+            form
+                .form-group
+                    label(for="exampleInput1")
+                        | Ваше имя
+                        span.req(style="color: red") *
+                    input#exampleInput1.form-control(type="text")
+
+                .form-group
+                    label(for="exampleInputPhone1")
+                        | Номер телефона
+                        span.req(style="color: red") *
+                    input#exampleInputPhone1.form-control(type="tel", aria-describedby="phoneHelp")
+
+                    small#phoneHelp.form-text.text-muted
+                        | Мы не передаем ваши персональные данные третьим лицам
+
+                .form-group
+                    label(for="exampleInputEmail1") Электронная почта
+                    input#exampleInputEmail1.form-control(type="email")
+
+                .form-group.form-check
+                    input#exampleCheck1.form-check-input(type="checkbox")
+                    label.form-check-label(for="exampleCheck1") Выбери меня
+
+                button.btn.btn-primary(type="submit") Отправить
 
         // Scripts and Analitics
         script(src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr@min.js", crossorigin="anonymous", type="text/javascript")
@@ -163,8 +192,29 @@ html.no-js(lang='ru-RU')
 
         script(type="text/javascript", src="/assets/vendor/bootstrap@min.js")
         //- script(type="text/javascript", src="/assets/vendor/waypoints/jquery.waypoints@min.js")
+        script(type="text/javascript", src="/assets/vendor/cleave/cleave@min.js")
+        script(type="text/javascript", src="/assets/vendor/cleave/addons/cleave-phone.ru.js")
         script(type="text/javascript", src="/assets/vendor/slick/slick@min.js")
-        //- script(type="text/javascript", src="/assets/vendor/fancybox/jquery.fancybox@min.js")
+        script(type="text/javascript", src="/assets/vendor/fancybox/jquery.fancybox@min.js")
+        script.
+            if( typeof($.fancybox) ) {
+                // more: 'share', 'download', 'thumbs',
+                $.fancybox.defaults.buttons = ['zoom', 'slideShow', 'fullScreen', 'close'];
+                $.fancybox.defaults.lang = 'ru';
+                $.fancybox.defaults.i18n['ru'] = {
+                    'CLOSE'       : "Закрыть",
+                    'NEXT'        : "Следующий",
+                    'PREV'        : "Предыдущий",
+                    'ERROR'       : "Контент по запросу не найден. <br/> Пожалуйста, попробуйте позже.",
+                    'PLAY_START'  : "Запустить слайдшоу",
+                    'PLAY_STOP'   : "Остановить слайдшоу",
+                    'FULL_SCREEN' : "На весь экран",
+                    'THUMBS'      : "Эскизы",
+                    'DOWNLOAD'    : "Скачать",
+                    'SHARE'       : "Поделиться",
+                    'ZOOM'        : "Приблизить"
+                }
+            }
 
         script(src="/assets/main@min.js")
         script(src="/pages/index/script@min.js")

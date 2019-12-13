@@ -52,6 +52,7 @@
 		"gulp-svg-sprite": "^1.5.0"
 	},
 	"dependencies": {
+		"@fancyapps/fancybox": "^3.5.7",
 		"animatewithsass": "^3.2.1",
 		"bootstrap": "^4.2.1",
 		"cleave.js": "^1.5.3",
@@ -63,7 +64,6 @@
 		"waypoints": "^4.0.1"
 	},
 	"~dependencies": {
-		"@fancyapps/fancybox": "^3.5.6",
 		"lettering": "^0.4.1"
 	}
 }
