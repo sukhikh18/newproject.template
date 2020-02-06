@@ -290,28 +290,28 @@ const buildPug = function (done) {
 }
 
 const buildVendorStyles    = function (cb, $n = 1) {
-    if(!paths.vendor.src) return cb();
-    return buildStyles([ dir + paths.vendor.src + ext.scss ], dist + paths.vendor.dest, {newerOnly: $n});
+    return ! paths.vendor.src ? cb() :
+        buildStyles([ dir + paths.vendor.src + ext.scss ], dist + paths.vendor.dest, {newerOnly: $n});
 }
 const buildMainStyles      = function (cb, $n = 1) {
-    if(false === paths.styles.src) return cb();
-    return buildStyles([ dir + paths.styles.src + '**/' + ext.scss ], dist + paths.styles.dest, {newerOnly: $n});
+    return false === paths.styles.src ? cb() :
+        buildStyles([ dir + paths.styles.src + '**/' + ext.scss ], dist + paths.styles.dest, {newerOnly: $n});
 }
 const buildBlocksStyles    = function (cb, $n = 1) {
-    if(!paths.blocks.src) return cb();
-    return buildStyles([ dir + paths.blocks.src + '**/' + ext.scss ], dist + paths.blocks.dest, {newerOnly: $n});
+    return ! paths.blocks.src ? cb() :
+        buildStyles([ dir + paths.blocks.src + '**/' + ext.scss ], dist + paths.blocks.dest, {newerOnly: $n});
 }
-const buildBlocksScripts = function (cb) {
-    if(!paths.blocks.src) return cb();
-    return buildScripts([ dir + paths.blocks.src + '**/' + ext.js ], dist + paths.blocks.dest, {newerOnly: true});
+const buildBlocksScripts = function (cb, $n = 1) {
+    return ! paths.blocks.src ? cb() :
+        buildScripts([ dir + paths.blocks.src + '**/' + ext.js ], dist + paths.blocks.dest, {newerOnly: $n});
 }
 const buildMainImages    = function (cb) {
-    if(!paths.images.src) return cb();
-    return buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
+    return ! paths.images.src ? cb() :
+        buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
 }
 const buildBlocksImages  = function (cb) {
-    if(!paths.blocks.src) return cb();
-    return buildImages([ dir + paths.blocks.src + '**/' + ext.img ], dist + paths.blocks.dest);
+    return ! paths.blocks.src ? cb() :
+        buildImages([ dir + paths.blocks.src + '**/' + ext.img ], dist + paths.blocks.dest);
 }
 
 // const buildFaviconImages = function () {
