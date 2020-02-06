@@ -152,7 +152,7 @@ const buildStyles = function( srcPath, buildPath, _args ) {
         // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
         .pipe(plumber.stop())
         .pipe(dest(buildPath))
-        .pipe(debug())
+        .pipe(debug(args['debug']))
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
