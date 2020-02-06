@@ -10,8 +10,6 @@ const gulp = require("gulp");
 const src = gulp.src;
 const dest = gulp.dest;
 const watch = gulp.watch;
-const parallel = gulp.parallel;
-const series = gulp.series;
 
 const gulpif = require("gulp-if");
 const browsersync = require("browser-sync");
@@ -50,9 +48,11 @@ const webpackStream = require("webpack-stream");
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
-const scssExt = '*.scss';
-const jsExt   = '*.js';
-const imgExt  = '*.{jpg,jpeg,png,gif,svg}';
+const ext = {
+    scss: '*.scss',
+    js: '*.js',
+    img: '*.{jpg,jpeg,png,gif,svg}'
+};
 
 const config  = (function() {
     let conf = require(root + ".config");
@@ -131,7 +131,7 @@ const buildStyles = function( srcPath, buildPath, _args ) {
     _args = _args || {};
     for (var arg in _args) { args[arg] = _args[arg]; }
 
-    srcPath.push ('!' + dir + '**/_' + scssExt);
+    srcPath.push ('!' + dir + '**/_' + ext.scss);
 
     // @todo check and do document this;
     if( '' === srcPath ) {
@@ -178,7 +178,7 @@ const buildScripts = function (srcPath, buildPath, _args) {
     _args = _args || {};
     for (var arg in _args) { args[arg] = _args[arg]; }
 
-    srcPath.push('!' + dir + '**/_' + jsExt);
+    srcPath.push('!' + dir + '**/_' + ext.js);
 
     if( '' === srcPath ) {
         srcPath.push( '!' + paths.vendor.src + '**/*' )
@@ -291,27 +291,27 @@ const buildPug = function (done) {
 
 const buildVendorStyles    = function (cb, $n = 1) {
     if(!paths.vendor.src) return cb();
-    return buildStyles([ dir + paths.vendor.src + scssExt ], dist + paths.vendor.dest, {newerOnly: $n});
+    return buildStyles([ dir + paths.vendor.src + ext.scss ], dist + paths.vendor.dest, {newerOnly: $n});
 }
 const buildMainStyles      = function (cb, $n = 1) {
     if(false === paths.styles.src) return cb();
-    return buildStyles([ dir + paths.styles.src + '**/' + scssExt ], dist + paths.styles.dest, {newerOnly: $n});
+    return buildStyles([ dir + paths.styles.src + '**/' + ext.scss ], dist + paths.styles.dest, {newerOnly: $n});
 }
 const buildBlocksStyles    = function (cb, $n = 1) {
     if(!paths.blocks.src) return cb();
-    return buildStyles([ dir + paths.blocks.src + '**/' + scssExt ], dist + paths.blocks.dest, {newerOnly: $n});
+    return buildStyles([ dir + paths.blocks.src + '**/' + ext.scss ], dist + paths.blocks.dest, {newerOnly: $n});
 }
 const buildBlocksScripts = function (cb) {
     if(!paths.blocks.src) return cb();
-    return buildScripts([ dir + paths.blocks.src + '**/' + jsExt ], dist + paths.blocks.dest, {newerOnly: true});
+    return buildScripts([ dir + paths.blocks.src + '**/' + ext.js ], dist + paths.blocks.dest, {newerOnly: true});
 }
 const buildMainImages    = function (cb) {
     if(!paths.images.src) return cb();
-    return buildImages([ dir + paths.images.src + '**/' + imgExt ], dist + paths.images.dest);
+    return buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
 }
 const buildBlocksImages  = function (cb) {
     if(!paths.blocks.src) return cb();
-    return buildImages([ dir + paths.blocks.src + '**/' + imgExt ], dist + paths.blocks.dest);
+    return buildImages([ dir + paths.blocks.src + '**/' + ext.img ], dist + paths.blocks.dest);
 }
 
 // const buildFaviconImages = function () {
@@ -344,8 +344,8 @@ const watchAll = function () {
         return cb();
     });
 
-    watch(paths.webpack.src, series("buildScriptsWebpack") );
-    watch([ dir + paths.blocks.src + '**/' + jsExt ], buildBlocksScripts );
+    watch(paths.webpack.src, gulp.series("buildScriptsWebpack") );
+    watch([ dir + paths.blocks.src + '**/' + ext.js ], buildBlocksScripts );
 
     const settings = dir + paths.styles.src + '_site-settings.scss';
 
@@ -356,30 +356,30 @@ const watchAll = function () {
         return cb();
     } );
 
-    watch([ dir + paths.vendor.src + '**/' + scssExt ], function reBuildVendorStyles(cb) {
+    watch([ dir + paths.vendor.src + '**/' + ext.scss ], function reBuildVendorStyles(cb) {
         return buildVendorStyles(cb, 0);
     } );
 
-    watch( [ dir + paths.styles.src + '**/' + scssExt, '!' + settings ], function reBuildMainStyles(cb) {
+    watch( [ dir + paths.styles.src + '**/' + ext.scss, '!' + settings ], function reBuildMainStyles(cb) {
         return buildMainStyles(cb, 0);
     } );
 
-    watch( [ dir + paths.module + '**/' + scssExt ], function reBuildStylesByModules(cb) {
+    watch( [ dir + paths.module + '**/' + ext.scss ], function reBuildStylesByModules(cb) {
         buildMainStyles(cb, 0);
         buildBlocksStyles(cb, 0);
         return cb();
     } );
 
     if( paths.blocks.src ) {
-        watch( [ dir + paths.blocks.src + '**/' + scssExt ], buildBlocksStyles );
+        watch( [ dir + paths.blocks.src + '**/' + ext.scss ], buildBlocksStyles );
     }
 
     if( paths.images.src ) {
-        watch( [ dir + paths.images.src + '**/' + imgExt ], buildMainImages );
+        watch( [ dir + paths.images.src + '**/' + ext.img ], buildMainImages );
     }
 
     if( paths.blocks.src ) {
-        watch( [ dir + paths.blocks.src + '**/' + imgExt ], buildBlocksImages );
+        watch( [ dir + paths.blocks.src + '**/' + ext.img ], buildBlocksImages );
     }
 };
 
@@ -403,15 +403,15 @@ const serve = function () {
     browsersync.init(serverCfg);
 };
 
-gulp.task("buildCode", parallel(buildHtml, buildPug));
-gulp.task("buildStyles", parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
-gulp.task("buildImages", parallel(buildBlocksImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
-gulp.task("buildScripts", parallel(buildBlocksScripts, "buildScriptsWebpack"));
+gulp.task("buildCode", gulp.parallel(buildHtml, buildPug));
+gulp.task("buildStyles", gulp.parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
+gulp.task("buildImages", gulp.parallel(buildBlocksImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
+gulp.task("buildScripts", gulp.parallel(buildBlocksScripts, "buildScriptsWebpack"));
 
 /**
  * Build only
  */
-gulp.task("build", parallel("buildCode", "buildStyles", "buildScripts", "buildImages"));
+gulp.task("build", gulp.parallel("buildCode", "buildStyles", "buildScripts", "buildImages"));
 
 /**
  * Move assets (if yarn/npm installed them)
@@ -430,4 +430,4 @@ gulp.task("install", function(done) {
 /**
  * Build with start serve/watcher
  */
-gulp.task("default", series("build", parallel(watchAll, serve)));
+gulp.task("default", gulp.series("build", gulp.parallel(watchAll, serve)));
