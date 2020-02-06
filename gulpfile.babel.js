@@ -6,6 +6,12 @@ const subDomain = 'nikolays93';
 /** {String} Domain for use local server proxy */
 const domain = '';
 
+const ext = {
+    scss: '*.scss',
+    js: '*.js',
+    img: '*.{jpg,jpeg,png,gif,svg}'
+};
+
 const gulp = require("gulp");
 const src = gulp.src;
 const dest = gulp.dest;
@@ -48,17 +54,11 @@ const webpackStream = require("webpack-stream");
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
-const ext = {
-    scss: '*.scss',
-    js: '*.js',
-    img: '*.{jpg,jpeg,png,gif,svg}'
-};
-
-const config  = (function() {
+const config = (() => {
     let conf = require(root + ".config");
 
     // prepare webpack config
-    conf.webpack = (function( webpack ) {
+    conf.webpack = ((webpack) => {
         webpack.mode = production ? 'production' : 'development';
         webpack.devtool = production ? false : "source-map";
 
@@ -75,16 +75,53 @@ const config  = (function() {
 const dir = root + config.src;
 const dist = root + config.dest;
 
-const paths = (function( paths ) {
-    paths.webpack.src.forEach( function(element, index) {
+const paths = (( paths ) => {
+    paths.arr = {};
+
+    paths.webpack.src.forEach((element, index) => {
         paths.webpack.src[ index ] = dir + element;
     });
+
+    if( paths.html ) {
+        paths.arr.html = [
+            dir + '**/' + paths.html,
+            '!' + dir + '**/_' + paths.html,
+            '!' + dir + paths.assets + '**/' + paths.html
+        ];
+    }
+
+    if( paths.pug ) {
+        paths.arr.pug = [
+            dir + '**/' + paths.pug,
+            '!' + dir + '**/_' + paths.pug,
+            '!' + dir + paths.assets + '**/' + paths.pug
+        ];
+    }
 
     return paths;
 })( config.paths );
 
-const buildStyles = function( srcPath, buildPath, _args ) {
-    var args = {
+const buildHtml = (done) => !paths.arr.html ? done() :
+    src(paths.arr.html, {allowEmpty: true})
+    .pipe(rigger())
+    .pipe(replace("@min", production ? ".min" : ''))
+    .pipe(rename({basename: "index"}))
+    .pipe(dest(dist))
+    .pipe(debug({ "title": "RAW to HTML" }));
+
+const buildPug = (done) => !paths.arr.pug ? done() :
+    src(paths.arr.pug, {allowEmpty: true})
+    .pipe(pug({
+        pretty: "    ",
+        basedir: dir
+    }))
+    .pipe(replace("@min", production ? ".min" : ''))
+    .pipe(rename({basename: "index"}))
+    .pipe(dest(dist))
+    .pipe(debug({"title": "PUG to HTML"}));
+
+const getStylesArgs = (args = {}, buildPath) => {
+    let _default = {
         'newerOnly': false,
         'newer': {
             dest: buildPath,
@@ -128,20 +165,27 @@ const buildStyles = function( srcPath, buildPath, _args ) {
         }
     };
 
-    _args = _args || {};
-    for (var arg in _args) { args[arg] = _args[arg]; }
+    for (var arg in args) { _default[arg] = args[arg]; }
+    return _default;
+};
 
-    srcPath.push ('!' + dir + '**/_' + ext.scss);
+const getStylesPath = (path) => {
+    path.push('!' + dir + '**/_' + ext.scss);
 
-    // @todo check and do document this;
-    if( '' === srcPath ) {
-        srcPath.push( '!' + paths.vendor.srcPath + '**/*' )
-        srcPath.push( '!' + paths.blocks.srcPath + '**/*' )
+    if( '' === path ) { // @todo @check How easy?
+        path.push( '!' + paths.vendor.path + '**/*' )
+        path.push( '!' + paths.blocks.path + '**/*' )
     }
 
-    return src(srcPath, { allowEmpty: true })
+    return path;
+};
+
+const buildStyles = function(srcPath, buildPath, _args) {
+    let args = getStylesArgs(_args, buildPath);
+
+    return src(getStylesPath(srcPath), {allowEmpty: true})
         .pipe(plumber(args['plumber']))
-        .pipe(gulpif(args['newerOnly'], newer(args['newer'])))
+        .pipe(gulpif(!!args['newerOnly'] && !production, newer(args['newer'])))
         // .pipe(gulpif(!production, sourcemaps.init()))
         .pipe(sass(args['sass']))
         .pipe(groupmediaqueries(args['groupmediaqueries']))
@@ -156,8 +200,8 @@ const buildStyles = function( srcPath, buildPath, _args ) {
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
-const buildScripts = function (srcPath, buildPath, _args) {
-    var args = {
+const getScriptsArgs = (args = {}, buildPath) => {
+    let _default = {
         'newerOnly': false,
         'newer': {
             dest: buildPath,
@@ -175,19 +219,27 @@ const buildScripts = function (srcPath, buildPath, _args) {
         }
     };
 
-    _args = _args || {};
-    for (var arg in _args) { args[arg] = _args[arg]; }
+    for (var arg in args) { _default[arg] = args[arg]; }
+    return _default;
+};
 
-    srcPath.push('!' + dir + '**/_' + ext.js);
+const getScriptsPath = (path) => {
+    path.push('!' + dir + '**/_' + ext.js);
 
-    if( '' === srcPath ) {
-        srcPath.push( '!' + paths.vendor.src + '**/*' )
-        srcPath.push( '!' + paths.blocks.src + '**/*' )
+    if( '' === path ) { // @todo @check How easy?
+        path.push( '!' + paths.vendor.src + '**/*' )
+        path.push( '!' + paths.blocks.src + '**/*' )
     }
 
-    return src(srcPath, { allowEmpty: true })
+    return path;
+};
+
+const buildScripts = (srcPath, buildPath, _args = {}) => {
+    let args = getScriptsArgs(_args, buildPath);
+
+    return src(getScriptsPath(srcPath), { allowEmpty: true })
         .pipe(plumber(args['plumber']))
-        .pipe(gulpif(args['newerOnly'], newer(args['newer'])))
+        .pipe(gulpif(!!args['newerOnly'] && !production, newer(args['newer'])))
         .pipe(rigger(args['rigger']))
         .pipe(gulpif(!production, sourcemaps.init()))
         .pipe(gulpif(production, uglify(args['uglify'])))
@@ -197,27 +249,16 @@ const buildScripts = function (srcPath, buildPath, _args) {
         .pipe(dest(buildPath))
         .pipe(debug(args['debug']))
         .on("end", browsersync.reload);
+};
+
+const getImagesPath = (path) => {
+    // path.images.push('!' + paths.src.sprites);
+    // path.images.push('!' + paths.src.favicons);
+    return path;
 }
 
-gulp.task("buildScriptsWebpack", function(cb) {
-    if( !paths.webpack.src ) return cb();
-
-    return src(paths.webpack.src, { allowEmpty: true })
-        .pipe(webpackStream(config.webpack), webpack)
-        .pipe(gulpif(production, rename({ suffix: ".min" })))
-        .pipe(rename(function (currentPath) {
-            currentPath.dirname = currentPath.basename.match(/^main/i) ? paths.webpack.dest : paths.vendor.dest;
-        }))
-        .pipe(dest(dist))
-        .pipe(debug({ "title": "Webpack" }))
-        .on("end", browsersync.reload);
-});
-
 const buildImages = function (srcPath, buildPath) {
-    // srcPath.images.push('!' + paths.src.sprites);
-    // srcPath.images.push('!' + paths.src.favicons);
-
-    return src(srcPath, { allowEmpty: true })
+    return src(getImagesPath(srcPath), {allowEmpty: true})
         .pipe(newer(buildPath))
         .pipe(gulpif(production, imagemin([
             imageminGiflossy({
@@ -250,69 +291,40 @@ const buildImages = function (srcPath, buildPath) {
             })
         ])))
         .pipe(dest(buildPath))
-        .pipe(debug({ "title": "Images" }))
+        .pipe(debug({"title": "Images"}))
         .on("end", browsersync.reload);
 }
 
-const buildHtml = function (done) {
-    if( !paths.html ) return done();
 
-    var srcPath = [ dir + '**/' + paths.html ];
+const buildVendorStyles  = (done, n = 1) => paths.vendor.src ? done() :
+    buildStyles([ dir + paths.vendor.src + ext.scss ], dist + paths.vendor.dest, {newerOnly: n});
 
-    srcPath.push('!' + dir + '**/_' + paths.html);
-    srcPath.push('!' + dir + paths.assets + '**/' + paths.html);
+const buildMainStyles    = (done, n = 1) => false === paths.styles.src ? done() :
+    buildStyles([ dir + paths.styles.src + '**/' + ext.scss ], dist + paths.styles.dest, {newerOnly: n});
 
-    return src( srcPath, { allowEmpty: true })
-        .pipe(rigger())
-        .pipe(replace("@min", production ? ".min" : ''))
-        .pipe(rename({ basename: "index" }))
-        .pipe(dest(dist))
-        .pipe(debug({ "title": "RAW to HTML" }));
-}
+const buildBlocksStyles  = (done, n = 1) => ! paths.blocks.src ? done() :
+    buildStyles([ dir + paths.blocks.src + '**/' + ext.scss ], dist + paths.blocks.dest, {newerOnly: n});
 
-const buildPug = function (done) {
-    if( !paths.pug ) return done();
+// @todo maybe need newer?
+const buildMainScripts   = (done, n = 1) => ! paths.webpack.src ? done() :
+    src(paths.webpack.src, {allowEmpty: true})
+    .pipe(webpackStream(config.webpack), webpack)
+    .pipe(gulpif(production, rename({ suffix: ".min" })))
+    .pipe(rename(function (currentPath) {
+        currentPath.dirname = currentPath.basename.match(/^main/i) ? paths.webpack.dest : paths.vendor.dest;
+    }))
+    .pipe(dest(dist))
+    .pipe(debug({ "title": "Webpack" }))
+    .on("end", browsersync.reload);
 
-    var srcPath = [ dir + '**/' + paths.pug ];
+const buildBlocksScripts = (done, n = 1) => ! paths.blocks.src ? done() :
+    buildScripts([ dir + paths.blocks.src + '**/' + ext.js ], dist + paths.blocks.dest, {newerOnly: n});
 
-    srcPath.push('!' + dir + '**/_' + paths.pug);
-    srcPath.push('!' + dir + paths.assets + '**/' + paths.pug);
+const buildMainImages    = (done) => ! paths.images.src ? done() :
+    buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
 
-    return src( srcPath, { allowEmpty: true })
-        .pipe(pug({
-            pretty: "    ",
-            basedir: dir
-        }))
-        .pipe(replace("@min", production ? ".min" : ''))
-        .pipe(rename({ basename: "index" }))
-        .pipe(dest(dist))
-        .pipe(debug({ "title": "PUG to HTML" }));
-}
-
-const buildVendorStyles    = function (cb, $n = 1) {
-    return ! paths.vendor.src ? cb() :
-        buildStyles([ dir + paths.vendor.src + ext.scss ], dist + paths.vendor.dest, {newerOnly: $n});
-}
-const buildMainStyles      = function (cb, $n = 1) {
-    return false === paths.styles.src ? cb() :
-        buildStyles([ dir + paths.styles.src + '**/' + ext.scss ], dist + paths.styles.dest, {newerOnly: $n});
-}
-const buildBlocksStyles    = function (cb, $n = 1) {
-    return ! paths.blocks.src ? cb() :
-        buildStyles([ dir + paths.blocks.src + '**/' + ext.scss ], dist + paths.blocks.dest, {newerOnly: $n});
-}
-const buildBlocksScripts = function (cb, $n = 1) {
-    return ! paths.blocks.src ? cb() :
-        buildScripts([ dir + paths.blocks.src + '**/' + ext.js ], dist + paths.blocks.dest, {newerOnly: $n});
-}
-const buildMainImages    = function (cb) {
-    return ! paths.images.src ? cb() :
-        buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
-}
-const buildBlocksImages  = function (cb) {
-    return ! paths.blocks.src ? cb() :
-        buildImages([ dir + paths.blocks.src + '**/' + ext.img ], dist + paths.blocks.dest);
-}
+const buildBlocksImages  = (done) => ! paths.blocks.src ? done() :
+    buildImages([ dir + paths.blocks.src + '**/' + ext.img ], dist + paths.blocks.dest);
 
 // const buildFaviconImages = function () {
 //     return src(paths.src.favicons, { allowEmpty: true })
@@ -337,49 +349,43 @@ const buildBlocksImages  = function (cb) {
 // }
 
 const watchAll = function () {
+    // Watch markup.
     if( paths.html ) watch([ dir + '**/' + paths.html ], buildHtml);
     if( paths.pug ) watch([ dir + '**/' + paths.pug ], buildPug);
-    watch([ dir + '**/*.html' ], function htmlChangedReload(cb) {
+    watch([ dir + '**/*.html' ], function htmlChangedReload(done) {
         browsersync.reload();
-        return cb();
+        return done();
     });
 
-    watch(paths.webpack.src, gulp.series("buildScriptsWebpack") );
-    watch([ dir + paths.blocks.src + '**/' + ext.js ], buildBlocksScripts );
-
+    // Watch styles.
     const settings = dir + paths.styles.src + '_site-settings.scss';
 
-    watch( [ settings ], function(cb) {
-        buildVendorStyles(cb, 0);
-        buildMainStyles(cb, 0);
-        buildBlocksStyles(cb, 0);
-        return cb();
-    } );
+    watch([ settings ], function(done) {
+        buildVendorStyles(done, 0);
+        buildMainStyles(done, 0);
+        buildBlocksStyles(done, 0);
+        return done();
+    });
 
-    watch([ dir + paths.vendor.src + '**/' + ext.scss ], function reBuildVendorStyles(cb) {
-        return buildVendorStyles(cb, 0);
-    } );
+    watch([ dir + paths.vendor.src + '**/' + ext.scss, '!' + settings ], (done) => buildVendorStyles(done, 0) );
+    watch([ dir + paths.styles.src + '**/' + ext.scss, '!' + settings ], (done) => buildMainStyles(done, 0) );
+    watch([ dir + paths.module + '**/' + ext.scss, '!' + settings ], (done) => {
+        buildMainStyles(done, 0);
+        buildBlocksStyles(done, 0);
+        return done();
+    });
 
-    watch( [ dir + paths.styles.src + '**/' + ext.scss, '!' + settings ], function reBuildMainStyles(cb) {
-        return buildMainStyles(cb, 0);
-    } );
+    // Watch javascript.
+    watch(paths.webpack.src, buildMainScripts);
 
-    watch( [ dir + paths.module + '**/' + ext.scss ], function reBuildStylesByModules(cb) {
-        buildMainStyles(cb, 0);
-        buildBlocksStyles(cb, 0);
-        return cb();
-    } );
+    // Watch images.
+    if(paths.images.src) watch([ dir + paths.images.src + '**/' + ext.img ], buildMainImages);
 
-    if( paths.blocks.src ) {
-        watch( [ dir + paths.blocks.src + '**/' + ext.scss ], buildBlocksStyles );
-    }
-
-    if( paths.images.src ) {
-        watch( [ dir + paths.images.src + '**/' + ext.img ], buildMainImages );
-    }
-
-    if( paths.blocks.src ) {
-        watch( [ dir + paths.blocks.src + '**/' + ext.img ], buildBlocksImages );
+    // Watch pages.
+    if(paths.blocks.src) {
+        watch([ dir + paths.blocks.src + '**/' + ext.scss ], buildBlocksStyles);
+        watch([ dir + paths.blocks.src + '**/' + ext.js ], buildBlocksScripts);
+        watch([ dir + paths.blocks.src + '**/' + ext.img ], buildBlocksImages);
     }
 };
 
@@ -405,8 +411,8 @@ const serve = function () {
 
 gulp.task("buildCode", gulp.parallel(buildHtml, buildPug));
 gulp.task("buildStyles", gulp.parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
-gulp.task("buildImages", gulp.parallel(buildBlocksImages, buildMainImages)); // buildVendorImages, buildFaviconImages, buildSpriteImages
-gulp.task("buildScripts", gulp.parallel(buildBlocksScripts, "buildScriptsWebpack"));
+gulp.task("buildScripts", gulp.parallel(buildBlocksScripts, buildMainScripts));
+gulp.task("buildImages", gulp.parallel(buildBlocksImages, buildMainImages)); // buildFavicons, buildSprites
 
 /**
  * Build only
@@ -417,12 +423,11 @@ gulp.task("build", gulp.parallel("buildCode", "buildStyles", "buildScripts", "bu
  * Move assets (if yarn/npm installed them)
  */
 gulp.task("install", function(done) {
-    let tasks = config.vendor.map(function (element) {
-        return src(element.src)
-            .pipe(newer(dist + element.dest))
-            .pipe(dest(dist + element.dest))
-            .pipe(debug({ "title": element.name }));
-    });
+    let tasks = config.vendor.map((element) => src(element.src)
+        .pipe(newer(dist + element.dest))
+        .pipe(dest(dist + element.dest))
+        .pipe(debug({"title": "vendor: " + element.name}))
+    );
 
     return merge(tasks);
 });
