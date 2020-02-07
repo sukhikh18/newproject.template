@@ -395,16 +395,10 @@ const serve = function () {
         notify: false
     }
 
-    if( tunnel ) {
-        serverCfg.tunnel = subDomain;
-    }
+    if( tunnel ) serverCfg.tunnel = subDomain;
 
-    if( '' !== domain ) {
-        serverCfg.proxy = domain;
-    }
-    else {
-        serverCfg.server = {baseDir: dist};
-    }
+    if( '' !== domain ) serverCfg.proxy = domain;
+    else serverCfg.server = {baseDir: dist};
 
     browsersync.init(serverCfg);
 };
