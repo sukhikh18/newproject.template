@@ -11,8 +11,6 @@ var paths = module.exports.paths = {
     assets: 'assets/',
     module: 'assets/module/',
 
-    html: false, // index.raw.html
-    pug: 'index.pug',
 
     styles: {
         src:  'assets/scss/',

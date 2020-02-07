@@ -27,7 +27,6 @@ const debug = require("gulp-debug");
 const clean = require("gulp-clean");
 const yargs = require("yargs");
 const rigger = require("gulp-rigger");
-const pug = require("gulp-pug");
 const autoprefixer = require("gulp-autoprefixer");
 const sass = require("gulp-sass");
 const groupmediaqueries = require("gulp-group-css-media-queries");
@@ -76,49 +75,12 @@ const dir = root + config.src;
 const dist = root + config.dest;
 
 const paths = (( paths ) => {
-    paths.arr = {};
-
     paths.webpack.src.forEach((element, index) => {
         paths.webpack.src[ index ] = dir + element;
     });
 
-    if( paths.html ) {
-        paths.arr.html = [
-            dir + '**/' + paths.html,
-            '!' + dir + '**/_' + paths.html,
-            '!' + dir + paths.assets + '**/' + paths.html
-        ];
-    }
-
-    if( paths.pug ) {
-        paths.arr.pug = [
-            dir + '**/' + paths.pug,
-            '!' + dir + '**/_' + paths.pug,
-            '!' + dir + paths.assets + '**/' + paths.pug
-        ];
-    }
-
     return paths;
 })( config.paths );
-
-const buildHtml = (done) => !paths.arr.html ? done() :
-    src(paths.arr.html, {allowEmpty: true})
-    .pipe(rigger())
-    .pipe(replace("@min", production ? ".min" : ''))
-    .pipe(rename({basename: "index"}))
-    .pipe(dest(dist))
-    .pipe(debug({ "title": "RAW to HTML" }));
-
-const buildPug = (done) => !paths.arr.pug ? done() :
-    src(paths.arr.pug, {allowEmpty: true})
-    .pipe(pug({
-        pretty: "    ",
-        basedir: dir
-    }))
-    .pipe(replace("@min", production ? ".min" : ''))
-    .pipe(rename({basename: "index"}))
-    .pipe(dest(dist))
-    .pipe(debug({"title": "PUG to HTML"}));
 
 const getStylesArgs = (args = {}, buildPath) => {
     let _default = {
@@ -350,9 +312,7 @@ const buildBlocksImages  = (done) => ! paths.blocks.src ? done() :
 
 const watchAll = function () {
     // Watch markup.
-    if( paths.html ) watch([ dir + '**/' + paths.html ], buildHtml);
-    if( paths.pug ) watch([ dir + '**/' + paths.pug ], buildPug);
-    watch([ dir + '**/*.html' ], function htmlChangedReload(done) {
+    watch([ dir + '**/*.html' ], (done) => {
         browsersync.reload();
         return done();
     });
@@ -403,7 +363,6 @@ const serve = function () {
     browsersync.init(serverCfg);
 };
 
-gulp.task("buildCode", gulp.parallel(buildHtml, buildPug));
 gulp.task("buildStyles", gulp.parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
 gulp.task("buildScripts", gulp.parallel(buildBlocksScripts, buildMainScripts));
 gulp.task("buildImages", gulp.parallel(buildBlocksImages, buildMainImages)); // buildFavicons, buildSprites
@@ -411,7 +370,7 @@ gulp.task("buildImages", gulp.parallel(buildBlocksImages, buildMainImages)); // 
 /**
  * Build only
  */
-gulp.task("build", gulp.parallel("buildCode", "buildStyles", "buildScripts", "buildImages"));
+gulp.task("build", gulp.parallel("buildStyles", "buildScripts", "buildImages"));
 
 /**
  * Move assets (if yarn/npm installed them)
