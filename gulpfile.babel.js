@@ -296,7 +296,7 @@ const buildImages = function (srcPath, buildPath) {
 }
 
 
-const buildVendorStyles  = (done, n = 1) => paths.vendor.src ? done() :
+const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
     buildStyles([ dir + paths.vendor.src + ext.scss ], dist + paths.vendor.dest, {newerOnly: n});
 
 const buildMainStyles    = (done, n = 1) => false === paths.styles.src ? done() :
