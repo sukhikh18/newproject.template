@@ -75,9 +75,47 @@ const dir = root + config.src;
 const dist = root + config.dest;
 
 const paths = (( paths ) => {
-    paths.webpack.src.forEach((element, index) => {
-        paths.webpack.src[ index ] = dir + element;
-    });
+
+    paths.markup = dir + paths.markup;
+
+    if( paths.vendor ) {
+        paths.vendor.styles = [
+            '!' + dir + paths.vendor.src + '**/_' + ext.scss,
+                  dir + paths.vendor.src + '**/' + ext.scss,
+        ];
+
+        paths.vendor.scripts = [
+            '!' + dir + paths.vendor.src + '**/_' + ext.js,
+                  dir + paths.vendor.src + '**/' + ext.js,
+        ];
+    }
+
+    paths.main = {
+        styles: [
+            '!' + dir + paths.styles.src + '**/_' + ext.scss,
+                  dir + paths.styles.src + '**/' + ext.scss,
+        ],
+        scripts: [
+            '!' + dir + paths.scripts.src + '**/_' + ext.js,
+                  dir + paths.scripts.src + '**/' + ext.js,
+        ]
+    };
+
+    if( paths.pages ) {
+        paths.pages.styles = [
+            '!' + dir + paths.pages.src + '**/_' + ext.scss,
+                  dir + paths.pages.src + '**/' + ext.scss,
+        ];
+
+        paths.pages.scripts = [
+            '!' + dir + paths.pages.src + '**/_' + ext.js,
+                  dir + paths.pages.src + '**/' + ext.js,
+        ];
+    }
+
+    paths.webpack = {
+        src: [...paths.vendor.scripts, ...paths.main.scripts],
+    };
 
     return paths;
 })( config.paths );
@@ -132,11 +170,9 @@ const getStylesArgs = (args = {}, buildPath) => {
 };
 
 const getStylesPath = (path) => {
-    path.push('!' + dir + '**/_' + ext.scss);
-
     if( '' === path ) { // @todo @check How easy?
         path.push( '!' + paths.vendor.path + '**/*' )
-        path.push( '!' + paths.blocks.path + '**/*' )
+        path.push( '!' + paths.pages.path + '**/*' )
     }
 
     return path;
@@ -186,11 +222,9 @@ const getScriptsArgs = (args = {}, buildPath) => {
 };
 
 const getScriptsPath = (path) => {
-    path.push('!' + dir + '**/_' + ext.js);
-
     if( '' === path ) { // @todo @check How easy?
         path.push( '!' + paths.vendor.src + '**/*' )
-        path.push( '!' + paths.blocks.src + '**/*' )
+        path.push( '!' + paths.pages.src + '**/*' )
     }
 
     return path;
@@ -259,34 +293,35 @@ const buildImages = function (srcPath, buildPath) {
 
 
 const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
-    buildStyles([ dir + paths.vendor.src + ext.scss ], dist + paths.vendor.dest, {newerOnly: n});
+    buildStyles(paths.vendor.styles, dist + paths.vendor.dest, {newerOnly: n});
 
-const buildMainStyles    = (done, n = 1) => false === paths.styles.src ? done() :
-    buildStyles([ dir + paths.styles.src + '**/' + ext.scss ], dist + paths.styles.dest, {newerOnly: n});
+const buildMainStyles    = (done, n = 1) => ! paths.styles.src ? done() :
+    buildStyles(paths.main.styles, dist + paths.styles.dest, {newerOnly: n});
 
-const buildBlocksStyles  = (done, n = 1) => ! paths.blocks.src ? done() :
-    buildStyles([ dir + paths.blocks.src + '**/' + ext.scss ], dist + paths.blocks.dest, {newerOnly: n});
+const buildBlocksStyles  = (done, n = 1) => ! paths.pages.src ? done() :
+    buildStyles(paths.pages.styles, dist + paths.pages.dest, {newerOnly: n});
 
 // @todo maybe need newer?
 const buildMainScripts   = (done, n = 1) => ! paths.webpack.src ? done() :
     src(paths.webpack.src, {allowEmpty: true})
     .pipe(webpackStream(config.webpack), webpack)
-    .pipe(gulpif(production, rename({ suffix: ".min" })))
+    .pipe(gulpif(production, rename({suffix: ".min"})))
     .pipe(rename(function (currentPath) {
-        currentPath.dirname = currentPath.basename.match(/^main/i) ? paths.webpack.dest : paths.vendor.dest;
+        console.log( paths.scripts.dest, paths.vendor.dest );
+        currentPath.dirname = currentPath.basename.match(/^main/i) ? paths.scripts.dest : paths.vendor.dest;
     }))
     .pipe(dest(dist))
-    .pipe(debug({ "title": "Webpack" }))
+    .pipe(debug({"title": "Webpack"}))
     .on("end", browsersync.reload);
 
-const buildBlocksScripts = (done, n = 1) => ! paths.blocks.src ? done() :
-    buildScripts([ dir + paths.blocks.src + '**/' + ext.js ], dist + paths.blocks.dest, {newerOnly: n});
+const buildBlocksScripts = (done, n = 1) => ! paths.pages.src ? done() :
+    buildScripts(paths.pages.scripts, dist + paths.pages.dest, {newerOnly: n});
 
 const buildMainImages    = (done) => ! paths.images.src ? done() :
     buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
 
-const buildBlocksImages  = (done) => ! paths.blocks.src ? done() :
-    buildImages([ dir + paths.blocks.src + '**/' + ext.img ], dist + paths.blocks.dest);
+const buildBlocksImages  = (done) => ! paths.pages.src ? done() :
+    buildImages([ dir + paths.pages.src + '**/' + ext.img ], dist + paths.pages.dest);
 
 // const buildFaviconImages = function () {
 //     return src(paths.src.favicons, { allowEmpty: true })
@@ -312,7 +347,7 @@ const buildBlocksImages  = (done) => ! paths.blocks.src ? done() :
 
 const watchAll = function () {
     // Watch markup.
-    watch([ dir + '**/*.html' ], (done) => {
+    watch(paths.markup, (done) => {
         browsersync.reload();
         return done();
     });
@@ -327,8 +362,8 @@ const watchAll = function () {
         return done();
     });
 
-    watch([ dir + paths.vendor.src + '**/' + ext.scss, '!' + settings ], (done) => buildVendorStyles(done, 0) );
-    watch([ dir + paths.styles.src + '**/' + ext.scss, '!' + settings ], (done) => buildMainStyles(done, 0) );
+    watch([ ...paths.vendor.styles, ...['!' + settings] ], (done) => buildVendorStyles(done, 0) );
+    watch([ ...paths.main.styles, ...['!' + settings] ], (done) => buildMainStyles(done, 0) );
     watch([ dir + paths.module + '**/' + ext.scss, '!' + settings ], (done) => {
         buildMainStyles(done, 0);
         buildBlocksStyles(done, 0);
@@ -342,10 +377,10 @@ const watchAll = function () {
     if(paths.images.src) watch([ dir + paths.images.src + '**/' + ext.img ], buildMainImages);
 
     // Watch pages.
-    if(paths.blocks.src) {
-        watch([ dir + paths.blocks.src + '**/' + ext.scss ], buildBlocksStyles);
-        watch([ dir + paths.blocks.src + '**/' + ext.js ], buildBlocksScripts);
-        watch([ dir + paths.blocks.src + '**/' + ext.img ], buildBlocksImages);
+    if(paths.pages.src) {
+        watch(paths.pages.styles, buildBlocksStyles);
+        watch(paths.pages.scripts, buildBlocksScripts);
+        watch([ dir + paths.pages.src + '**/' + ext.img ], buildBlocksImages);
     }
 };
 

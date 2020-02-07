@@ -16,7 +16,6 @@ node_modules/
 vendor/
 
 public_html/*.css
-public_html/*.html
 
 public_html/pages/
 
@@ -24,7 +23,7 @@ public_html/img/*
 !public_html/img/HD/
 
 public_html/assets/*
-!public_html/assets/babel/
+!public_html/assets/js/
 !public_html/assets/pages/
 !public_html/assets/scss/
 !public_html/assets/vendor/
