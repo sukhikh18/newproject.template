@@ -11,8 +11,8 @@ var paths = module.exports.paths = {
     assets: 'assets/',
     module: 'assets/module/',
 
-
     styles: {
+        settings: 'assets/scss/_site-settings.scss',
         src:  'assets/scss/',
         dest: 'assets/',
     },

@@ -317,9 +317,9 @@ const watchAll = function () {
         return done();
     });
 
-    // Watch styles.
-    const settings = dir + paths.styles.src + '_site-settings.scss';
+    const settings = dir + paths.styles.settings;
 
+    // Watch styles.
     watch([ settings ], function(done) {
         buildVendorStyles(done, 0);
         buildMainStyles(done, 0);
