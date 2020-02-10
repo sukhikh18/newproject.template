@@ -1,3 +1,4 @@
+import lazy from "./parts/_lazy.js";
 // for smooth scrool to object
 import scrollTo from "./parts/_scrollTo.js";
 import preloader from "./parts/_preloader.js";
