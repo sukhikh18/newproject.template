@@ -29,7 +29,7 @@ jQuery(document).ready(function($) {
      * Example form submit event.
      */
     if( typeof($.fancybox) ) {
-        $('form').on('submit', function(event) {
+        $('.modal form').on('submit', function(event) {
             event.preventDefault();
             preloader.show();
 
