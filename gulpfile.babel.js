@@ -307,7 +307,6 @@ const buildMainScripts   = (done, n = 1) => ! paths.webpack.src ? done() :
     .pipe(webpackStream(config.webpack), webpack)
     .pipe(gulpif(production, rename({suffix: ".min"})))
     .pipe(rename(function (currentPath) {
-        console.log( paths.scripts.dest, paths.vendor.dest );
         currentPath.dirname = currentPath.basename.match(/^main/i) ? paths.scripts.dest : paths.vendor.dest;
     }))
     .pipe(dest(dist))
