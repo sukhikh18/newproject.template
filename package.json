@@ -8,10 +8,10 @@
 	},
 	"license": "MIT",
 	"scripts": {
-		"dev": "gulp --silence",
-		"prod": "gulp build --silence --production",
-		"tunnel": "gulp --tunnel --silence",
-		"vendor": "gulp install --silence"
+		"dev": "gulp --silent",
+		"prod": "gulp build --silent --production",
+		"tunnel": "gulp --tunnel --silent",
+		"vendor": "gulp install --silent"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.5.5",
