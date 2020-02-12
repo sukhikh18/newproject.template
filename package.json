@@ -9,9 +9,9 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "gulp --silence",
-		"prod": "gulp --silence build --production",
-		"tunnel": "gulp --silence --tunnel",
-		"vendor": "gulp --silence install"
+		"prod": "gulp build --silence --production",
+		"tunnel": "gulp --tunnel --silence",
+		"vendor": "gulp install --silence"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.5.5",
