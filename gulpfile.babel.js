@@ -82,6 +82,13 @@ const paths = (( paths ) => {
         ];
     }
 
+    if( paths.pages ) {
+        paths.pages.styles = [
+            '!' + dir + paths.pages.src + '**/_' + ext.scss,
+                  dir + paths.pages.src + '**/' + ext.scss,
+        ];
+    }
+
     paths.main = {
         styles: [
             '!' + dir + paths.styles.src + '**/_' + ext.scss,
@@ -91,22 +98,6 @@ const paths = (( paths ) => {
             '!' + dir + paths.scripts.src + '**/_' + ext.js,
                   dir + paths.scripts.src + '**/' + ext.js,
         ]
-    };
-
-    if( paths.pages ) {
-        paths.pages.styles = [
-            '!' + dir + paths.pages.src + '**/_' + ext.scss,
-                  dir + paths.pages.src + '**/' + ext.scss,
-        ];
-
-        paths.pages.scripts = [
-            '!' + dir + paths.pages.src + '**/_' + ext.js,
-                  dir + paths.pages.src + '**/' + ext.js,
-        ];
-    }
-
-    paths.webpack = {
-        src: [...paths.vendor.scripts, ...paths.main.scripts],
     };
 
     return paths;
@@ -190,7 +181,7 @@ const buildStyles = function(srcPath, buildPath, _args) {
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
-const configureScripts = async function(done) {
+const configureScripts = function(done) {
     src(dir + paths.pages.src + '**/script.js', {allowEmpty: true})
         .pipe(map( (file, done) => {
             const separator = '/';
@@ -202,33 +193,31 @@ const configureScripts = async function(done) {
     return done();
 };
 
-const buildMainScripts = async function(done) {
-    src(dir + paths.pages.src + '**/script.js', {allowEmpty: true})
+const buildMainScripts = function(done) {
+    return src(dir + paths.pages.src + '**/script.js', {allowEmpty: true})
         .pipe(webpackStream(webpackConfig), webpack)
-            .pipe(rename(function (file) {
-                if( file.basename.match(/^page-/i) ) {
-                    file.dirname = paths.pages.dest + file.basename.replace(/^page-/i, '').replace('.js', '');
-                    if( '.map' !== file.extname ) {
-                        file.basename = 'script';
-                    }
+        .pipe(rename(function (file) {
+            if( file.basename.match(/^page-/i) ) {
+                file.dirname = paths.pages.dest + file.basename.replace(/^page-/i, '').replace('.js', '');
+                if( '.map' !== file.extname ) {
+                    file.basename = 'script';
                 }
-                else {
-                    file.dirname = file.basename.match(/^main/i) ? paths.scripts.dest : paths.vendor.dest;
-                }
-            }))
-            .pipe(gulpif(production, rename({suffix: ".min"})))
-            .pipe(dest(dist))
-            .pipe(debug({"title": "Webpack"}))
-            .on("end", browsersync.reload);
-
-    return done();
+            }
+            else {
+                file.dirname = file.basename.match(/^main/i) ? paths.scripts.dest : paths.vendor.dest;
+            }
+        }))
+        .pipe(gulpif(production, rename({suffix: ".min"})))
+        .pipe(dest(dist))
+        .pipe(debug({"title": "Webpack"}))
+        .on("end", browsersync.reload);
 };
 
 const getImagesPath = (path) => {
     // path.images.push('!' + paths.src.sprites);
     // path.images.push('!' + paths.src.favicons);
     return path;
-}
+};
 
 const buildImages = function (srcPath, buildPath) {
     return src(getImagesPath(srcPath), {allowEmpty: true})
@@ -266,8 +255,7 @@ const buildImages = function (srcPath, buildPath) {
         .pipe(dest(buildPath))
         .pipe(debug({"title": "Images"}))
         .on("end", browsersync.reload);
-}
-
+};
 
 const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
     buildStyles(paths.vendor.styles, dist + paths.vendor.dest, {newerOnly: n});
@@ -310,7 +298,12 @@ const watchAll = function () {
     });
 
     // Watch javascript.
-    // watch(paths.webpack.src, buildMainScripts);
+    let scripts = [];
+    for(var key in webpackConfig.entry) {
+        scripts.push(webpackConfig.entry[key] + '.js');
+    }
+    console.log(scripts);
+    watch(scripts, buildMainScripts);
 
     // Watch images.
     if(paths.images.src) watch([ dir + paths.images.src + '**/' + ext.img ], buildMainImages);
@@ -318,7 +311,6 @@ const watchAll = function () {
     // Watch pages.
     if(paths.pages.src) {
         watch(paths.pages.styles, buildBlocksStyles);
-        // watch(paths.pages.scripts, buildBlocksScripts);
         watch([ dir + paths.pages.src + '**/' + ext.img ], buildBlocksImages);
     }
 };
