@@ -264,13 +264,13 @@ const buildMainStyles    = (done, n = 1) => ! paths.styles.src ? done() :
     buildStyles(paths.main.styles, dist + paths.styles.dest, {newerOnly: n});
 
 const buildBlocksStyles  = (done, n = 1) => ! paths.pages.src ? done() :
-    buildStyles(paths.pages.styles, dist + paths.pages.dest, {newerOnly: n});
+    buildStyles(paths.pages.styles, root + paths.pages.dest, {newerOnly: n});
 
 const buildMainImages    = (done) => ! paths.images.src ? done() :
     buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
 
 const buildBlocksImages  = (done) => ! paths.pages.src ? done() :
-    buildImages([ dir + paths.pages.src + '**/' + ext.img ], dist + paths.pages.dest);
+    buildImages([ dir + paths.pages.src + '**/' + ext.img ], root + paths.pages.dest);
 
 const watchAll = function () {
     // Watch markup.
