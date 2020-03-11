@@ -51,28 +51,20 @@ const webpackStream = require("webpack-stream");
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
-const config = (() => {
-    let conf = require(root + ".config");
-
-    // prepare webpack config
-    conf.webpack = ((webpack) => {
-        webpack.mode = production ? 'production' : 'development';
-        webpack.devtool = production ? false : "source-map";
-
-        for (var key in webpack.entry) {
-            webpack.entry[ key ] = root + conf.src + webpack.entry[ key ];
-        }
-
-        return webpack;
-    })( conf.webpack );
-
-    return conf;
-})();
-
-var webpackConfig = config.webpack;
-
+const config = require(root + ".config");
 const dir = root + config.src;
 const dist = root + config.dest;
+
+var webpackConfig = ((webpack) => {
+    webpack.mode = production ? 'production' : 'development';
+    webpack.devtool = production ? false : "source-map";
+
+    for (var key in webpack.entry) {
+        webpack.entry[ key ] = dir + webpack.entry[ key ];
+    }
+
+    return webpack;
+})(config.webpack);
 
 const paths = (( paths ) => {
 
