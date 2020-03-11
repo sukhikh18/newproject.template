@@ -12,6 +12,7 @@ const ext = {
     img: '*.{jpg,jpeg,png,gif,svg}'
 };
 
+const path = require('path');
 const gulp = require("gulp");
 const src = gulp.src;
 const dest = gulp.dest;
@@ -198,7 +199,9 @@ const buildMainScripts = function(done) {
         .pipe(webpackStream(webpackConfig), webpack)
         .pipe(rename(function (file) {
             if( file.basename.match(/^page-/i) ) {
-                file.dirname = paths.pages.dest + file.basename.replace(/^page-/i, '').replace('.js', '');
+                let basename = file.basename.replace(/^page-/i, '').replace('.js', '');
+                file.dirname = path.resolve(__dirname, root + paths.pages.dest) + '/' + basename;
+
                 if( '.map' !== file.extname ) {
                     file.basename = 'script';
                 }
