@@ -9,10 +9,9 @@
 ## Как пользоваться
 * Клонируйте репозиторий ```git clone https://github.com/nikolays93/newproject.template.git``` или скачайте сборку из этого репозитория ```Clone or download > Download ZIP```;
 * Перейдите в папку командой ```cd newproject.template``` или откройте консоль в папке скачанной сборки;
-* Введите команду ```yarn``` для установки проекта;
-* Воспользуйтесь командой ```yarn run vendor``` или ```gulp install``` для переноса скачанных библиотек (bootstrap, jQuery и т.д.)
+* Введите команду ```yarn``` для установки проекта; Начнется перенос библиотек в проект (bootstrap, jQuery и т.д.)
 * Введите ```yarn run dev``` или ```gulp``` для разработки;
-* Введите ```yarn run prod``` или ```gulp build --production``` для завершения разработки;
+* Введите ```yarn run build``` или ```gulp build --production``` для завершения разработки;
 
 ### Так же рекомендую
 https://github.com/andreyalexeich/gulp-scss-starter  

@@ -1,7 +1,7 @@
 {
 	"name": "",
 	"description": "",
-	"author": "Nikolay Shukhikh",
+	"author": "Nikolay Sukhikh",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/nikolays93/newproject.boilerplate.git"
@@ -9,9 +9,9 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "gulp --silent",
-		"prod": "gulp build --silent --production",
+		"build": "gulp build --production",
 		"tunnel": "gulp --tunnel --silent",
-		"vendor": "gulp install --silent"
+		"install": "gulp install --silent"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.5.5",
@@ -47,10 +47,6 @@
 		"webpack-stream": "^5.2.1",
 		"yargs": "^12.0.5"
 	},
-	"~devDependencies": {
-		"gulp-favicons": "^2.2.7",
-		"gulp-svg-sprite": "^1.5.0"
-	},
 	"dependencies": {
 		"@fancyapps/fancybox": "^3.5.7",
 		"animatewithsass": "^3.2.1",
@@ -62,8 +58,5 @@
 		"popper.js": "^1.14.6",
 		"slick-carousel": "^1.8.1",
 		"waypoints": "^4.0.1"
-	},
-	"~dependencies": {
-		"lettering": "^0.4.1"
 	}
 }
