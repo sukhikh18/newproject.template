@@ -302,7 +302,6 @@ const watchAll = function () {
     for(var key in webpackConfig.entry) {
         scripts.push(webpackConfig.entry[key] + '.js');
     }
-    console.log(scripts);
     watch(scripts, buildMainScripts);
 
     // Watch images.
