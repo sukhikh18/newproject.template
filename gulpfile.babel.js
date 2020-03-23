@@ -12,6 +12,7 @@ const ext = {
     img: '*.{jpg,jpeg,png,gif,svg}'
 };
 
+const path = require('path');
 const gulp = require("gulp");
 const src = gulp.src;
 const dest = gulp.dest;
@@ -20,13 +21,12 @@ const watch = gulp.watch;
 const gulpif = require("gulp-if");
 const browsersync = require("browser-sync");
 const rename = require("gulp-rename");
+const map = require("map-stream");
 const replace = require("gulp-replace");
 const merge = require('merge-stream');
 const plumber = require("gulp-plumber");
 const debug = require("gulp-debug");
-const clean = require("gulp-clean");
 const yargs = require("yargs");
-const rigger = require("gulp-rigger");
 const autoprefixer = require("gulp-autoprefixer");
 const sass = require("gulp-sass");
 const groupmediaqueries = require("gulp-group-css-media-queries");
@@ -34,8 +34,7 @@ const groupmediaqueries = require("gulp-group-css-media-queries");
 // const mqpacker = require("css-mqpacker");
 // const sortCSSmq = require("sort-css-media-queries");
 const mincss = require("gulp-clean-css");
-const uglify = require("gulp-uglify");
-const sourcemaps = require("gulp-sourcemaps");
+// const sourcemaps = require("gulp-sourcemaps");
 const newer = require("gulp-newer");
 // const favicons = require("gulp-favicons");
 // const svgSprite = require("gulp-svg-sprite");
@@ -53,26 +52,20 @@ const webpackStream = require("webpack-stream");
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
-const config = (() => {
-    let conf = require(root + ".config");
-
-    // prepare webpack config
-    conf.webpack = ((webpack) => {
-        webpack.mode = production ? 'production' : 'development';
-        webpack.devtool = production ? false : "source-map";
-
-        for (var key in webpack.entry) {
-            webpack.entry[ key ] = root + conf.src + webpack.entry[ key ];
-        }
-
-        return webpack;
-    })( conf.webpack );
-
-    return conf;
-})();
-
+const config = require(root + ".config");
 const dir = root + config.src;
 const dist = root + config.dest;
+
+var webpackConfig = ((webpack) => {
+    webpack.mode = production ? 'production' : 'development';
+    webpack.devtool = production ? false : "source-map";
+
+    for (var key in webpack.entry) {
+        webpack.entry[ key ] = dir + webpack.entry[ key ];
+    }
+
+    return webpack;
+})(config.webpack);
 
 const paths = (( paths ) => {
 
@@ -90,6 +83,13 @@ const paths = (( paths ) => {
         ];
     }
 
+    if( paths.pages ) {
+        paths.pages.styles = [
+            '!' + dir + paths.pages.src + '**/_' + ext.scss,
+                  dir + paths.pages.src + '**/' + ext.scss,
+        ];
+    }
+
     paths.main = {
         styles: [
             '!' + dir + paths.styles.src + '**/_' + ext.scss,
@@ -99,22 +99,6 @@ const paths = (( paths ) => {
             '!' + dir + paths.scripts.src + '**/_' + ext.js,
                   dir + paths.scripts.src + '**/' + ext.js,
         ]
-    };
-
-    if( paths.pages ) {
-        paths.pages.styles = [
-            '!' + dir + paths.pages.src + '**/_' + ext.scss,
-                  dir + paths.pages.src + '**/' + ext.scss,
-        ];
-
-        paths.pages.scripts = [
-            '!' + dir + paths.pages.src + '**/_' + ext.js,
-                  dir + paths.pages.src + '**/' + ext.js,
-        ];
-    }
-
-    paths.webpack = {
-        src: [...paths.vendor.scripts, ...paths.main.scripts],
     };
 
     return paths;
@@ -198,52 +182,37 @@ const buildStyles = function(srcPath, buildPath, _args) {
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
-const getScriptsArgs = (args = {}, buildPath) => {
-    let _default = {
-        'newerOnly': false,
-        'newer': {
-            dest: buildPath,
-            ext: production ? '.min.js' : '.js'
-        },
-        'plumber': {},
-        'rigger': {},
-        'uglify': {},
-        'rename': {
-            suffix: ".min"
-        },
-        'sourcemaps': "./maps/",
-        'debug': {
-            "title": "JS files"
-        }
-    };
+const configureScripts = function(done) {
+    src(dir + paths.pages.src + '**/script.js', {allowEmpty: true})
+        .pipe(map( (file, done) => {
+            const separator = '/';
+            let path = file.relative.replace('\\', separator);
 
-    for (var arg in args) { _default[arg] = args[arg]; }
-    return _default;
+            webpackConfig.entry[ 'page-' + path.split(separator)[0] ] = dir + paths.pages.src + path.replace('.js', '');
+        } ));
+
+    return done();
 };
 
-const getScriptsPath = (path) => {
-    if( '' === path ) { // @todo @check How easy?
-        path.push( '!' + paths.vendor.src + '**/*' )
-        path.push( '!' + paths.pages.src + '**/*' )
-    }
+const buildMainScripts = function(done) {
+    return src(dir + paths.pages.src + '**/script.js', {allowEmpty: true})
+        .pipe(webpackStream(webpackConfig), webpack)
+        .pipe(rename(function (file) {
+            if( file.basename.match(/^page-/i) ) {
+                let basename = file.basename.replace(/^page-/i, '').replace('.js', '');
+                file.dirname = path.resolve(__dirname, root + paths.pages.dest) + '/' + basename;
 
-    return path;
-};
-
-const buildScripts = (srcPath, buildPath, _args = {}) => {
-    let args = getScriptsArgs(_args, buildPath);
-
-    return src(getScriptsPath(srcPath), { allowEmpty: true })
-        .pipe(plumber(args['plumber']))
-        .pipe(gulpif(!!args['newerOnly'] && !production, newer(args['newer'])))
-        .pipe(rigger(args['rigger']))
-        .pipe(gulpif(!production, sourcemaps.init()))
-        .pipe(gulpif(production, uglify(args['uglify'])))
-        .pipe(gulpif(production, rename(args['rename'])))
-        .pipe(gulpif(!production, sourcemaps.write(args['sourcemaps'])))
-        .pipe(plumber.stop())
-        .pipe(dest(buildPath))
-        .pipe(debug(args['debug']))
+                if( '.map' !== file.extname ) {
+                    file.basename = 'script';
+                }
+            }
+            else {
+                file.dirname = file.basename.match(/^main/i) ? paths.scripts.dest : paths.vendor.dest;
+            }
+        }))
+        .pipe(gulpif(production, rename({suffix: ".min"})))
+        .pipe(dest(dist))
+        .pipe(debug({"title": "Webpack"}))
         .on("end", browsersync.reload);
 };
 
@@ -251,7 +220,7 @@ const getImagesPath = (path) => {
     // path.images.push('!' + paths.src.sprites);
     // path.images.push('!' + paths.src.favicons);
     return path;
-}
+};
 
 const buildImages = function (srcPath, buildPath) {
     return src(getImagesPath(srcPath), {allowEmpty: true})
@@ -289,8 +258,7 @@ const buildImages = function (srcPath, buildPath) {
         .pipe(dest(buildPath))
         .pipe(debug({"title": "Images"}))
         .on("end", browsersync.reload);
-}
-
+};
 
 const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
     buildStyles(paths.vendor.styles, dist + paths.vendor.dest, {newerOnly: n});
@@ -299,50 +267,13 @@ const buildMainStyles    = (done, n = 1) => ! paths.styles.src ? done() :
     buildStyles(paths.main.styles, dist + paths.styles.dest, {newerOnly: n});
 
 const buildBlocksStyles  = (done, n = 1) => ! paths.pages.src ? done() :
-    buildStyles(paths.pages.styles, dist + paths.pages.dest, {newerOnly: n});
-
-// @todo maybe need newer?
-const buildMainScripts   = (done, n = 1) => ! paths.webpack.src ? done() :
-    src(paths.webpack.src, {allowEmpty: true})
-    .pipe(webpackStream(config.webpack), webpack)
-    .pipe(gulpif(production, rename({suffix: ".min"})))
-    .pipe(rename(function (currentPath) {
-        currentPath.dirname = currentPath.basename.match(/^main/i) ? paths.scripts.dest : paths.vendor.dest;
-    }))
-    .pipe(dest(dist))
-    .pipe(debug({"title": "Webpack"}))
-    .on("end", browsersync.reload);
-
-const buildBlocksScripts = (done, n = 1) => ! paths.pages.src ? done() :
-    buildScripts(paths.pages.scripts, dist + paths.pages.dest, {newerOnly: n});
+    buildStyles(paths.pages.styles, root + paths.pages.dest, {newerOnly: n});
 
 const buildMainImages    = (done) => ! paths.images.src ? done() :
     buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
 
 const buildBlocksImages  = (done) => ! paths.pages.src ? done() :
-    buildImages([ dir + paths.pages.src + '**/' + ext.img ], dist + paths.pages.dest);
-
-// const buildFaviconImages = function () {
-//     return src(paths.src.favicons, { allowEmpty: true })
-//         .pipe(newer(paths.build.favicons))
-//         .pipe(favicons({
-//             icons: {
-//                 appleIcon: true,
-//                 favicons: true,
-//                 online: false,
-//                 appleStartup: false,
-//                 android: false,
-//                 firefox: false,
-//                 yandex: false,
-//                 windows: false,
-//                 coast: false
-//             }
-//         }))
-//         .pipe(dest(paths.build.favicons))
-//         .pipe(debug({
-//             "title": "Favicons"
-//         }));
-// }
+    buildImages([ dir + paths.pages.src + '**/' + ext.img ], root + paths.pages.dest);
 
 const watchAll = function () {
     // Watch markup.
@@ -370,7 +301,11 @@ const watchAll = function () {
     });
 
     // Watch javascript.
-    watch(paths.webpack.src, buildMainScripts);
+    let scripts = [];
+    for(var key in webpackConfig.entry) {
+        scripts.push(webpackConfig.entry[key] + '.js');
+    }
+    watch(scripts, buildMainScripts);
 
     // Watch images.
     if(paths.images.src) watch([ dir + paths.images.src + '**/' + ext.img ], buildMainImages);
@@ -378,7 +313,6 @@ const watchAll = function () {
     // Watch pages.
     if(paths.pages.src) {
         watch(paths.pages.styles, buildBlocksStyles);
-        watch(paths.pages.scripts, buildBlocksScripts);
         watch([ dir + paths.pages.src + '**/' + ext.img ], buildBlocksImages);
     }
 };
@@ -398,13 +332,12 @@ const serve = function () {
 };
 
 gulp.task("buildStyles", gulp.parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
-gulp.task("buildScripts", gulp.parallel(buildBlocksScripts, buildMainScripts));
 gulp.task("buildImages", gulp.parallel(buildBlocksImages, buildMainImages)); // buildFavicons, buildSprites
 
 /**
  * Build only
  */
-gulp.task("build", gulp.parallel("buildStyles", "buildScripts", "buildImages"));
+gulp.task("build", gulp.series(configureScripts, gulp.parallel("buildStyles", "buildImages"), buildMainScripts));
 
 /**
  * Move assets (if yarn/npm installed them)
