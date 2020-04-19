@@ -218,48 +218,42 @@ const buildMainScripts = function(done) {
         .on("end", browsersync.reload);
 };
 
+const getImageMinArgs = () => [
+    imageminGiflossy({
+        optimizationLevel: 3,
+        optimize: 3,
+        lossy: 2
+    }),
+    imageminPngquant({
+        speed: 5,
+        quality: 75
+    }),
+    imageminZopfli({
+        more: true
+    }),
+    imageminMozjpeg({
+        progressive: true,
+        quality: 70
+    }),
+    imagemin.svgo({
+        plugins: [
+            { removeViewBox: false },
+            { removeUnusedNS: false },
+            { removeUselessStrokeAndFill: false },
+            { cleanupIDs: false },
+            { removeComments: true },
+            { removeEmptyAttrs: true },
+            { removeEmptyText: true },
+            { collapseGroups: true }
+        ]
+    })
+];
+
 const getImagesPath = (path) => {
     // path.images.push('!' + paths.src.sprites);
     // path.images.push('!' + paths.src.favicons);
     return path;
 };
-
-const buildImages = (done, srcPath, buildPath) => !production ? done() :
-    src(getImagesPath(srcPath), {allowEmpty: true})
-        .pipe(newer(buildPath))
-        .pipe(imagemin([
-            imageminGiflossy({
-                optimizationLevel: 3,
-                optimize: 3,
-                lossy: 2
-            }),
-            imageminPngquant({
-                speed: 5,
-                quality: 75
-            }),
-            imageminZopfli({
-                more: true
-            }),
-            imageminMozjpeg({
-                progressive: true,
-                quality: 70
-            }),
-            imagemin.svgo({
-                plugins: [
-                    { removeViewBox: false },
-                    { removeUnusedNS: false },
-                    { removeUselessStrokeAndFill: false },
-                    { cleanupIDs: false },
-                    { removeComments: true },
-                    { removeEmptyAttrs: true },
-                    { removeEmptyText: true },
-                    { collapseGroups: true }
-                ]
-            })
-        ]))
-        .pipe(dest(buildPath))
-        .pipe(debug({"title": "Images"}))
-        .on("end", browsersync.reload);
 
 const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
     buildStyles(paths.vendor.styles, dist + paths.vendor.dest, {newerOnly: n});
@@ -270,11 +264,22 @@ const buildMainStyles    = (done, n = 1) => ! paths.styles.src ? done() :
 const buildBlocksStyles  = (done, n = 1) => ! paths.pages.src ? done() :
     buildStyles(paths.pages.styles, root + paths.pages.dest, {newerOnly: n});
 
-const buildMainImages    = (done) => ! paths.images.src ? done() :
-    buildImages(done, [ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
+const buildMainImages    = (done) => ! production || ! paths.images.src ? done() :
+    src(getImagesPath([ dir + paths.images.src + '**/' + ext.img ]), {allowEmpty: true})
+        .pipe(newer(dist + paths.images.dest))
+        .pipe(imagemin(getImageMinArgs()))
+        .pipe(dest(dist + paths.images.dest))
+        .pipe(debug({"title": "Images"}));
 
-const buildBlocksImages  = (done) => ! paths.pages.src ? done() :
-    buildImages(done, [ dir + paths.pages.src + '**/' + ext.img ], root + paths.pages.dest);
+const buildBlocksImages  = (done) => ! production || ! paths.pages.src ? done() :
+    src(getImagesPath([ dir + paths.images.pages + '**/' + ext.img ]), {allowEmpty: true})
+        .pipe(rename((path) => {
+            path.dirname += "/..";
+        }))
+        .pipe(newer(root + paths.pages.dest))
+        .pipe(imagemin(getImageMinArgs()))
+        .pipe(dest(root + paths.pages.dest))
+        .pipe(debug({"title": "Pages images"}));
 
 const watchAll = function () {
     // Watch markup.

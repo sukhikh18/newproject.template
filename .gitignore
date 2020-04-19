@@ -11,13 +11,7 @@ _config.yml
 *.lock
 *.log
 package-lock.json
-
 node_modules/
-vendor/
-
-public_html/*.css
-
-public_html/page/
 
 public_html/img/*
 !public_html/img/HD/
@@ -27,7 +21,12 @@ public_html/assets/*
 !public_html/assets/page/
 !public_html/assets/scss/
 !public_html/assets/vendor/
-
 public_html/assets/vendor/*
 !public_html/assets/vendor/_source
 public_html/assets/vendor/_source/**/
+
+# Pages assets
+public_html/page/**/*.css
+public_html/page/**/*.js
+public_html/page/**/img/*
+!public_html/page/**/img/HD

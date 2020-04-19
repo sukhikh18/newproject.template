@@ -28,6 +28,7 @@ var paths = module.exports.paths = {
 
     images: {
         src:  'img/HD/',
+        pages: 'page/**/img/HD/',
         dest: 'img/',
     },
 
