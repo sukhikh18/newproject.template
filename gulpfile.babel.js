@@ -94,6 +94,9 @@ const paths = (( paths ) => {
     return paths;
 })( config.paths );
 
+/**
+ * Styles
+ */
 const getStylesArgs = (args = {}, buildPath) => {
     let _default = {
         'newerOnly': false,
@@ -172,6 +175,18 @@ const buildStyles = function(srcPath, buildPath, _args) {
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
+const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
+    buildStyles(paths.vendor.styles, dist + paths.vendor.dest, {newerOnly: n});
+
+const buildMainStyles    = (done, n = 1) => ! paths.styles.src ? done() :
+    buildStyles(paths.main.styles, dist + paths.styles.dest, {newerOnly: n});
+
+const buildBlocksStyles  = (done, n = 1) => ! paths.pages.src ? done() :
+    buildStyles(paths.pages.styles, root + paths.pages.dest, {newerOnly: n});
+
+/**
+ * Scripts
+ */
 const configureScripts = function(done) {
     webpackConfig = ((webpack) => {
         webpack.mode = production ? 'production' : 'development';
@@ -218,6 +233,9 @@ const buildMainScripts = function(done) {
         .on("end", browsersync.reload);
 };
 
+/**
+ * Images
+ */
 const getImageMinArgs = () => [
     imageminGiflossy({
         optimizationLevel: 3,
@@ -255,15 +273,6 @@ const getImagesPath = (path) => {
     return path;
 };
 
-const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
-    buildStyles(paths.vendor.styles, dist + paths.vendor.dest, {newerOnly: n});
-
-const buildMainStyles    = (done, n = 1) => ! paths.styles.src ? done() :
-    buildStyles(paths.main.styles, dist + paths.styles.dest, {newerOnly: n});
-
-const buildBlocksStyles  = (done, n = 1) => ! paths.pages.src ? done() :
-    buildStyles(paths.pages.styles, root + paths.pages.dest, {newerOnly: n});
-
 const buildMainImages    = (done) => ! production || ! paths.images.src ? done() :
     src(getImagesPath([ dir + paths.images.src + '**/' + ext.img ]), {allowEmpty: true})
         .pipe(newer(dist + paths.images.dest))
@@ -281,6 +290,9 @@ const buildBlocksImages  = (done) => ! production || ! paths.pages.src ? done() 
         .pipe(dest(root + paths.pages.dest))
         .pipe(debug({"title": "Pages images"}));
 
+/**
+ * Dev browser sync tasks
+ */
 const watchAll = function () {
     // Watch markup.
     watch(paths.markup, (done) => {
@@ -333,6 +345,9 @@ const serve = function () {
     browsersync.init(serverCfg);
 };
 
+/**
+ * Tasks
+ */
 gulp.task("buildStyles", gulp.parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
 gulp.task("buildImages", gulp.parallel(buildBlocksImages, buildMainImages)); // buildFavicons, buildSprites
 
