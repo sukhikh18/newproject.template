@@ -32,8 +32,8 @@ var paths = module.exports.paths = {
     },
 
     pages: {
-        src: assets + 'pages/',
-        dest: 'pages/',
+        src: assets + 'page/',
+        dest: 'page/',
     },
 
     vendor: {
