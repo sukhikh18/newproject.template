@@ -273,14 +273,14 @@ const getImagesPath = (path) => {
     return path;
 };
 
-const buildMainImages    = (done) => ! production || ! paths.images.src ? done() :
+const buildMainImages    = (done) => ! paths.images.src ? done() :
     src(getImagesPath([ dir + paths.images.src + '**/' + ext.img ]), {allowEmpty: true})
         .pipe(newer(dist + paths.images.dest))
         .pipe(imagemin(getImageMinArgs()))
         .pipe(dest(dist + paths.images.dest))
         .pipe(debug({"title": "Images"}));
 
-const buildBlocksImages  = (done) => ! production || ! paths.pages.src ? done() :
+const buildBlocksImages  = (done) => ! paths.images.pages ? done() :
     src(getImagesPath([ dir + paths.images.pages + '**/' + ext.img ]), {allowEmpty: true})
         .pipe(rename((path) => {
             path.dirname += "/..";
@@ -325,9 +325,16 @@ const watchAll = function () {
     }
     watch(scripts, buildMainScripts);
 
+    // Watch images.
+    if(paths.images.src) watch([ dir + paths.images.src + '**/' + ext.img ], buildMainImages);
+
     // Watch pages.
     if(paths.pages.src) {
         watch(paths.pages.styles, buildBlocksStyles);
+    }
+
+    if(paths.images.pages) {
+        watch([ dir + paths.images.pages + '**/' + ext.img ], buildBlocksImages);
     }
 };
 
