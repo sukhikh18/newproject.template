@@ -308,13 +308,9 @@ const watchAll = function () {
     }
     watch(scripts, buildMainScripts);
 
-    // Watch images.
-    if(paths.images.src) watch([ dir + paths.images.src + '**/' + ext.img ], buildMainImages);
-
     // Watch pages.
     if(paths.pages.src) {
         watch(paths.pages.styles, buildBlocksStyles);
-        watch([ dir + paths.pages.src + '**/' + ext.img ], buildBlocksImages);
     }
 };
 
