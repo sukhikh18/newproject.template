@@ -224,10 +224,10 @@ const getImagesPath = (path) => {
     return path;
 };
 
-const buildImages = function (srcPath, buildPath) {
-    return src(getImagesPath(srcPath), {allowEmpty: true})
+const buildImages = (done, srcPath, buildPath) => !production ? done() :
+    src(getImagesPath(srcPath), {allowEmpty: true})
         .pipe(newer(buildPath))
-        .pipe(gulpif(production, imagemin([
+        .pipe(imagemin([
             imageminGiflossy({
                 optimizationLevel: 3,
                 optimize: 3,
@@ -256,11 +256,10 @@ const buildImages = function (srcPath, buildPath) {
                     { collapseGroups: true }
                 ]
             })
-        ])))
+        ]))
         .pipe(dest(buildPath))
         .pipe(debug({"title": "Images"}))
         .on("end", browsersync.reload);
-};
 
 const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
     buildStyles(paths.vendor.styles, dist + paths.vendor.dest, {newerOnly: n});
@@ -272,10 +271,10 @@ const buildBlocksStyles  = (done, n = 1) => ! paths.pages.src ? done() :
     buildStyles(paths.pages.styles, root + paths.pages.dest, {newerOnly: n});
 
 const buildMainImages    = (done) => ! paths.images.src ? done() :
-    buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
+    buildImages(done, [ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
 
 const buildBlocksImages  = (done) => ! paths.pages.src ? done() :
-    buildImages([ dir + paths.pages.src + '**/' + ext.img ], root + paths.pages.dest);
+    buildImages(done, [ dir + paths.pages.src + '**/' + ext.img ], root + paths.pages.dest);
 
 const watchAll = function () {
     // Watch markup.
