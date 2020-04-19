@@ -52,20 +52,10 @@ const webpackStream = require("webpack-stream");
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
+let webpackConfig;
 const config = require(root + ".config");
 const dir = root + config.src;
 const dist = root + config.dest;
-
-var webpackConfig = ((webpack) => {
-    webpack.mode = production ? 'production' : 'development';
-    webpack.devtool = production ? false : "source-map";
-
-    for (var key in webpack.entry) {
-        webpack.entry[ key ] = dir + webpack.entry[ key ];
-    }
-
-    return webpack;
-})(config.webpack);
 
 const paths = (( paths ) => {
 
@@ -183,12 +173,24 @@ const buildStyles = function(srcPath, buildPath, _args) {
 };
 
 const configureScripts = function(done) {
+    webpackConfig = ((webpack) => {
+        webpack.mode = production ? 'production' : 'development';
+        webpack.devtool = production ? false : "source-map";
+
+        for (var key in webpack.entry) {
+            webpack.entry[ key ] = dir + webpack.entry[ key ];
+        }
+
+        return webpack;
+    })(config.webpack);
+
     src(dir + paths.pages.src + '**/script.js', {allowEmpty: true})
         .pipe(map( (file, done) => {
             const separator = '/';
             let path = file.relative.replace('\\', separator);
+            let basename = path.replace('.js', '');
 
-            webpackConfig.entry[ 'page-' + path.split(separator)[0] ] = dir + paths.pages.src + path.replace('.js', '');
+            webpackConfig.entry[ 'page-' + path.split(separator)[0] ] = dir + paths.pages.src + basename;
         } ));
 
     return done();
