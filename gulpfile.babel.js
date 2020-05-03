@@ -52,20 +52,10 @@ const webpackStream = require("webpack-stream");
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
+let webpackConfig;
 const config = require(root + ".config");
 const dir = root + config.src;
 const dist = root + config.dest;
-
-var webpackConfig = ((webpack) => {
-    webpack.mode = production ? 'production' : 'development';
-    webpack.devtool = production ? false : "source-map";
-
-    for (var key in webpack.entry) {
-        webpack.entry[ key ] = dir + webpack.entry[ key ];
-    }
-
-    return webpack;
-})(config.webpack);
 
 const paths = (( paths ) => {
 
@@ -104,6 +94,9 @@ const paths = (( paths ) => {
     return paths;
 })( config.paths );
 
+/**
+ * Styles
+ */
 const getStylesArgs = (args = {}, buildPath) => {
     let _default = {
         'newerOnly': false,
@@ -182,13 +175,37 @@ const buildStyles = function(srcPath, buildPath, _args) {
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
+const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
+    buildStyles(paths.vendor.styles, dist + paths.vendor.dest, {newerOnly: n});
+
+const buildMainStyles    = (done, n = 1) => ! paths.styles.src ? done() :
+    buildStyles(paths.main.styles, dist + paths.styles.dest, {newerOnly: n});
+
+const buildBlocksStyles  = (done, n = 1) => ! paths.pages.src ? done() :
+    buildStyles(paths.pages.styles, root + paths.pages.dest, {newerOnly: n});
+
+/**
+ * Scripts
+ */
 const configureScripts = function(done) {
+    webpackConfig = ((webpack) => {
+        webpack.mode = production ? 'production' : 'development';
+        webpack.devtool = production ? false : "source-map";
+
+        for (var key in webpack.entry) {
+            webpack.entry[ key ] = dir + webpack.entry[ key ];
+        }
+
+        return webpack;
+    })(config.webpack);
+
     src(dir + paths.pages.src + '**/script.js', {allowEmpty: true})
         .pipe(map( (file, done) => {
             const separator = '/';
             let path = file.relative.replace('\\', separator);
+            let basename = path.replace('.js', '');
 
-            webpackConfig.entry[ 'page-' + path.split(separator)[0] ] = dir + paths.pages.src + path.replace('.js', '');
+            webpackConfig.entry[ 'page-' + path.split(separator)[0] ] = dir + paths.pages.src + basename;
         } ));
 
     return done();
@@ -216,65 +233,66 @@ const buildMainScripts = function(done) {
         .on("end", browsersync.reload);
 };
 
+/**
+ * Images
+ */
+const getImageMinArgs = () => [
+    imageminGiflossy({
+        optimizationLevel: 3,
+        optimize: 3,
+        lossy: 2
+    }),
+    imageminPngquant({
+        speed: 5,
+        quality: 75
+    }),
+    imageminZopfli({
+        more: true
+    }),
+    imageminMozjpeg({
+        progressive: true,
+        quality: 70
+    }),
+    imagemin.svgo({
+        plugins: [
+            { removeViewBox: false },
+            { removeUnusedNS: false },
+            { removeUselessStrokeAndFill: false },
+            { cleanupIDs: false },
+            { removeComments: true },
+            { removeEmptyAttrs: true },
+            { removeEmptyText: true },
+            { collapseGroups: true }
+        ]
+    })
+];
+
 const getImagesPath = (path) => {
     // path.images.push('!' + paths.src.sprites);
     // path.images.push('!' + paths.src.favicons);
     return path;
 };
 
-const buildImages = function (srcPath, buildPath) {
-    return src(getImagesPath(srcPath), {allowEmpty: true})
-        .pipe(newer(buildPath))
-        .pipe(gulpif(production, imagemin([
-            imageminGiflossy({
-                optimizationLevel: 3,
-                optimize: 3,
-                lossy: 2
-            }),
-            imageminPngquant({
-                speed: 5,
-                quality: 75
-            }),
-            imageminZopfli({
-                more: true
-            }),
-            imageminMozjpeg({
-                progressive: true,
-                quality: 70
-            }),
-            imagemin.svgo({
-                plugins: [
-                    { removeViewBox: false },
-                    { removeUnusedNS: false },
-                    { removeUselessStrokeAndFill: false },
-                    { cleanupIDs: false },
-                    { removeComments: true },
-                    { removeEmptyAttrs: true },
-                    { removeEmptyText: true },
-                    { collapseGroups: true }
-                ]
-            })
-        ])))
-        .pipe(dest(buildPath))
-        .pipe(debug({"title": "Images"}))
-        .on("end", browsersync.reload);
-};
-
-const buildVendorStyles  = (done, n = 1) => ! paths.vendor.src ? done() :
-    buildStyles(paths.vendor.styles, dist + paths.vendor.dest, {newerOnly: n});
-
-const buildMainStyles    = (done, n = 1) => ! paths.styles.src ? done() :
-    buildStyles(paths.main.styles, dist + paths.styles.dest, {newerOnly: n});
-
-const buildBlocksStyles  = (done, n = 1) => ! paths.pages.src ? done() :
-    buildStyles(paths.pages.styles, root + paths.pages.dest, {newerOnly: n});
-
 const buildMainImages    = (done) => ! paths.images.src ? done() :
-    buildImages([ dir + paths.images.src + '**/' + ext.img ], dist + paths.images.dest);
+    src(getImagesPath([ dir + paths.images.src + '**/' + ext.img ]), {allowEmpty: true})
+        .pipe(newer(dist + paths.images.dest))
+        .pipe(imagemin(getImageMinArgs()))
+        .pipe(dest(dist + paths.images.dest))
+        .pipe(debug({"title": "Images"}));
 
-const buildBlocksImages  = (done) => ! paths.pages.src ? done() :
-    buildImages([ dir + paths.pages.src + '**/' + ext.img ], root + paths.pages.dest);
+const buildBlocksImages  = (done) => ! paths.images.pages ? done() :
+    src(getImagesPath([ dir + paths.images.pages + '**/' + ext.img ]), {allowEmpty: true})
+        .pipe(rename((path) => {
+            path.dirname += "/..";
+        }))
+        .pipe(newer(root + paths.pages.dest))
+        .pipe(imagemin(getImageMinArgs()))
+        .pipe(dest(root + paths.pages.dest))
+        .pipe(debug({"title": "Pages images"}));
 
+/**
+ * Dev browser sync tasks
+ */
 const watchAll = function () {
     // Watch markup.
     watch(paths.markup, (done) => {
@@ -313,7 +331,10 @@ const watchAll = function () {
     // Watch pages.
     if(paths.pages.src) {
         watch(paths.pages.styles, buildBlocksStyles);
-        watch([ dir + paths.pages.src + '**/' + ext.img ], buildBlocksImages);
+    }
+
+    if(paths.images.pages) {
+        watch([ dir + paths.images.pages + '**/' + ext.img ], buildBlocksImages);
     }
 };
 
@@ -331,6 +352,9 @@ const serve = function () {
     browsersync.init(serverCfg);
 };
 
+/**
+ * Tasks
+ */
 gulp.task("buildStyles", gulp.parallel(buildVendorStyles, buildBlocksStyles, buildMainStyles));
 gulp.task("buildImages", gulp.parallel(buildBlocksImages, buildMainImages)); // buildFavicons, buildSprites
 
