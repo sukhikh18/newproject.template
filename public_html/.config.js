@@ -28,13 +28,13 @@ var paths = module.exports.paths = {
 
     images: {
         src:  'img/high/',
-        pages: 'page/**/img/high/',
+        pages: '**/img/high/',
         dest: 'img/',
     },
 
     pages: {
         src: assets + 'page/',
-        dest: 'page/',
+        dest: '',
     },
 
     vendor: {
