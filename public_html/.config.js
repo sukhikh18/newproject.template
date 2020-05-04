@@ -15,39 +15,40 @@ const sourceVendor = assets + 'vendor/';
 var vendor = module.exports.vendor = [
     {
         name: 'Jquery',
-        src: './node_modules/jquery/dist/**/*',
+        src: './node_modules/jquery/dist/**/*.*',
         dest: sourceVendor + 'jquery/'
     },
     {
         name: 'Cleave',
-        src: './node_modules/cleave.js/dist/**/*',
+        src: './node_modules/cleave.js/dist/**/*.*',
         dest: sourceVendor + 'cleave/'
     },
     {
         name: 'Slick',
-        src: './node_modules/slick-carousel/slick/**/*',
+        src: './node_modules/slick-carousel/slick/**/*.*',
         dest: sourceVendor + 'slick/',
     },
     {
         name: 'Fancybox',
-        src: './node_modules/@fancyapps/fancybox/dist/**/*',
+        src: './node_modules/@fancyapps/fancybox/dist/**/*.*',
         dest: sourceVendor + 'fancybox/'
     },
     {
         name: 'Waypoints',
-        src: './node_modules/waypoints/lib/**/*',
+        src: './node_modules/waypoints/lib/**/*.*',
         dest: sourceVendor + 'waypoints/'
     },
 ];
 
 var paths = module.exports.paths = {
     assets: assets,
-    module: assets + 'module/',
+    module: assets + '.source/module/',
+    variables: assets + '.source/_site-settings.scss',
 
     markup: '**/*.html',
 
-    style: assets + source,
-    vendor: vendor + source,
+    styles: assets + source,
+    vendor: sourceVendor + source,
     pages: '**/' + source,
     images: '**/' + sourceMedia,
     scripts: '**/' + source,

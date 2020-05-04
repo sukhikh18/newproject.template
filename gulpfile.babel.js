@@ -53,7 +53,6 @@ const webpackStream = require("webpack-stream");
 const production = !!yargs.argv.production;
 const tunnel = !!yargs.argv.tunnel;
 
-let webpackConfig;
 const config = require(root + ".config");
 const paths = config.paths;
 const dir = root + config.src;
@@ -77,7 +76,7 @@ const getStylesArgs = (args = {}) => {
         },
         'plumber': {},
         'sass': {
-            includePaths: [ 'node_modules', dir + paths.style ]
+            includePaths: [ 'node_modules', dir + paths.styles ]
         },
         'groupmediaqueries': {},
         'autoprefixer': {
@@ -134,10 +133,10 @@ const buildStyles = function(name, _args, advancedSrc = []) {
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
-const buildMainStyles = (args) => buildStyles('Main', { ...args, src: paths.style });
+const buildMainStyles = (args) => buildStyles('Main', { ...args, src: paths.styles });
 const buildVendorStyles  = (args) => buildStyles('Vendor', { ...args, src: paths.vendor });
 const buildPagesStyles  = (args) => buildStyles('Page', { ...args, src: paths.pages, dest: root + '../' },
-    ['!' + dir + 'assets/**']);
+    ['!' + dir + 'assets/**/*.*']);
 
 /**
  * Scripts
@@ -192,29 +191,32 @@ const buildImages = (done) =>
  * Dev browser sync tasks
  */
 const watchAll = function () {
+    const variables = dir + paths.variables;
+    const modules = dir + paths.module + '**/' + ext.scss;
+
     // Watch markup.
     watch(dir + paths.markup, (done) => {
         browsersync.reload();
         return done();
     });
 
-    // const settings = dir + paths.styles.settings;
+    // Watch styles.
+    watch(['!' + modules, variables], function(done) {
+        buildVendorStyles({'newer': false});
+        buildPagesStyles({'newer': false});
+        buildMainStyles({'newer': false});
+        return done();
+    });
 
-    // // Watch styles.
-    // watch([ settings ], function(done) {
-    //     buildVendorStyles({'newer': false});
-    //     buildMainStyles({'newer': false});
-    //     buildPagesStyles(done, 0);
-    //     return done();
-    // });
+    watch(['!' + variables, modules], (done) => {
+        buildPagesStyles({'newer': false});
+        buildMainStyles({'newer': false});
+        return done();
+    });
 
-    // watch([ ...paths.vendor.styles, ...['!' + settings] ], (done) => buildVendorStyles(done, 0) );
-    // watch([ ...paths.main.styles, ...['!' + settings] ], (done) => buildMainStyles(done, 0) );
-    // watch([ dir + paths.module + '**/' + ext.scss, '!' + settings ], (done) => {
-    //     buildMainStyles(done, 0);
-    //     buildPagesStyles(done, 0);
-    //     return done();
-    // });
+    watch(['!' + variables, '!' + modules].concat(buildSrcList(paths.vendor, ext.scss)), buildVendorStyles({'newer': false}));
+    watch(['!' + variables, '!' + modules].concat(buildSrcList(paths.pages, ext.scss)), buildPagesStyles({'newer': false}));
+    watch(['!' + variables, '!' + modules].concat(buildSrcList(paths.styles, ext.scss)), buildMainStyles({'newer': false}));
 
     // Watch javascript.
     // let scripts = [];
@@ -267,7 +269,7 @@ gulp.task("build", gulp.parallel("build::styles", buildScripts, buildImages));
  */
 gulp.task("install", function(done) {
     let tasks = config.vendor.map((element) => src(element.src)
-        .pipe(newer(dir + element.dest))
+        .pipe(newer(dir + element.dest.replace('/*.*', '')))
         .pipe(dest(dir + element.dest))
         .pipe(debug({"title": "vendor: " + element.name}))
     );
