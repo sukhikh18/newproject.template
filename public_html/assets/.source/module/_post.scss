@@ -1,0 +1,13 @@
+.post {
+    &__thmb {
+        margin-right: 1rem;
+    }
+
+    @include to($media-sm) {
+        flex-direction: column;
+
+        &__thmb {
+            margin: 0 auto .5rem;
+        }
+    }
+}
