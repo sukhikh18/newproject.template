@@ -59,31 +59,31 @@ const dir = root + config.src;
 const dist = root + config.dest;
 
 const buildSrcList = (src, ext) => [
-    '!' + dir + src + '**/_' + ext,
     dir + src + '**/' + ext,
+    '!' + dir + src + '**/_' + ext,
 ];
 
-const buildDistPath = (dist) => dir + dist;
+const buildRelativePath = (dist) => dir + dist;
 
 /**
  * Styles
  */
 const getStylesArgs = (args = {}) => {
     let _default = {
-        'newer': {
-            dest: buildDistPath(args['src']) + '../',
+        newer: {
+            dest: buildRelativePath(args['src']) + '../',
             ext: production ? '.min.css' : '.css'
         },
-        'plumber': {},
-        'sass': {
+        plumber: {},
+        sass: {
             includePaths: [ 'node_modules', dir + paths.styles ]
         },
-        'groupmediaqueries': {},
-        'autoprefixer': {
+        groupmediaqueries: {},
+        autoprefixer: {
             cascade: false,
             grid: true
         },
-        'mincss': {
+        mincss: {
             compatibility: "*",
             level: {
                 1: {
@@ -102,9 +102,9 @@ const getStylesArgs = (args = {}) => {
             },
             rebase: false
         },
-        'rename': (path) => {
-            path.extname = production ? ".min" + path.extname : "";
+        rename: (path) => {
             path.dirname += "/..";
+            if(production) path.extname = ".min" + path.extname;
         }
     };
 
@@ -125,10 +125,10 @@ const buildStyles = function(name, _args, advancedSrc = []) {
         .pipe(autoprefixer(args['autoprefixer']))
         .pipe(gulpif(!production, browsersync.stream()))
         .pipe(gulpif(production, mincss(args['mincss'])))
-        .pipe(gulpif(production, rename(args['rename'])))
+        .pipe(rename(args['rename']))
         // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
         .pipe(plumber.stop())
-        .pipe(dest(buildDistPath(args['dest'] || args['src'])))
+        .pipe(dest(buildRelativePath(args['dest'] || args['src'])))
         .pipe(debug(args['debug']))
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
@@ -142,7 +142,7 @@ const buildPagesStyles  = (args) => buildStyles('Page', { ...args, src: paths.pa
  * Scripts
  */
 const buildScripts = function(done) {
-    let srcJS = dir + paths.scripts + ext.js;
+    let srcJS = buildRelativePath(paths.scripts) + ext.js;
     let config = {
         entry: glob.sync(srcJS).reduce((entries, entry) => {
             var matchForRename = /([\w\d.-_\/]+)\/.source\/([\w\d_-]+)\.js$/g.exec(entry);
@@ -190,52 +190,29 @@ const buildImages = (done) =>
 /**
  * Dev browser sync tasks
  */
+const watchVendorStyles = () => buildVendorStyles({'newer': false});
+const watchPagesStyles = () => buildPagesStyles({'newer': false});
+const watchMainStyles = () => buildMainStyles({'newer': false});
+
 const watchAll = function () {
     const variables = dir + paths.variables;
     const modules = dir + paths.module + '**/' + ext.scss;
 
     // Watch markup.
-    watch(dir + paths.markup, (done) => {
-        browsersync.reload();
-        return done();
-    });
+    watch(dir + paths.markup, (done) => { browsersync.reload(); return done(); });
 
     // Watch styles.
-    watch(['!' + modules, variables], function(done) {
-        buildVendorStyles({'newer': false});
-        buildPagesStyles({'newer': false});
-        buildMainStyles({'newer': false});
-        return done();
-    });
-
-    watch(['!' + variables, modules], (done) => {
-        buildPagesStyles({'newer': false});
-        buildMainStyles({'newer': false});
-        return done();
-    });
-
-    watch(['!' + variables, '!' + modules].concat(buildSrcList(paths.vendor, ext.scss)), buildVendorStyles({'newer': false}));
-    watch(['!' + variables, '!' + modules].concat(buildSrcList(paths.pages, ext.scss)), buildPagesStyles({'newer': false}));
-    watch(['!' + variables, '!' + modules].concat(buildSrcList(paths.styles, ext.scss)), buildMainStyles({'newer': false}));
+    watch(['!' + modules, variables], function(done) { watchVendorStyles(); watchPagesStyles(); watchMainStyles(); return done(); });
+    watch(['!' + variables, modules], (done) => { watchPagesStyles(); watchMainStyles(); return done(); });
+    watch(buildSrcList(paths.vendor, ext.scss).concat(['!' + variables, '!' + modules]), () => watchVendorStyles());
+    watch(buildSrcList(paths.pages,  ext.scss).concat(['!' + variables, '!' + modules, '!' + dir + paths.styles + '**/*.*']), () => watchPagesStyles());
+    watch(buildSrcList(paths.styles, ext.scss).concat(['!' + variables, '!' + modules]), () => watchMainStyles());
 
     // Watch javascript.
-    // let scripts = [];
-    // for(var key in webpackConfig.entry) {
-    //     scripts.push(webpackConfig.entry[key] + '.js');
-    // }
-    // watch(scripts, buildScripts);
+    watch(buildRelativePath(paths.scripts) + ext.js, buildScripts);
 
     // Watch images.
-    // if(paths.images.src) watch([dir + paths.images.src + '**/' + ext.img], buildImages);
-
-    // Watch pages.
-    // if(paths.pages.src) {
-    //     watch(paths.pages.styles, buildPagesStyles);
-    // }
-
-    // if(paths.images.pages) {
-    //     watch([dir + paths.images.pages + '**/' + ext.img]);
-    // }
+    watch([buildRelativePath(paths.images) + '**/' + ext.img], buildImages);
 };
 
 const serve = function () {
