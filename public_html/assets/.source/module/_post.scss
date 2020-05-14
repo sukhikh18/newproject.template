@@ -1,13 +1,26 @@
 .post {
-    &__thmb {
-        margin-right: 1rem;
+    display: flex;
+    flex-direction: column;
+    @include md(display, block);
+    @include row-float();
+
+    &__preview {
+        @include col();
+        @include size-md(3);
+        @include md(float, left);
+        margin-bottom: 1rem;
     }
 
-    @include to($media-sm) {
-        flex-direction: column;
+    &__name {
+        order: -1;
+        @include col();
+        @include size-md(9);
+        @include md(float, right);
+    }
 
-        &__thmb {
-            margin: 0 auto .5rem;
-        }
+    &__content {
+        @include col();
+        @include size-md(9);
+        @include md(float, right);
     }
 }

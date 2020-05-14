@@ -37,6 +37,7 @@ const groupmediaqueries = require("gulp-group-css-media-queries");
 const mincss = require("gulp-clean-css");
 // const sourcemaps = require("gulp-sourcemaps");
 const newer = require("gulp-newer");
+const smartgrid = require("smart-grid");
 // const favicons = require("gulp-favicons");
 // const svgSprite = require("gulp-svg-sprite");
 const imagemin = require("gulp-imagemin");
@@ -188,6 +189,40 @@ const buildImages = (done) =>
         .pipe(debug({"title": "Images"}));
 
 /**
+ * GRID
+ */
+const buildSmartGrid = () => smartgrid(buildRelativePath(paths.vendor), {
+    outputStyle: "scss",
+    filename: "_smart-grid",
+    columns: 12, // number of grid columns
+    offset: "1.875rem", // gutter width - 30px
+    mobileFirst: true,
+    mixinNames: {
+        container: "container"
+    },
+    container: {
+        fields: "0.9375rem" // side fields - 15px
+    },
+    breakPoints: {
+        xs: {
+            width: "20rem" // 320px
+        },
+        sm: {
+            width: "36rem" // 576px
+        },
+        md: {
+            width: "48rem" // 768px
+        },
+        lg: {
+            width: "62rem" // 992px
+        },
+        xl: {
+            width: "75rem" // 1200px
+        }
+    }
+});
+
+/**
  * Dev browser sync tasks
  */
 const watchVendorStyles = () => buildVendorStyles({'newer': false});
@@ -251,6 +286,7 @@ gulp.task("install", function(done) {
         .pipe(debug({"title": "vendor: " + element.name}))
     );
 
+    buildSmartGrid();
     return merge(tasks);
 });
 

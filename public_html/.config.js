@@ -42,8 +42,8 @@ var vendor = module.exports.vendor = [
 
 var paths = module.exports.paths = {
     assets: assets,
-    module: assets + '.source/module/',
-    variables: assets + '.source/_site-settings.scss',
+    module: assets + source + 'module/',
+    variables: assets + source + '_site-settings.scss',
 
     markup: '**/*.html',
 
