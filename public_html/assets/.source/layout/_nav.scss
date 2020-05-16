@@ -24,6 +24,19 @@
         .nav-link:focus {
             text-decoration: none;
         }
+
+        @include from-to($media-lg, $media-xl) {
+            > .container {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .navbar-collapse {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
     }
 
     .navbar-toggler {

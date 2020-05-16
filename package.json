@@ -9,6 +9,8 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "gulp --silent",
+		"watch": "gulp --silent",
+		"prod": "gulp build --production",
 		"build": "gulp build --production",
 		"tunnel": "gulp --tunnel --silent",
 		"install": "gulp install --silent"
@@ -47,13 +49,14 @@
 	"dependencies": {
 		"@fancyapps/fancybox": "^3.5.7",
 		"animatewithsass": "^3.2.1",
-		"bootstrap": "^4.2.1",
+		"bootstrap": "^4.4.1",
 		"cleave.js": "^1.5.3",
 		"font-awesome": "^4.7.0",
 		"hamburgers": "^1.1.3",
-		"jquery": "^3.3.1",
+		"jquery": "^3.5",
 		"popper.js": "^1.14.6",
 		"slick-carousel": "^1.8.1",
+		"smart-grid": "^2.1.2",
 		"waypoints": "^4.0.1"
 	}
 }

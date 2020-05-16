@@ -1,7 +1,7 @@
-import lazy from "./parts/_lazy.js";
+import lazy from "./module/_lazy.js";
 // for smooth scrool to object
-import scrollTo from "./parts/_scrollTo.js";
-import preloader from "./parts/_preloader.js";
+import scrollTo from "./module/_scrollTo.js";
+import preloader from "./module/_preloader.js";
 
 jQuery(document).ready(function($) {
     $(document).on('click', '[href^="#"]', function(event) {
