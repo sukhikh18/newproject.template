@@ -59,12 +59,12 @@ const paths = config.paths;
 const dir = root + config.src;
 const dist = root + config.dest;
 
-const buildSrcList = (src, ext) => [
-    dir + src + '**/' + ext,
-    '!' + dir + src + '**/_' + ext,
+const buildSrcList = (src, ext, folder = dir) => [
+    folder + src + '**/' + ext,
+    '!' + folder + src + '**/_' + ext,
 ];
 
-const buildRelativePath = (dist) => dir + dist;
+const buildRelativePath = (dist, folder = dir) => folder + dist;
 
 /**
  * Styles
@@ -113,11 +113,11 @@ const getStylesArgs = (args = {}) => {
     return _default;
 };
 
-const buildStyles = function(name, _args, advancedSrc = []) {
+const buildStyles = function(name, _args) {
     let args = getStylesArgs(_args)
     args.debug = { title: name + ' style' }
 
-    return src(buildSrcList(args['src'], ext.scss).concat(advancedSrc), {allowEmpty: true})
+    return src(args['src'], {allowEmpty: true, dot: true})
         .pipe(plumber(args['plumber']))
         // .pipe(gulpif(!!args['newer'] && !production, newer(args['newer'])))
         // .pipe(gulpif(!production, sourcemaps.init()))
@@ -129,15 +129,28 @@ const buildStyles = function(name, _args, advancedSrc = []) {
         .pipe(rename(args['rename']))
         // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
         .pipe(plumber.stop())
-        .pipe(dest(buildRelativePath(args['dest'] || args['src'])))
+        .pipe(dest(args['dest']))
         .pipe(debug(args['debug']))
         .on("end", () => production || '' == domain ? browsersync.reload : null);
 };
 
-const buildMainStyles = (args) => buildStyles('Main', { ...args, src: paths.styles });
-const buildVendorStyles  = (args) => buildStyles('Vendor', { ...args, src: paths.vendor });
-const buildPagesStyles  = (args) => buildStyles('Page', { ...args, src: paths.pages, dest: root + '../' },
-    ['!' + dir + 'assets/**/*.*']);
+const buildMainStyles = (args) => buildStyles('Main', {
+    ...args,
+    src: buildSrcList(paths.styles, ext.scss),
+    dest: buildRelativePath(paths.styles)
+});
+
+const buildVendorStyles = (args) => buildStyles('Vendor', {
+    ...args,
+    src: buildSrcList(paths.vendor, ext.scss),
+    dest: buildRelativePath(paths.vendor)
+});
+
+const buildPagesStyles = (args) => buildStyles('Page', {
+    ...args,
+    src: buildSrcList(paths.pages, ext.scss, root).concat(['!' + dir + paths.assets + '**/*.*']),
+    dest: root
+});
 
 /**
  * Scripts
@@ -159,6 +172,10 @@ const buildScripts = function(done) {
         output: { filename: "[name].js" },
         mode: production ? 'production' : 'development',
         devtool: production ? false : "source-map",
+    }
+
+    if(!config.entry.length) {
+        return done();
     }
 
     return src(srcJS, {allowEmpty: true})
@@ -240,7 +257,7 @@ const watchAll = function () {
     watch(['!' + modules, variables], function(done) { watchVendorStyles(); watchPagesStyles(); watchMainStyles(); return done(); });
     watch(['!' + variables, modules], (done) => { watchPagesStyles(); watchMainStyles(); return done(); });
     watch(buildSrcList(paths.vendor, ext.scss).concat(['!' + variables, '!' + modules]), () => watchVendorStyles());
-    watch(buildSrcList(paths.pages,  ext.scss).concat(['!' + variables, '!' + modules, '!' + dir + paths.styles + '**/*.*']), () => watchPagesStyles());
+    watch(buildSrcList(paths.pages,  ext.scss, root).concat(['!' + variables, '!' + modules, '!' + dir + paths.styles + '**/*.*']), () => watchPagesStyles());
     watch(buildSrcList(paths.styles, ext.scss).concat(['!' + variables, '!' + modules]), () => watchMainStyles());
 
     // Watch javascript.
