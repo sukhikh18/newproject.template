@@ -174,7 +174,7 @@ const buildScripts = function(done) {
         devtool: production ? false : "source-map",
     }
 
-    if(!config.entry.length) {
+    if(!Object.keys(config.entry).length) {
         return done();
     }
 
