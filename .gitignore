@@ -21,4 +21,3 @@ public_html/assets/*
 !public_html/assets/vendor/
 public_html/assets/vendor/*
 !public_html/assets/vendor/.source/
-public_html/assets/vendor/.source/**/

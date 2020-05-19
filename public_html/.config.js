@@ -19,6 +19,11 @@ var vendor = module.exports.vendor = [
         dest: sourceVendor + 'jquery/'
     },
     {
+        name: 'BootstrapJs',
+        src: './node_modules/bootstrap/dist/js/*.*',
+        dest: sourceVendor + 'bootstrap/'
+    },
+    {
         name: 'Cleave',
         src: './node_modules/cleave.js/dist/**/*.*',
         dest: sourceVendor + 'cleave/'
