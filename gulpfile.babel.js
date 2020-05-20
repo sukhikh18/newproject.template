@@ -1,168 +1,170 @@
 "use strict";
 
+/**
+ * Modules
+ */
+const glob = require('glob')
+const merge = require('merge-stream')
+const browserSync = require("browser-sync")
+const yargs = require("yargs")
+const smartgrid = require("smart-grid")
+
+const gulp = {
+    ...require("gulp"),
+    if: require("gulp-if"),
+    rename: require("gulp-rename"),
+    replace: require("gulp-replace"),
+    plumber: require("gulp-plumber"),
+    debug: require("gulp-debug"),
+    autoprefixer: require("gulp-autoprefixer"),
+    sass: require("gulp-sass"),
+    groupCssMediaQueries: require("gulp-group-css-media-queries"),
+    cleanCss: require("gulp-clean-css"),
+    newer: require("gulp-newer"),
+    imagemin: require("gulp-imagemin"),
+    // const sourcemaps = require("gulp-sourcemaps"),
+    // const favicons = require("gulp-favicons"),
+    // const svgSprite = require("gulp-svg-sprite"),
+    // const webp = require("gulp-webp"),
+}
+
+const imagemin = {
+    Pngquant: require("imagemin-pngquant"),
+    Zopfli: require("imagemin-zopfli"),
+    Mozjpeg: require("imagemin-mozjpeg"),
+    Giflossy: require("imagemin-giflossy"),
+    // Webp = require("imagemin-webp"),
+}
+
+const webpack = {
+    ...require("webpack"),
+    stream: require("webpack-stream"),
+}
+
+/**
+ * Definitions
+ */
+const assets = 'assets/'
+const source = '_source/'
+const sourceMedia = 'high/'
+const sourceVendor = 'assets/vendor/'
+const variables = assets + source + '_site-settings.scss'
+const modules = assets + source + 'module/'
+
+/** @type {String} Public folder */
 const root = './public_html/';
-const subDomain = 'nikolays93';
-
-/** {String} Domain for use local server proxy */
+/** @type {String} Domain for use local server proxy */
 const domain = '';
-
-const ext = {
-    scss: '*.scss',
-    js: '*.js',
-    img: '*.{jpg,jpeg,png,gif,svg}'
-};
-
-const path = require('path');
-const gulp = require("gulp");
-const src = gulp.src;
-const dest = gulp.dest;
-const watch = gulp.watch;
-
-const glob = require('glob');
-const gulpif = require("gulp-if");
-const browsersync = require("browser-sync");
-const rename = require("gulp-rename");
-const map = require("map-stream");
-const replace = require("gulp-replace");
-const merge = require('merge-stream');
-const plumber = require("gulp-plumber");
-const debug = require("gulp-debug");
-const yargs = require("yargs");
-const autoprefixer = require("gulp-autoprefixer");
-const sass = require("gulp-sass");
-const groupmediaqueries = require("gulp-group-css-media-queries");
-// const postcss = require("gulp-postcss");
-// const mqpacker = require("css-mqpacker");
-// const sortCSSmq = require("sort-css-media-queries");
-const mincss = require("gulp-clean-css");
-// const sourcemaps = require("gulp-sourcemaps");
-const newer = require("gulp-newer");
-const smartgrid = require("smart-grid");
-// const favicons = require("gulp-favicons");
-// const svgSprite = require("gulp-svg-sprite");
-const imagemin = require("gulp-imagemin");
-const imageminPngquant = require("imagemin-pngquant");
-const imageminZopfli = require("imagemin-zopfli");
-const imageminMozjpeg = require("imagemin-mozjpeg");
-const imageminGiflossy = require("imagemin-giflossy");
-// const imageminWebp = require("imagemin-webp");
-// const webp = require("gulp-webp");
-const webpack = require("webpack");
-const webpackStream = require("webpack-stream");
-
-/** @type bool */
+/** @type {String} Path to the source directory. Target is root + src + ${*.*} */
+const src = root + '';
+/** @type {String} Path to the destination directory. Target is root + dest + ${*.*} */
+const dest = root + '';
+/** @type {Bool} When not development build */
 const production = !!yargs.argv.production;
-const tunnel = !!yargs.argv.tunnel;
 
-const config = require(root + ".config");
-const paths = config.paths;
-const dir = root + config.src;
-const dist = root + config.dest;
+const extension = {
+    scss: '.scss',
+    js: '.js',
+    img: '.{jpg,jpeg,png,gif,svg}'
+}
 
-const buildSrcList = (src, ext, folder = dir) => [
-    folder + src + '**/' + ext,
-    '!' + folder + src + '**/_' + ext,
-];
+const serve = {
+    tunnel: !!yargs.argv.tunnel ? yargs.argv.tunnel : false,
+    port: 9000,
+    notify: false,
+    ...domain ? { proxy: domain } : { server: { baseDir: dest } }
+}
 
-const buildRelativePath = (dist, folder = dir) => folder + dist;
+const path = {
+    variables: assets + source + '_site-settings.scss',
+    modules: assets + source + 'module/*',
 
-/**
- * Styles
- */
-const getStylesArgs = (args = {}) => {
-    let _default = {
-        newer: {
-            dest: buildRelativePath(args['src']) + '../',
-            ext: production ? '.min.css' : '.css'
+    markup: '**/*.html',
+    styles: assets + source,
+    vendor: '**/' + sourceVendor + source,
+    pages: '**/' + source,
+    images: '**/' + sourceMedia,
+    scripts: '**/' + source,
+}
+
+const vendorList = [{
+    name: 'Jquery',
+    src: './node_modules/jquery/dist/**/*.*',
+}, {
+    name: 'Bootstrap',
+    src: './node_modules/bootstrap/dist/js/*.*',
+}, { // @todo cleave bundle (or add to main.js)
+    name: 'Cleave',
+    src: './node_modules/cleave.js/dist/**/*.*',
+}, {
+    name: 'Slick',
+    src: './node_modules/slick-carousel/slick/**/*.*',
+}, {
+    name: 'Fancybox',
+    src: './node_modules/@fancyapps/fancybox/dist/**/*.*',
+}, {
+    name: 'Waypoints',
+    src: './node_modules/waypoints/lib/**/*.*',
+}]
+
+const buildSrcList = (src, ext) => [
+    src + '**/*' + ext,
+    '!' + src + '**/_*' + ext,
+]
+
+const buildStyles = (srcPaths, minify = !!production, force = !!production) => gulp.src(srcPaths, { allowEmpty: true })
+    .pipe(gulp.plumber())
+    .pipe(gulp.rename((filename) => {
+        filename.dirname += "/..";
+        if (minify) filename.extname = ".min" + filename.extname;
+    }))
+    .pipe(gulp.if(!force, gulp.newer({
+        map: (relative) => {
+            return src + relative;
         },
-        plumber: {},
-        sass: {
-            includePaths: [ 'node_modules', dir + paths.styles ]
-        },
-        groupmediaqueries: {},
-        autoprefixer: {
-            cascade: false,
-            grid: true
-        },
-        mincss: {
-            compatibility: "*",
-            level: {
-                1: {
-                    specialComments: 0,
-                    removeEmpty: true,
-                    removeWhitespace: true
-                },
-                2: {
-                    mergeMedia: true,
-                    removeEmpty: true,
-                    removeDuplicateFontRules: true,
-                    removeDuplicateMediaBlocks: true,
-                    removeDuplicateRules: true,
-                    removeUnusedAtRules: false
-                }
+        // dest: src,
+        ext: !!minify ? '.min.css' : '.css',
+    })))
+    // .pipe(gulp.newer({ dest: buildRelativePath(args['src']) + '../', ext: production ? '.min.css' : '.css' }))
+    // .pipe(gulp.sourcemaps())
+    .pipe(gulp.sass({ includePaths: ['node_modules', src + assets + source] }))
+    .pipe(gulp.groupCssMediaQueries())
+    .pipe(gulp.autoprefixer({ cascade: false, grid: true }))
+    .pipe(gulp.if(!minify, browserSync.stream()))
+    .pipe(gulp.if(minify, gulp.cleanCss({
+        compatibility: "*",
+        level: {
+            1: {
+                specialComments: 0,
+                removeEmpty: true,
+                removeWhitespace: true
             },
-            rebase: false
+            2: {
+                mergeMedia: true,
+                removeEmpty: true,
+                removeDuplicateFontRules: true,
+                removeDuplicateMediaBlocks: true,
+                removeDuplicateRules: true,
+                removeUnusedAtRules: false
+            }
         },
-        rename: (path) => {
-            path.dirname += "/..";
-            if(production) path.extname = ".min" + path.extname;
-        }
-    };
+        rebase: false
+    })))
+    // .pipe(gulp.if(!minify, gulp.sourcemaps.write("./assets/maps/")))
+    .pipe(gulp.plumber.stop())
+    .pipe(gulp.dest(dest))
+    .pipe(gulp.debug({ "title": "Styles" }))
+    .on("end", () => minify || '' == domain ? browserSync.reload : null)
 
-    for (var arg in args) { _default[arg] = args[arg]; }
-    return _default;
-};
-
-const buildStyles = function(name, _args) {
-    let args = getStylesArgs(_args)
-    args.debug = { title: name + ' style' }
-
-    return src(args['src'], {allowEmpty: true, dot: true})
-        .pipe(plumber(args['plumber']))
-        // .pipe(gulpif(!!args['newer'] && !production, newer(args['newer'])))
-        // .pipe(gulpif(!production, sourcemaps.init()))
-        .pipe(sass(args['sass']))
-        .pipe(groupmediaqueries(args['groupmediaqueries']))
-        .pipe(autoprefixer(args['autoprefixer']))
-        .pipe(gulpif(!production, browsersync.stream()))
-        .pipe(gulpif(production, mincss(args['mincss'])))
-        .pipe(rename(args['rename']))
-        // .pipe(gulpif(!production, sourcemaps.write("./assets/maps/")))
-        .pipe(plumber.stop())
-        .pipe(dest(args['dest']))
-        .pipe(debug(args['debug']))
-        .on("end", () => production || '' == domain ? browsersync.reload : null);
-};
-
-const buildMainStyles = (args) => buildStyles('Main', {
-    ...args,
-    src: buildSrcList(paths.styles, ext.scss),
-    dest: buildRelativePath(paths.styles)
-});
-
-const buildVendorStyles = (args) => buildStyles('Vendor', {
-    ...args,
-    src: buildSrcList(paths.vendor, ext.scss),
-    dest: buildRelativePath(paths.vendor)
-});
-
-const buildPagesStyles = (args) => buildStyles('Page', {
-    ...args,
-    src: buildSrcList(paths.pages, ext.scss, root).concat(['!' + dir + paths.assets + '**/*.*']),
-    dest: root
-});
-
-/**
- * Scripts
- */
-const buildScripts = function(done) {
-    let srcJS = buildRelativePath(paths.scripts) + ext.js;
-    let config = {
-        entry: glob.sync(srcJS).reduce((entries, entry) => {
-            var matchForRename = /([\w\d.-_\/]+)\/.source\/([\w\d_-]+)\.js$/g.exec(entry);
+const buildScripts = (srcPath, minify = !!production) => {
+    const allScripts = glob.sync(srcPath);
+    const config = {
+        entry: allScripts.reduce((entries, entry) => {
+            const regex = new RegExp(``, 'g'),
+                matchForRename = /([\w\d.-_\/]+)\_source\/([\w\d._-]+)\.js$/g.exec(entry);
 
             if (matchForRename !== null) {
-                if(typeof matchForRename[1] !== 'undefined' && typeof matchForRename[2] !== 'undefined') {
+                if (typeof matchForRename[1] !== 'undefined' && typeof matchForRename[2] !== 'undefined') {
                     entries[matchForRename[1].replace(root, '') + '/' + matchForRename[2]] = entry;
                 }
             }
@@ -170,45 +172,24 @@ const buildScripts = function(done) {
             return entries;
         }, {}),
         output: { filename: "[name].js" },
-        mode: production ? 'production' : 'development',
-        devtool: production ? false : "source-map",
+        stats: 'errors-only',
+        mode: minify ? 'production' : 'development',
+        devtool: minify ? false : "source-map",
     }
 
-    if(!Object.keys(config.entry).length) {
+    if (!Object.keys(config.entry).length) {
         return done();
     }
 
-    return src(srcJS, {allowEmpty: true})
-        .pipe(webpackStream(config), webpack)
-        .pipe(gulpif(production, rename({suffix: ".min"})))
-        .pipe(dest(root))
-        .pipe(debug({"title": "Webpack"}))
-        .on("end", browsersync.reload);
-};
+    return gulp.src(allScripts, { allowEmpty: true })
+        .pipe(webpack.stream(config), webpack)
+        .pipe(gulp.if(minify, gulp.rename({ suffix: ".min" })))
+        .pipe(gulp.dest(root))
+        .pipe(gulp.debug({ "title": "Script" }))
+        .on("end", browserSync.reload);
+}
 
-/**
- * Images
- */
-const getImagesPath = (path) => {
-    // path.images.push('!' + paths.src.sprites);
-    // path.images.push('!' + paths.src.favicons);
-    return path;
-};
-
-const buildImages = (done) =>
-    src(getImagesPath(buildSrcList(paths.images, ext.img)), {allowEmpty: true})
-        .pipe(rename((path) => {
-            path.dirname += "/..";
-        }))
-        .pipe(gulpif(!production, newer(root + '**/' + ext.img)))
-        .pipe(imagemin())
-        .pipe(dest(root))
-        .pipe(debug({"title": "Images"}));
-
-/**
- * GRID
- */
-const buildSmartGrid = () => smartgrid(buildRelativePath(paths.vendor), {
+const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
     outputStyle: "scss",
     filename: "_smart-grid",
     columns: 12, // number of grid columns
@@ -240,74 +221,99 @@ const buildSmartGrid = () => smartgrid(buildRelativePath(paths.vendor), {
 });
 
 /**
- * Dev browser sync tasks
- */
-const watchVendorStyles = () => buildVendorStyles({'newer': false});
-const watchPagesStyles = () => buildPagesStyles({'newer': false});
-const watchMainStyles = () => buildMainStyles({'newer': false});
-
-const watchAll = function () {
-    const variables = dir + paths.variables;
-    const modules = dir + paths.module + '**/' + ext.scss;
-
-    // Watch markup.
-    watch(dir + paths.markup, (done) => { browsersync.reload(); return done(); });
-
-    // Watch styles.
-    watch(['!' + modules, variables], function(done) { watchVendorStyles(); watchPagesStyles(); watchMainStyles(); return done(); });
-    watch(['!' + variables, modules], (done) => { watchPagesStyles(); watchMainStyles(); return done(); });
-    watch(buildSrcList(paths.vendor, ext.scss).concat(['!' + variables, '!' + modules]), () => watchVendorStyles());
-    watch(buildSrcList(paths.pages,  ext.scss, root).concat(['!' + variables, '!' + modules, '!' + dir + paths.styles + '**/*.*']), () => watchPagesStyles());
-    watch(buildSrcList(paths.styles, ext.scss).concat(['!' + variables, '!' + modules]), () => watchMainStyles());
-
-    // Watch javascript.
-    watch(buildRelativePath(paths.scripts) + ext.js, buildScripts);
-
-    // Watch images.
-    watch([buildRelativePath(paths.images) + '**/' + ext.img], buildImages);
-};
-
-const serve = function () {
-    var serverCfg = {
-        port: 9000,
-        notify: false
-    }
-
-    if( tunnel ) serverCfg.tunnel = subDomain;
-
-    if( '' !== domain ) serverCfg.proxy = domain;
-    else serverCfg.server = {baseDir: dist};
-
-    browsersync.init(serverCfg);
-};
-
-/**
  * Tasks
  */
-gulp.task("build::styles", gulp.parallel(buildVendorStyles, buildPagesStyles, buildMainStyles));
-gulp.task("build::scripts", buildScripts);
-gulp.task("build::images", buildImages); // buildFavicons, buildSprites
+gulp.task("build::styles", (done) => {
+    const buildPath = buildSrcList(src, extension.scss);
+
+    buildStyles(buildPath, !!production);
+    if (!!production) buildStyles(buildPath, !production);
+    return done();
+})
+
+gulp.task("build::scripts", (done) => {
+    const buildPath = src + path.scripts + '*' + extension.js;
+
+    buildScripts(buildPath, !!production);
+    if (!!production) buildScripts(buildPath, !production);
+    return done();
+})
+
+gulp.task("build::images", (done) => gulp.src(src + path.images + '**/*' + extension.img, { allowEmpty: true })
+    .pipe(gulp.rename((path) => {
+        path.dirname += "/..";
+    }))
+    .pipe(gulp.if(!production, gulp.newer(root)))
+    .pipe(gulp.imagemin([
+        imagemin.Giflossy({
+            optimizationLevel: 3,
+            optimize: 3,
+            lossy: 2
+        }),
+        imagemin.Pngquant({
+            speed: 5,
+            quality: [0.6, 0.8]
+        }),
+        imagemin.Zopfli({
+            more: true
+        }),
+        imagemin.Mozjpeg({
+            progressive: true,
+            quality: 90
+        }),
+        gulp.imagemin.svgo({
+            plugins: [
+                { removeViewBox: false },
+                { removeUnusedNS: false },
+                { removeUselessStrokeAndFill: false },
+                { cleanupIDs: false },
+                { removeComments: true },
+                { removeEmptyAttrs: true },
+                { removeEmptyText: true },
+                { collapseGroups: true }
+            ]
+        })
+    ]))
+    .pipe(gulp.dest(root))
+    .pipe(gulp.debug({ "title": "Images" }))); // buildFavicons, buildSprites
+
+gulp.task("watch", (done) => {
+    // Watch markup.
+    gulp.watch(src + path.markup, (done) => { browserSync.reload(); return done(); });
+    // Watch styles.
+    gulp.watch(src + '**/*' + extension.scss, gulp.series("build::styles"));
+    gulp.watch([src + path.variables, src + path.modules + extension.scss], (e) =>
+        buildStyles(buildSrcList(src, extension.scss), !!production, true));
+    // Watch javascript.
+    gulp.watch(src + path.scripts + '*' + extension.js, gulp.series("build::scripts"));
+    // Watch images.
+    gulp.watch(src + path.images + '*' + extension.img, gulp.series("build::images"));
+})
 
 /**
  * Build only
  */
-gulp.task("build", gulp.parallel("build::styles", buildScripts, buildImages));
+gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::images"));
 
 /**
  * Move assets (if yarn/npm installed them)
+ * @var vendorList {Array}<{name, src}>
  */
 gulp.task("install", function(done) {
-    let tasks = config.vendor.map((element) => src(element.src)
-        .pipe(newer(dir + element.dest.replace('/*.*', '')))
-        .pipe(dest(dir + element.dest))
-        .pipe(debug({"title": "vendor: " + element.name}))
-    );
+    let tasks = vendorList.map((vendor) => {
+        let destination = src + sourceVendor + vendor.name.toLowerCase();
 
-    buildSmartGrid();
+        return gulp.src(vendor.src)
+            .pipe(gulp.newer(destination))
+            .pipe(gulp.dest(destination))
+            .pipe(gulp.debug({ "title": "Vendor: " + vendor.name }))
+    })
+
+    buildSmartGrid(src + sourceVendor);
     return merge(tasks);
 });
 
 /**
  * Build with start serve/watcher
  */
-gulp.task("default", gulp.series("build", gulp.parallel(watchAll, serve)));
+gulp.task("default", gulp.series("build", gulp.parallel("watch", () => browserSync.init(serve))))
