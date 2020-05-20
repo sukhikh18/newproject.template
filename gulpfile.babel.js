@@ -44,13 +44,6 @@ const webpack = {
 /**
  * Definitions
  */
-const assets = 'assets/'
-const source = '_source/'
-const sourceMedia = 'high/'
-const sourceVendor = 'assets/vendor/'
-const variables = assets + source + '_site-settings.scss'
-const modules = assets + source + 'module/'
-
 /** @type {String} Public folder */
 const root = './public_html/';
 /** @type {String} Domain for use local server proxy */
@@ -75,16 +68,17 @@ const serve = {
     ...domain ? { proxy: domain } : { server: { baseDir: dest } }
 }
 
+const source = '_source/';
+
 const path = {
-    variables: assets + source + '_site-settings.scss',
-    modules: assets + source + 'module/*',
+    variables: 'assets/_source/_site-settings.scss',
+    modules: 'assets/_source/module/*',
 
     markup: '**/*.html',
-    styles: assets + source,
-    vendor: '**/' + sourceVendor + source,
-    pages: '**/' + source,
-    images: '**/' + sourceMedia,
-    scripts: '**/' + source,
+    styles: 'assets/',
+    vendor: 'assets/vendor/',
+    images: '**/high/',
+    scripts: '**/',
 }
 
 const vendorList = [{
@@ -127,7 +121,7 @@ const buildStyles = (srcPaths, minify = !!production, force = !!production) => g
     })))
     // .pipe(gulp.newer({ dest: buildRelativePath(args['src']) + '../', ext: production ? '.min.css' : '.css' }))
     // .pipe(gulp.sourcemaps())
-    .pipe(gulp.sass({ includePaths: ['node_modules', src + assets + source] }))
+    .pipe(gulp.sass({ includePaths: ['node_modules', src + path.styles + source] }))
     .pipe(gulp.groupCssMediaQueries())
     .pipe(gulp.autoprefixer({ cascade: false, grid: true }))
     .pipe(gulp.if(!minify, browserSync.stream()))
@@ -156,7 +150,7 @@ const buildStyles = (srcPaths, minify = !!production, force = !!production) => g
     .pipe(gulp.debug({ "title": "Styles" }))
     .on("end", () => minify || '' == domain ? browserSync.reload : null)
 
-const buildScripts = (srcPath, minify = !!production) => {
+const buildScripts = (done, srcPath, minify = !!production) => {
     const allScripts = glob.sync(srcPath);
     const config = {
         entry: allScripts.reduce((entries, entry) => {
@@ -232,10 +226,10 @@ gulp.task("build::styles", (done) => {
 })
 
 gulp.task("build::scripts", (done) => {
-    const buildPath = src + path.scripts + '*' + extension.js;
+    const buildPath = src + path.scripts + source + '*' + extension.js;
 
-    buildScripts(buildPath, !!production);
-    if (!!production) buildScripts(buildPath, !production);
+    buildScripts(done, buildPath, !!production);
+    if (!!production) buildScripts(done, buildPath, !production);
     return done();
 })
 
@@ -285,7 +279,7 @@ gulp.task("watch", (done) => {
     gulp.watch([src + path.variables, src + path.modules + extension.scss], (e) =>
         buildStyles(buildSrcList(src, extension.scss), !!production, true));
     // Watch javascript.
-    gulp.watch(src + path.scripts + '*' + extension.js, gulp.series("build::scripts"));
+    gulp.watch(src + path.scripts + source + '*' + extension.js, gulp.series("build::scripts"));
     // Watch images.
     gulp.watch(src + path.images + '*' + extension.img, gulp.series("build::images"));
 })
@@ -301,7 +295,7 @@ gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::imag
  */
 gulp.task("install", function(done) {
     let tasks = vendorList.map((vendor) => {
-        let destination = src + sourceVendor + vendor.name.toLowerCase();
+        let destination = src + path.vendor + vendor.name.toLowerCase();
 
         return gulp.src(vendor.src)
             .pipe(gulp.newer(destination))
@@ -309,7 +303,7 @@ gulp.task("install", function(done) {
             .pipe(gulp.debug({ "title": "Vendor: " + vendor.name }))
     })
 
-    buildSmartGrid(src + sourceVendor);
+    buildSmartGrid(src + path.vendor + source);
     return merge(tasks);
 });
 
