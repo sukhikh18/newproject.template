@@ -36,6 +36,10 @@ textarea {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+
+    &__content {
+        margin-bottom: auto;
+    }
 }
 
 h1 {

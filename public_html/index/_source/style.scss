@@ -8,10 +8,5 @@
 @import "module/slider";
 
 .site__prefix {
-    padding-top: 3rem;
-    margin-top: auto;
-
-    ~ .site__footer {
-        margin-top: 0;
-    }
+    margin-top: 3rem;
 }
