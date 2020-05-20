@@ -46,10 +46,12 @@ const webpack = {
  */
 /** @type {String} Public folder */
 const root = './public_html/';
+/** @type {String} Assets folder relative by root */
+const assets = 'assets/';
+/** @type {String} Source folder */
+const source = '_source/';
 /** @type {String} Domain for use local server proxy */
 const domain = '';
-/** @type {String} Path to the source directory. Target is root + src + ${*.*} */
-const src = root + '';
 /** @type {String} Path to the destination directory. Target is root + dest + ${*.*} */
 const dest = root + '';
 /** @type {Bool} When not development build */
@@ -68,15 +70,13 @@ const serve = {
     ...domain ? { proxy: domain } : { server: { baseDir: dest } }
 }
 
-const source = '_source/';
-
 const path = {
-    variables: 'assets/_source/_site-settings.scss',
-    modules: 'assets/_source/module/*',
+    variables: assets + '_source/_site-settings.scss',
+    modules: assets + '_source/module/*',
 
     markup: '**/*.html',
-    styles: 'assets/',
-    vendor: 'assets/vendor/',
+    styles: assets,
+    vendor: assets + 'vendor/',
     images: '**/high/',
     scripts: '**/',
 }
@@ -114,14 +114,14 @@ const buildStyles = (srcPaths, minify = !!production, force = !!production) => g
     }))
     .pipe(gulp.if(!force, gulp.newer({
         map: (relative) => {
-            return src + relative;
+            return root + relative;
         },
-        // dest: src,
+        // dest: root,
         ext: !!minify ? '.min.css' : '.css',
     })))
     // .pipe(gulp.newer({ dest: buildRelativePath(args['src']) + '../', ext: production ? '.min.css' : '.css' }))
     // .pipe(gulp.sourcemaps())
-    .pipe(gulp.sass({ includePaths: ['node_modules', src + path.styles + source] }))
+    .pipe(gulp.sass({ includePaths: ['node_modules', root + path.styles + source] }))
     .pipe(gulp.groupCssMediaQueries())
     .pipe(gulp.autoprefixer({ cascade: false, grid: true }))
     .pipe(gulp.if(!minify, browserSync.stream()))
@@ -218,7 +218,8 @@ const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
  * Tasks
  */
 gulp.task("build::styles", (done) => {
-    const buildPath = buildSrcList(src, extension.scss);
+    const buildPath = buildSrcList(root, extension.scss);
+    console.log(buildPath)
 
     buildStyles(buildPath, !!production);
     if (!!production) buildStyles(buildPath, !production);
@@ -226,14 +227,14 @@ gulp.task("build::styles", (done) => {
 })
 
 gulp.task("build::scripts", (done) => {
-    const buildPath = src + path.scripts + source + '*' + extension.js;
+    const buildPath = root + path.scripts + source + '*' + extension.js;
 
     buildScripts(done, buildPath, !!production);
     if (!!production) buildScripts(done, buildPath, !production);
     return done();
 })
 
-gulp.task("build::images", (done) => gulp.src(src + path.images + '**/*' + extension.img, { allowEmpty: true })
+gulp.task("build::images", (done) => gulp.src(root + path.images + '**/*' + extension.img, { allowEmpty: true })
     .pipe(gulp.rename((path) => {
         path.dirname += "/..";
     }))
@@ -273,15 +274,15 @@ gulp.task("build::images", (done) => gulp.src(src + path.images + '**/*' + exten
 
 gulp.task("watch", (done) => {
     // Watch markup.
-    gulp.watch(src + path.markup, (done) => { browserSync.reload(); return done(); });
+    gulp.watch(root + path.markup, (done) => { browserSync.reload(); return done(); });
     // Watch styles.
-    gulp.watch(src + '**/*' + extension.scss, gulp.series("build::styles"));
-    gulp.watch([src + path.variables, src + path.modules + extension.scss], (e) =>
-        buildStyles(buildSrcList(src, extension.scss), !!production, true));
+    gulp.watch(root + '**/*' + extension.scss, gulp.series("build::styles"));
+    gulp.watch([root + path.variables, root + path.modules + extension.scss], (e) =>
+        buildStyles(buildSrcList(root, extension.scss), !!production, true));
     // Watch javascript.
-    gulp.watch(src + path.scripts + source + '*' + extension.js, gulp.series("build::scripts"));
+    gulp.watch(root + path.scripts + source + '*' + extension.js, gulp.series("build::scripts"));
     // Watch images.
-    gulp.watch(src + path.images + '*' + extension.img, gulp.series("build::images"));
+    gulp.watch(root + path.images + '*' + extension.img, gulp.series("build::images"));
 })
 
 /**
@@ -295,7 +296,7 @@ gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::imag
  */
 gulp.task("install", function(done) {
     let tasks = vendorList.map((vendor) => {
-        let destination = src + path.vendor + vendor.name.toLowerCase();
+        let destination = root + path.vendor + vendor.name.toLowerCase();
 
         return gulp.src(vendor.src)
             .pipe(gulp.newer(destination))
@@ -303,7 +304,7 @@ gulp.task("install", function(done) {
             .pipe(gulp.debug({ "title": "Vendor: " + vendor.name }))
     })
 
-    buildSmartGrid(src + path.vendor + source);
+    buildSmartGrid(root + path.vendor + source);
     return merge(tasks);
 });
 
