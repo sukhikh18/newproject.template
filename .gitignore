@@ -11,13 +11,14 @@ _config.yml
 *.lock
 *.log
 package-lock.json
-node_modules/
 
-public_html/img/*
-!public_html/img/high/
+/**/
+!/public_html/
+/public_html/img/*
+!/public_html/img/high/
 
-public_html/assets/*
-!public_html/assets/_source/
-!public_html/assets/vendor/
-public_html/assets/vendor/*
-!public_html/assets/vendor/_source/
+/public_html/assets/*
+!/public_html/assets/_source/
+!/public_html/assets/vendor/
+/public_html/assets/vendor/*
+!/public_html/assets/vendor/_source/
