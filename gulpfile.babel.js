@@ -87,9 +87,6 @@ const vendorList = [{
 }, {
     name: 'Bootstrap',
     src: './node_modules/bootstrap/dist/js/*.*',
-}, { // @todo cleave bundle (or add to main.js)
-    name: 'Cleave',
-    src: './node_modules/cleave.js/dist/**/*.*',
 }, {
     name: 'Slick',
     src: './node_modules/slick-carousel/slick/**/*.*',

@@ -1,3 +1,6 @@
+import Cleave from 'cleave.js';
+import "cleave.js/dist/addons/cleave-phone.ru";
+
 import scrollTo from "./parts/_scrollTo.js";
 import flyFromTo from "./parts/_flyFromTo.js";
 import preloader from "./parts/_preloader.js";
@@ -34,7 +37,7 @@ jQuery(document).ready(function($) {
 
     $('.post__preview img').on('click', function(event) {
         // flyFromTo(this, '.site-header', 500);
-        $(this).flyTo('.site-header', 500);
+        $(this).flyTo('.site__header', 500);
     });
 
     /**
