@@ -8,8 +8,8 @@ const flyFromTo = (from, to, time = 1000, beforeCSS = {}, afterCSS = {}) => {
     .css({
         opacity: 1,
         position: 'fixed',
-        top: $from.offset().top + ($from.height() / 2),
-        left: $from.offset().left + ($from.width() / 2),
+        top: $from.offset().top + ($from.height() / 2) - window.pageYOffset,
+        left: $from.offset().left + ($from.width() / 2) - window.pageXOffset,
         width: $from.width(),
         transform: 'translate(-50%, -50%) scale(1)',
         transition: time + 'ms linear all',
