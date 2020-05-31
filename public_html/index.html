@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html class="no-js" lang="ru-RU">
+<html class="site no-js" lang="ru-RU">
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="x-ua-compatible" content="ie=edge">
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <!-- <link rel="manifest" href="site.webmanifest">-->
         <!-- <link rel="apple-touch-icon" href="icon.png">-->
+        <!-- Place favicon.ico in the root directory -->
         <link rel="stylesheet" type="text/css" href="/assets/vendor/hamburgers.min.css">
         <link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap.min.css">
         <link rel="stylesheet" type="text/css" href="/assets/vendor/fancybox/jquery.fancybox.min.css">
@@ -15,13 +15,9 @@
         <link rel="stylesheet" href="/index/style.css">
         <!-- <link rel="stylesheet" href="/assets/template.min.css"> -->
         <!-- <link rel="stylesheet" href="/index/style.min.css"> -->
-        <!-- IE compatibility -->
-        <!--[if lt IE 9]>
-        <script data-skip-moving="true" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-        <![endif]-->
     </head>
 
-    <body class="site">
+    <body class="page">
         <!--[if lte IE 9]>
         <p class="browserupgrade">
             Вы используете <strong> устаревший </strong> браузер.
@@ -73,7 +69,7 @@
         <section class="site__breadcrumb breadcrumb">
         </section>
         <!-- /.breadcrumb -->
-        <div class="site__content container">
+        <section class="site__content container">
             <div class="row">
                 <aside class="site__sidebar sidebar col-12 col-lg-3 order-lg-2" id="secondary" role="complementary">
                     <h3 class="sidebar__title">Боковая панель</h3>
@@ -84,21 +80,20 @@
                     </div>
                 </aside>
                 <!-- /#secondary -->
-                <main class="main content col-12 col-lg-9" id="primary" role="main">
-                    <h1 class="archive-title mb-0">Заготовка нового проекта</h1>
-                    <div class="archive-description mb-5">Скоро это будет грандиозный проект</div>
-                    <article id="the_ID">
-                        <div class="post">
-                            <div class="post__preview">
-                                <img src="/index/img/placeholder.png" alt="" width="180" height="180">
-                            </div>
-                            <h4 class="post__name">Заголовок записи</h4>
-                            <div class="post__content">
-                                <div class="post__text">
-                                    <p>Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
-                                    <p id="more" class="collapse">Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
-                                    <a class="more meta-nav" href="#more" data-toggle="collapse" onclick="this.className='d-none'">Читать еще..</a>
-                                </div>
+                <main class="site__main col-12 col-lg-9">
+                    <h1 class="page__title mb-0">Заготовка нового проекта</h1>
+                    <div class="page__description mb-5">Скоро это будет грандиозный проект</div>
+                    <article class="post" id="post-id_1">
+                        <div class="post__preview">
+                            <img src="/index/img/placeholder.png" alt="" width="180" height="180">
+                        </div>
+                        <h4 class="post__name">Заголовок записи</h4>
+                        <div class="post__content">
+                            <div class="post__text">
+                                <p>Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
+                                <p class="collapse post__more">Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
+
+                                <a class="more meta-nav" href="#post-id_1 .post__more" data-toggle="collapse" onclick="this.className='d-none'">Читать еще..</a>
                             </div>
                         </div>
                     </article>
@@ -106,7 +101,7 @@
                 </main>
                 <!-- /#primary -->
             </div>
-        </div>
+        </section>
         <!-- /.site__content -->
         <section class="site__prefix container">
             <div class="slick slider" id="slider">
@@ -182,12 +177,11 @@
         <script src="/index/script.js"></script>
         <!-- <script src="/assets/main.min.js"></script> -->
         <!-- <script src="/index/script.min.js"></script> -->
-        <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID.-->
-        <!--
-        script.
+        <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+        <!-- <script>
             window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
-            ga('create', 'UA-XXXXX-Y', 'auto'); ga('send', 'pageview')
-        script(src="https://www.google-analytics.com/analytics.js" async defer)
-        -->
+            ga('create', 'UA-XXXXX-Y', 'auto'); ga('set','transport','beacon'); ga('send', 'pageview')
+        </script>
+        <script src="https://www.google-analytics.com/analytics.js" async></script> -->
     </body>
 </html>
