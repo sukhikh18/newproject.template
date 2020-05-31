@@ -32,6 +32,16 @@ textarea {
     padding: 0.2em 0;
 }
 
+.site {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+
+    &__content {
+        margin-bottom: auto;
+    }
+}
+
 h1 {
     @include font-size(22px, 40px);
 }
