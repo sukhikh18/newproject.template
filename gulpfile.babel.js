@@ -219,7 +219,6 @@ const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
  */
 gulp.task("build::styles", (done) => {
     const buildPath = buildSrcList(root, extension.scss);
-    console.log(buildPath)
 
     buildStyles(buildPath, !!production);
     if (!!production) buildStyles(buildPath, !production);
