@@ -1,7 +1,12 @@
 // Variables
 @import "site-settings";
 @import "utils/mixins";
+@import "../vendor/_source/_smart-grid";
 
 // Modules
 @import "module/slick";
 @import "module/slider";
+
+.site__prefix {
+    margin-top: 3rem;
+}

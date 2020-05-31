@@ -21,112 +21,109 @@
         <![endif]-->
     </head>
 
-    <body><!--[if lte IE 9]>
+    <body class="site">
+        <!--[if lte IE 9]>
         <p class="browserupgrade">
             Вы используете <strong> устаревший </strong> браузер.
             Пожалуйста <a href="https://browsehappy.com/"> обновите ваш браузер </a>
             для лучшего отображения и безопасности.
         </p><![endif]-->
-        <div class="site" id="page">
-            <header class="site-header">
-                <!-- <div itemscope itemtype="http://schema.org/LocalBusiness"> -->
-                <div class="container">
-                    <div class="row head-info">
-                        <div class="col-4 logotype">
-                            <!-- Logotype -->
-                        </div>
-                        <div class="col-4 contacts">
-                            <!-- Contacts -->
-                        </div>
-                        <div class="col-4 callback">
-                            <!-- <a href="#" id="get-callback"></a> -->
-                        </div>
+        <header class="site__header">
+            <!-- <div itemscope itemtype="http://schema.org/LocalBusiness"> -->
+            <div class="container">
+                <div class="row head-info">
+                    <div class="col-4 logotype">
+                        <!-- Logotype -->
                     </div>
-                </div>
-                <!--     <div class="hidden hidden-xs-up">-->
-                <!--     <span itemprop="priceRange">RUB</span>-->
-                <!--     </div>-->
-                <!-- </div>-->
-            </header>
-            <!-- /.site-header -->
-            <section class="site-navigation navbar-default">
-                <nav class="navbar navbar-expand-lg navbar-light bg-light">
-                    <div class="container">
-                        <div class="navbar-brand hidden-lg-up text-center text-primary">Название сайта</div>
-                        <button class="navbar-toggler hamburger hamburger--elastic" type="button" data-toggle="collapse" data-target="#site-nav" aria-controls="site-nav" aria-expanded="false" aria-label="Toggle navigation"><span class="hamburger-box"><span class="hamburger-inner"></span></span></button>
-                        <div class="collapse navbar-collapse" id="site-nav">
-                            <ul class="navbar-nav mr-auto">
-                                <li class="nav-item active"><a class="nav-link" href="#">Домой<span class="sr-only"> (Главная)</span></a></li>
-                                <li class="nav-item"><a class="nav-link" href="#">О нас</a></li>
-                                <li class="nav-item"><a class="nav-link" href="#slider">Скролл до слайдера</a></li>
-                                <li class="nav-item"><a class="nav-link disabled">Заблокированное меню</a></li>
-                            </ul>
-                            <form class="form-inline my-2 my-lg-0">
-                                <input class="form-control mr-sm-2" type="search" laceholder="Search" aria-label="Search">
-                                <button class="btn btn-primary my-2 my-sm-0" type="submit">Поиск</button>
-                            </form>
-                        </div>
+                    <div class="col-4 contacts">
+                        <!-- Contacts -->
                     </div>
-                </nav>
-            </section>
-            <!-- /.site-navigation -->
-            <section class="breadcrumb">
-                <div class="container"></div>
-            </section>
-            <!-- /.breadcrumb -->
-            <div class="site-content container" id="content">
-                <div class="row">
-                    <aside class="sidebar col-12 col-lg-3 order-lg-2" id="secondary" role="complementary">
-                        <h3 class="sidebar__title">Боковая панель</h3>
-                        <div class="sidebar__body">
-                            <div class="sidebar__text">
-                                Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.
-                            </div>
-                        </div>
-                    </aside>
-                    <!-- /#secondary -->
-                    <main class="main content col-12 col-lg-9" id="primary" role="main">
-                        <h1 class="archive-title mb-0">Заготовка нового проекта</h1>
-                        <div class="archive-description mb-5">Скоро это будет грандиозный проект</div>
-                        <article id="the_ID">
-                            <div class="post">
-                                <div class="post__preview">
-                                    <img src="/index/img/placeholder.png" alt="" width="180" height="180">
-                                </div>
-                                <h4 class="post__name">Заголовок записи</h4>
-                                <div class="post__content">
-                                    <div class="post__text">
-                                        <p>Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
-                                        <p id="more" class="collapse">Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
-                                        <a class="more meta-nav" href="#more" data-toggle="collapse" onclick="this.className='d-none'">Читать еще..</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </article>
-                        <!-- the_template_pagination()-->
-                    </main>
-                    <!-- /#primary -->
+                    <div class="col-4 callback">
+                        <!-- <a href="#" id="get-callback"></a> -->
+                    </div>
                 </div>
             </div>
-            <!-- /#content -->
-            <section class="site-prefix container mt-5">
-                <div class="slick slider" id="slider">
-                    <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" data-lazy="https://picsum.photos/400/400/" src="img/placeholder.png" alt=""></a></div>
-                    <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" src="img/placeholder.png" alt=""></a></div>
-                    <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" src="img/placeholder.png" alt=""></a></div>
-                    <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" src="img/placeholder.png" alt=""></a></div>
-                    <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" src="img/placeholder.png" alt=""></a></div>
+            <!--     <div class="hidden hidden-xs-up">-->
+            <!--     <span itemprop="priceRange">RUB</span>-->
+            <!--     </div>-->
+            <!-- </div>-->
+        </header>
+        <!-- /.site__header -->
+        <section class="site__navigation navbar-default">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container">
+                    <div class="navbar-brand hidden-lg-up text-center text-primary">Название сайта</div>
+                    <button class="navbar-toggler hamburger hamburger--elastic" type="button" data-toggle="collapse" data-target="#site-nav" aria-controls="site-nav" aria-expanded="false" aria-label="Toggle navigation"><span class="hamburger-box"><span class="hamburger-inner"></span></span></button>
+                    <div class="collapse navbar-collapse" id="site-nav">
+                        <ul class="navbar-nav mr-auto">
+                            <li class="nav-item active"><a class="nav-link" href="#">Домой<span class="sr-only"> (Главная)</span></a></li>
+                            <li class="nav-item"><a class="nav-link" href="#">О нас</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#slider">Скролл до слайдера</a></li>
+                            <li class="nav-item"><a class="nav-link disabled">Заблокированное меню</a></li>
+                        </ul>
+                        <form class="form-inline my-2 my-lg-0">
+                            <input class="form-control mr-sm-2" type="search" laceholder="Search" aria-label="Search">
+                            <button class="btn btn-primary my-2 my-sm-0" type="submit">Поиск</button>
+                        </form>
+                    </div>
                 </div>
-            </section>
-            <!-- /.site-prefix -->
-            <footer class="site-footer">
-                <div class="container text-center">
-                    <a href="javascript:;" data-fancybox data-src="#hidden-content">Отрыть модальное окно</a>
-                </div>
-            </footer>
-            <!-- /.site-footer-->
+            </nav>
+        </section>
+        <!-- /.site-navigation -->
+        <section class="site__breadcrumb breadcrumb">
+        </section>
+        <!-- /.breadcrumb -->
+        <div class="site__content container">
+            <div class="row">
+                <aside class="site__sidebar sidebar col-12 col-lg-3 order-lg-2" id="secondary" role="complementary">
+                    <h3 class="sidebar__title">Боковая панель</h3>
+                    <div class="sidebar__body">
+                        <div class="sidebar__text">
+                            Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.
+                        </div>
+                    </div>
+                </aside>
+                <!-- /#secondary -->
+                <main class="main content col-12 col-lg-9" id="primary" role="main">
+                    <h1 class="archive-title mb-0">Заготовка нового проекта</h1>
+                    <div class="archive-description mb-5">Скоро это будет грандиозный проект</div>
+                    <article id="the_ID">
+                        <div class="post">
+                            <div class="post__preview">
+                                <img src="/index/img/placeholder.png" alt="" width="180" height="180">
+                            </div>
+                            <h4 class="post__name">Заголовок записи</h4>
+                            <div class="post__content">
+                                <div class="post__text">
+                                    <p>Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
+                                    <p id="more" class="collapse">Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
+                                    <a class="more meta-nav" href="#more" data-toggle="collapse" onclick="this.className='d-none'">Читать еще..</a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    <!-- the_template_pagination()-->
+                </main>
+                <!-- /#primary -->
+            </div>
         </div>
-        <!-- /#page-->
+        <!-- /.site__content -->
+        <section class="site__prefix container">
+            <div class="slick slider" id="slider">
+                <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" data-lazy="https://picsum.photos/400/400/" src="img/placeholder.png" alt=""></a></div>
+                <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" src="img/placeholder.png" alt=""></a></div>
+                <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" src="img/placeholder.png" alt=""></a></div>
+                <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" src="img/placeholder.png" alt=""></a></div>
+                <div class="mb-3 slider__slide"><a href="/img/placeholder.png" data-fancybox="gallery1"><img class="ac" src="img/placeholder.png" alt=""></a></div>
+            </div>
+        </section>
+        <!-- /.site__prefix -->
+        <footer class="site__footer">
+            <div class="container text-center">
+                <a href="javascript:;" data-fancybox data-src="#hidden-content">Отрыть модальное окно</a>
+            </div>
+        </footer>
+        <!-- /.site__footer-->
         <div id="hidden-content" class="modal" style="display: none;">
             <h2>Обратный звонок</h2>
             <p>Мы перезвоним вам в течение 15 минут</p>
