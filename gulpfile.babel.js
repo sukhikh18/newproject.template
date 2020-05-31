@@ -177,7 +177,6 @@ const buildScripts = (done, srcPath, minify = !!production) => {
         .pipe(gulp.if(minify, gulp.rename({ suffix: ".min" })))
         .pipe(gulp.dest(root))
         .pipe(gulp.debug({ "title": "Script" }))
-        .on("end", browserSync.reload);
 }
 
 const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
@@ -227,6 +226,7 @@ gulp.task("build::scripts", (done) => {
 
     buildScripts(done, buildPath, !!production);
     if (!!production) buildScripts(done, buildPath, !production);
+    else browserSync.reload();
     return done();
 })
 
@@ -276,7 +276,7 @@ gulp.task("watch", (done) => {
     gulp.watch([root + path.variables, root + path.modules + extension.scss], (e) =>
         buildStyles(buildSrcList(root, extension.scss), !!production, true));
     // Watch javascript.
-    gulp.watch(root + path.scripts + source + '*' + extension.js, gulp.series("build::scripts"));
+    gulp.watch(root + path.scripts + source + '**/*' + extension.js, gulp.series("build::scripts"));
     // Watch images.
     gulp.watch(root + path.images + '*' + extension.img, gulp.series("build::images"));
 })
