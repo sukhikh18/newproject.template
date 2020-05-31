@@ -7,7 +7,7 @@
 4. Рекомендую так же установить [git-scm](https://git-scm.com) для клонирования репозиториев командой ```git clone```.
 
 ## Как пользоваться
-* Клонируйте репозиторий ```git clone https://github.com/template-builder/newproject.template.git``` или скачайте сборку из этого репозитория ```Clone or download > Download ZIP```;
+* Клонируйте репозиторий ```git clone https://github.com/template-builder/newproject.template.git``` или [скачайте](https://github.com/template-builder/newproject.template/releases/latest) последнюю версию к себе на компьютер;
 * Перейдите в папку командой ```cd newproject.template``` или откройте консоль в папке скачанной сборки;
 * Введите команду ```yarn``` для установки проекта; Начнется перенос библиотек в проект (bootstrap, jQuery и т.д.)
 * Введите ```yarn run dev``` или ```gulp``` для разработки;
