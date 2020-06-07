@@ -167,7 +167,11 @@ const buildStyles = (srcPaths, minify = !!production, force = !!production) => g
     .on("end", () => minify || '' == domain ? browserSync.reload : null)
 
 const buildScripts = (done, srcPath, minify = !!production) => {
-    const allScripts = glob.sync(srcPath);
+    let allScripts = [];
+    srcPath.filter((el) => '!' !== el[0]).map((el) => {
+        allScripts.push(...glob.sync(el))
+    });
+
     const config = {
         entry: allScripts.reduce((entries, entry) => {
             const regex = new RegExp(``, 'g'),
@@ -241,7 +245,7 @@ gulp.task("build::styles", (done) => {
 })
 
 gulp.task("build::scripts", (done) => {
-    const buildPath = root + paths.scripts + source + '*' + extension.js;
+    const buildPath = buildSrcList(extension.js, '**/' + paths.scripts + source, []);
 
     buildScripts(done, buildPath, !!production);
     if (!!production) buildScripts(done, buildPath, !production);
@@ -249,7 +253,7 @@ gulp.task("build::scripts", (done) => {
     return done();
 })
 
-gulp.task("build::images", (done) => gulp.src(root + paths.images + '**/*' + extension.img, { allowEmpty: true })
+gulp.task("build::images", (done) => gulp.src(buildSrcList(extension.img, paths.images, []), { allowEmpty: true })
     .pipe(gulp.rename((file) => {
         file.dirname += "/..";
     }))
@@ -284,7 +288,7 @@ gulp.task("build::images", (done) => gulp.src(root + paths.images + '**/*' + ext
             ]
         })
     ]))
-    .pipe(gulp.dest(root))
+    .pipe(gulp.dest((file) => dest + path.basename(file.base)))
     .pipe(gulp.debug({ "title": "Images" }))); // buildFavicons, buildSprites
 
 gulp.task("watch", (done) => {
