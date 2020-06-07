@@ -1,5 +1,5 @@
 {
-	"name": "",
+	"name": "newproject.boilerplate",
 	"description": "",
 	"author": "Nikolay Sukhikh",
 	"repository": {
@@ -10,8 +10,8 @@
 	"scripts": {
 		"dev": "gulp --silent",
 		"watch": "gulp --silent",
-		"prod": "gulp build --production",
 		"build": "gulp build --production",
+		"build::images": "gulp build::images --production",
 		"tunnel": "gulp --tunnel --silent",
 		"install": "gulp install"
 	},

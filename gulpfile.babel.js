@@ -307,7 +307,7 @@ gulp.task("watch", (done) => {
 /**
  * Build only
  */
-gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::images"));
+gulp.task("build", gulp.parallel("build::styles", "build::scripts"));
 
 /**
  * Move assets (if yarn/npm installed them)
