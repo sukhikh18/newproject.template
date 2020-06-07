@@ -301,7 +301,7 @@ gulp.task("watch", (done) => {
     // Watch javascript.
     gulp.watch(buildSrcList(extension.js, '**/' + source, []), gulp.series("build::scripts"));
     // Watch images.
-    gulp.watch(root + paths.images + '*' + extension.img, gulp.series("build::images"));
+    gulp.watch(buildSrcList(extension.img, paths.images, []), gulp.series("build::images"));
 })
 
 /**
