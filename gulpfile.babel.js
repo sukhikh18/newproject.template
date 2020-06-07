@@ -330,4 +330,4 @@ gulp.task("install", function(done) {
 /**
  * Build with start serve/watcher
  */
-gulp.task("default", gulp.series("build", gulp.parallel("watch", () => browserSync.init(serve))))
+gulp.task("default", gulp.parallel("watch", () => browserSync.init(serve)))
