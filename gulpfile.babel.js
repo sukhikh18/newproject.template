@@ -162,6 +162,14 @@ const buildScripts = (done, srcPath, minify = !!production) => {
 
             return entries;
         }, {}),
+        module: {
+            rules: [{
+                loader: 'babel-loader',
+                test: /\.(js|jsx)$/,
+                exclude: /node_modules/,
+                options: { "presets": ["@babel/env", "@babel/react"] },
+            }]
+        },
         output: { filename: "[name].js" },
         stats: 'errors-only',
         mode: minify ? 'production' : 'development',
