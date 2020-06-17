@@ -113,11 +113,11 @@ const vendorList = [{
  */
 const buildSrcList = (ext, affix = '**/', additional = ['!' + root + '**/_*' + ext]) => {
     // Get all root folders without exclude list items.
-    let rootFolders = glob.sync(root + '*', { ignore: root + '*.*' }).map(function(dir) {
-        // Check dir in array
-        return !exclude.includes(dir) ? dir + '/' + affix + '*' + ext :
-            '!' + dir + '/' + affix + '*';
-    })
+    let rootFolders = glob.sync(root + '*', { ignore: root + '*.*' })
+        .filter((filename) => !exclude.includes(filename))
+        .map(function(filename) {
+            return filename + '/' + affix + '*' + ext;
+        })
 
     return [...additional, ...rootFolders];
 }
@@ -168,7 +168,7 @@ const buildStyles = (srcPaths, minify = !!production, force = !!production) => g
 
 const buildScripts = (done, srcPath, minify = !!production) => {
     let allScripts = [];
-    srcPath.filter((el) => '!' !== el[0]).map((el) => {
+    srcPath.map((el) => {
         allScripts.push(...glob.sync(el))
     });
 
