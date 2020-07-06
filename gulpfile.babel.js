@@ -53,6 +53,8 @@ const template = '';
 const assets = 'assets/';
 /** @type {String} Source folder */
 const source = '_source/';
+/** @type {String} Heavy (raw) images folder */
+const images = 'images/high/';
 /** @type {String} Domain for use local server proxy */
 const domain = '';
 /** @type {String} Path to the destination directory. Target is root + dest + ${*.*} */
@@ -70,7 +72,7 @@ const exclude = [
 const extension = {
     scss: '.scss',
     js: '.js',
-    img: '.{jpg,jpeg,png,gif,svg}'
+    img: '.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}'
 }
 
 const serve = {
@@ -85,10 +87,17 @@ const paths = {
     modules: template + assets + '_source/module/*',
 
     markup: '**/*.html',
-    images: '**/high/',
     styles: template + assets,
     vendor: template + assets + 'vendor/',
     scripts: '**/',
+    images: [
+        // default: /public_html/images/high/*.{jpg,png...}
+        root + images + '**/*' + extension.img,
+        // default: /public_html/images/high/*.{jpg,png...}
+        root + template + images + '**/*' + extension.img,
+        // default: /public_html/about/images/high/*.{jpg,png...}
+        root + 'about/' + images + '**/*' + extension.img,
+    ],
 }
 
 const vendorList = [{
@@ -235,6 +244,47 @@ const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
     }
 });
 
+const buildImages = (done, rebuild = false) => {
+    console.log(paths.images);
+    return gulp.src(paths.images, {allowEmpty: true, base: root})
+        .pipe(gulp.rename((filename) => filename.dirname += "/.."))
+        .pipe(gulp.if(!rebuild, gulp.newer({
+            map: (relativePath) => root + relativePath
+        })))
+        .pipe(gulp.imagemin([
+            imagemin.Giflossy({
+                optimizationLevel: 3,
+                optimize: 3,
+                lossy: 2
+            }),
+            imagemin.Pngquant({
+                speed: 5,
+                quality: [0.6, 0.8]
+            }),
+            imagemin.Zopfli({
+                more: true
+            }),
+            imagemin.Mozjpeg({
+                progressive: true,
+                quality: 90
+            }),
+            gulp.imagemin.svgo({
+                plugins: [
+                    { removeViewBox: false },
+                    { removeUnusedNS: false },
+                    { removeUselessStrokeAndFill: false },
+                    { cleanupIDs: false },
+                    { removeComments: true },
+                    { removeEmptyAttrs: true },
+                    { removeEmptyText: true },
+                    { collapseGroups: true }
+                ]
+            })
+        ]))
+        .pipe(gulp.dest((file) => path.resolve(file.base)))
+        .pipe(gulp.debug({"title": "Images"}));
+    } // buildFavicons, buildSprites
+
 /**
  * Tasks
  */
@@ -255,43 +305,9 @@ gulp.task("build::scripts", (done) => {
     return done();
 })
 
-gulp.task("build::images", (done) => gulp.src(buildSrcList(extension.img, paths.images, []), { allowEmpty: true })
-    .pipe(gulp.rename((file) => {
-        file.dirname += "/..";
-    }))
-    .pipe(gulp.if(!production, gulp.newer(root)))
-    .pipe(gulp.imagemin([
-        imagemin.Giflossy({
-            optimizationLevel: 3,
-            optimize: 3,
-            lossy: 2
-        }),
-        imagemin.Pngquant({
-            speed: 5,
-            quality: [0.6, 0.8]
-        }),
-        imagemin.Zopfli({
-            more: true
-        }),
-        imagemin.Mozjpeg({
-            progressive: true,
-            quality: 90
-        }),
-        gulp.imagemin.svgo({
-            plugins: [
-                { removeViewBox: false },
-                { removeUnusedNS: false },
-                { removeUselessStrokeAndFill: false },
-                { cleanupIDs: false },
-                { removeComments: true },
-                { removeEmptyAttrs: true },
-                { removeEmptyText: true },
-                { collapseGroups: true }
-            ]
-        })
-    ]))
-    .pipe(gulp.dest((file) => dest + path.basename(file.base)))
-    .pipe(gulp.debug({ "title": "Images" }))); // buildFavicons, buildSprites
+gulp.task("build::images", (done) => buildImages(done, false))
+// force build images (rebuild)
+gulp.task("rebuild::images", (done) => buildImages(done, true))
 
 gulp.task("watch", (done) => {
     // Watch markup.
@@ -303,13 +319,13 @@ gulp.task("watch", (done) => {
     // Watch javascript.
     gulp.watch(buildSrcList(extension.js, '**/' + source, []), gulp.series("build::scripts"));
     // Watch images.
-    gulp.watch(buildSrcList(extension.img, paths.images, []), gulp.series("build::images"));
+    gulp.watch(paths.images, gulp.series("build::images"));
 })
 
 /**
  * Build only
  */
-gulp.task("build", gulp.parallel("build::styles", "build::scripts"));
+gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::images"));
 
 /**
  * Move assets (if yarn/npm installed them)
