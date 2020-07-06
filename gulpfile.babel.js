@@ -47,6 +47,8 @@ const webpack = {
  */
 /** @type {String} Public folder */
 const root = './public_html/';
+/** @type {[type]} Template folder */
+const template = '';
 /** @type {String} Assets folder relative by root */
 const assets = 'assets/';
 /** @type {String} Source folder */
@@ -79,13 +81,13 @@ const serve = {
 }
 
 const paths = {
-    variables: assets + '_source/_site-settings.scss',
-    modules: assets + '_source/module/*',
+    variables: template + assets + '_source/_site-settings.scss',
+    modules: template + assets + '_source/module/*',
 
     markup: '**/*.html',
-    styles: assets,
-    vendor: assets + 'vendor/',
     images: '**/high/',
+    styles: template + assets,
+    vendor: template + assets + 'vendor/',
     scripts: '**/',
 }
 
