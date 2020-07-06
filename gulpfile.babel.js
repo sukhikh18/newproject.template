@@ -61,20 +61,18 @@ const domain = '';
 const dest = root + '';
 /** @type {Bool} When not development build */
 const production = !!yargs.argv.production;
-/** @type {Array} Exclude folders */
-const exclude = [
-    root + 'bitrix',
-    root + 'upload',
-    root + 'wp-admin',
-    root + 'wp-includes'
+/** @type {Array} */
+const pages = [
+    '', //- index page
+    'about/'
 ];
-
+/** @type {Object} */
 const extension = {
-    scss: '.scss',
-    js: '.js',
-    img: '.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}'
+    scss: '*.scss',
+    js: '*.js',
+    img: '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}'
 }
-
+/** @type {Object} */
 const serve = {
     tunnel: !!yargs.argv.tunnel ? yargs.argv.tunnel : false,
     port: 9000,
@@ -82,21 +80,47 @@ const serve = {
     ...domain ? { proxy: domain } : { server: { baseDir: dest } }
 }
 
-const paths = {
-    variables: template + assets + '_source/_site-settings.scss',
-    modules: template + assets + '_source/module/*',
+const skipUnderscore = (path, ext) => [
+    '!' + path + '_' + ext,
+    path + ext
+];
 
+const pagesList = (ext) => pages.map((pageName) => {
+    return root + pageName + assets + source + '**/' + ext;
+})
+
+const paths = {
     markup: '**/*.html',
-    styles: template + assets,
-    vendor: template + assets + 'vendor/',
-    scripts: '**/',
+
+    styles: {
+        // rebuild all styles
+        variables: root + template + assets + '_source/_site-settings.scss',
+        // rebuild template and pages styles
+        modules: root + template + assets + '_source/module/*',
+        // rebuild template styles
+        template: template ? skipUnderscore(root + template + assets + source + '**/', extension.scss) : [],
+        // rebuild vendor styles
+        vendor: skipUnderscore(root + template + assets + 'vendor/' + source + '**/', extension.scss),
+        // rebuild pages styles
+        pages: pagesList(extension.scss),
+    },
+
+    scripts: {
+        // rebuild template scripts
+        template: template ? skipUnderscore(root + template + assets + source + '**/', extension.js) : [],
+        // rebuild vendor scripts
+        vendor: skipUnderscore(root + template + assets + 'vendor/' + source + '**/', extension.js),
+        // rebuild pages scripts
+        pages: pagesList(extension.js)
+    },
+    // @todo check script if u want depths (**)
     images: [
         // default: /public_html/images/high/*.{jpg,png...}
-        root + images + '**/*' + extension.img,
+        root + template + images + extension.img,
         // default: /public_html/images/high/*.{jpg,png...}
-        root + template + images + '**/*' + extension.img,
+        root + images + extension.img,
         // default: /public_html/about/images/high/*.{jpg,png...}
-        root + 'about/' + images + '**/*' + extension.img,
+        root + 'about/' + images + extension.img,
     ],
 }
 
@@ -116,22 +140,6 @@ const vendorList = [{
     name: 'Waypoints',
     src: './node_modules/waypoints/lib/**/*.*',
 }]
-
-/**
- * @param  {String} ext extension (ex. ".scss")
- * @global {Array} exclude
- * @return {Array}
- */
-const buildSrcList = (ext, affix = '**/', additional = ['!' + root + '**/_*' + ext]) => {
-    // Get all root folders without exclude list items.
-    let rootFolders = glob.sync(root + '*', { ignore: root + '*.*' })
-        .filter((filename) => !exclude.includes(filename))
-        .map(function(filename) {
-            return filename + '/' + affix + '*' + ext;
-        })
-
-    return [...additional, ...rootFolders];
-}
 
 const buildStyles = (srcPaths, minify = !!production, force = !!production) => gulp.src(srcPaths, { allowEmpty: true })
     .pipe(gulp.plumber())
@@ -310,22 +318,22 @@ gulp.task("build::images", (done) => buildImages(done, false))
 gulp.task("rebuild::images", (done) => buildImages(done, true))
 
 gulp.task("watch", (done) => {
-    // Watch markup.
-    gulp.watch(root + paths.markup, (done) => { browserSync.reload(); return done(); });
-    // Watch styles.
-    gulp.watch(buildSrcList(extension.scss, '**/*', []), gulp.series("build::styles"));
-    gulp.watch([root + paths.variables, root + paths.modules + extension.scss], (e) =>
-        buildStyles(buildSrcList(extension.scss), !!production, true));
-    // Watch javascript.
-    gulp.watch(buildSrcList(extension.js, '**/' + source, []), gulp.series("build::scripts"));
-    // Watch images.
-    gulp.watch(paths.images, gulp.series("build::images"));
+    // // Watch markup.
+    // gulp.watch(root + paths.markup, (done) => { browserSync.reload(); return done(); });
+    // // Watch styles.
+    // gulp.watch(buildSrcList(extension.scss, '**/*', []), gulp.series("build::styles"));
+    // gulp.watch([root + paths.variables, root + paths.modules + extension.scss], (e) =>
+    //     buildStyles(buildSrcList(extension.scss), !!production, true));
+    // // Watch javascript.
+    // gulp.watch(buildSrcList(extension.js, '**/' + source, []), gulp.series("build::scripts"));
+    // // Watch images.
+    // gulp.watch(paths.images, gulp.series("build::images"));
 })
 
 /**
  * Build only
  */
-gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::images"));
+gulp.task("build", () => false); // gulp.parallel("build::styles", "build::scripts", "build::images")
 
 /**
  * Move assets (if yarn/npm installed them)
