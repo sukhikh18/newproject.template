@@ -48,7 +48,7 @@ const webpack = {
 /** @type {String} Public folder */
 const root = './public_html/';
 /** @type {[type]} Template folder */
-const template = '';
+const template = 'template/new.project/';
 /** @type {String} Assets folder relative by root */
 const assets = 'assets/';
 /** @type {String} Source folder */
@@ -94,9 +94,9 @@ const paths = {
 
     styles: {
         // rebuild all styles
-        variables: root + template + assets + '_source/_site-settings.scss',
+        variables: root + template + assets + source + '_site-settings.scss',
         // rebuild template and pages styles
-        modules: root + template + assets + '_source/module/*',
+        modules: root + template + assets + source + 'module/' + extension.scss,
         // rebuild template styles
         template: template ? skipUnderscore(root + template + assets + source + '**/', extension.scss) : [],
         // rebuild vendor styles
@@ -106,6 +106,8 @@ const paths = {
     },
 
     scripts: {
+        // rebuild template and pages scripts
+        modules: root + template + assets + source + 'module/' + extension.js,
         // rebuild template scripts
         template: template ? skipUnderscore(root + template + assets + source + '**/', extension.js) : [],
         // rebuild vendor scripts
@@ -141,7 +143,10 @@ const vendorList = [{
     src: './node_modules/waypoints/lib/**/*.*',
 }]
 
-const buildStyles = (srcPaths, minify = !!production, force = !!production) => gulp.src(srcPaths, { allowEmpty: true })
+/**
+ * Build methods
+ */
+const buildStyles = (src, minify = !!production, force = !!production) => gulp.src(src, {allowEmpty: true, base: root})
     .pipe(gulp.plumber())
     .pipe(gulp.rename((filename) => {
         filename.dirname += "/..";
@@ -156,7 +161,7 @@ const buildStyles = (srcPaths, minify = !!production, force = !!production) => g
     })))
     // .pipe(gulp.newer({ dest: buildRelativePath(args['src']) + '../', ext: production ? '.min.css' : '.css' }))
     // .pipe(gulp.sourcemaps())
-    .pipe(gulp.sass({ includePaths: ['node_modules', root + paths.styles + source] }))
+    .pipe(gulp.sass({ includePaths: ['node_modules', root + template + assets + source] }))
     .pipe(gulp.groupCssMediaQueries())
     .pipe(gulp.autoprefixer({ cascade: false, grid: true }))
     .pipe(gulp.if(!minify, browserSync.stream()))
@@ -181,7 +186,7 @@ const buildStyles = (srcPaths, minify = !!production, force = !!production) => g
     })))
     // .pipe(gulp.if(!minify, gulp.sourcemaps.write("./assets/maps/")))
     .pipe(gulp.plumber.stop())
-    .pipe(gulp.dest((file) => dest + path.basename(file.base)))
+    .pipe(gulp.dest((file) => path.resolve(file.base))) // (file) => dest + path.basename(file.base)
     .pipe(gulp.debug({ "title": "Styles" }))
     .on("end", () => minify || '' == domain ? browserSync.reload : null)
 
@@ -221,6 +226,45 @@ const buildScripts = (done, srcPath, minify = !!production) => {
         .pipe(gulp.debug({ "title": "Script" }))
 }
 
+const buildImages = (done, rebuild = false) => gulp.src(paths.images, {allowEmpty: true, base: root})
+    .pipe(gulp.rename((filename) => filename.dirname += "/.."))
+    .pipe(gulp.if(!rebuild, gulp.newer({
+        map: (relativePath) => root + relativePath
+    })))
+    .pipe(gulp.imagemin([
+        imagemin.Giflossy({
+            optimizationLevel: 3,
+            optimize: 3,
+            lossy: 2
+        }),
+        imagemin.Pngquant({
+            speed: 5,
+            quality: [0.6, 0.8]
+        }),
+        imagemin.Zopfli({
+            more: true
+        }),
+        imagemin.Mozjpeg({
+            progressive: true,
+            quality: 90
+        }),
+        gulp.imagemin.svgo({
+            plugins: [
+                { removeViewBox: false },
+                { removeUnusedNS: false },
+                { removeUselessStrokeAndFill: false },
+                { cleanupIDs: false },
+                { removeComments: true },
+                { removeEmptyAttrs: true },
+                { removeEmptyText: true },
+                { collapseGroups: true }
+            ]
+        })
+    ]))
+    .pipe(gulp.dest((file) => path.resolve(file.base)))
+    .pipe(gulp.debug({"title": "Images"}));
+    // buildFavicons, buildSprites
+
 const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
     outputStyle: "scss",
     filename: "_smart-grid",
@@ -250,68 +294,59 @@ const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
             width: "75rem" // 1200px
         }
     }
-});
-
-const buildImages = (done, rebuild = false) => {
-    console.log(paths.images);
-    return gulp.src(paths.images, {allowEmpty: true, base: root})
-        .pipe(gulp.rename((filename) => filename.dirname += "/.."))
-        .pipe(gulp.if(!rebuild, gulp.newer({
-            map: (relativePath) => root + relativePath
-        })))
-        .pipe(gulp.imagemin([
-            imagemin.Giflossy({
-                optimizationLevel: 3,
-                optimize: 3,
-                lossy: 2
-            }),
-            imagemin.Pngquant({
-                speed: 5,
-                quality: [0.6, 0.8]
-            }),
-            imagemin.Zopfli({
-                more: true
-            }),
-            imagemin.Mozjpeg({
-                progressive: true,
-                quality: 90
-            }),
-            gulp.imagemin.svgo({
-                plugins: [
-                    { removeViewBox: false },
-                    { removeUnusedNS: false },
-                    { removeUselessStrokeAndFill: false },
-                    { cleanupIDs: false },
-                    { removeComments: true },
-                    { removeEmptyAttrs: true },
-                    { removeEmptyText: true },
-                    { collapseGroups: true }
-                ]
-            })
-        ]))
-        .pipe(gulp.dest((file) => path.resolve(file.base)))
-        .pipe(gulp.debug({"title": "Images"}));
-    } // buildFavicons, buildSprites
+})
 
 /**
  * Tasks
  */
-gulp.task("build::styles", (done) => {
-    const buildPath = buildSrcList(extension.scss);
+gulp.task('build:template:styles', (done) => {
+    if (paths.styles.template.length) {
+        buildStyles(paths.styles.template, !!production);
+        if (!!production) buildStyles(paths.styles.template, !production);
+    }
 
-    buildStyles(buildPath, !!production);
-    if (!!production) buildStyles(buildPath, !production);
     return done();
 })
 
-gulp.task("build::scripts", (done) => {
-    const buildPath = buildSrcList(extension.js, '**/' + paths.scripts + source, []);
+gulp.task('build:vendor:styles', (done) => {
+    buildStyles(paths.styles.vendor, !!production);
+    if (!!production) buildStyles(paths.styles.vendor, !production);
+    return done();
+})
 
-    buildScripts(done, buildPath, !!production);
-    if (!!production) buildScripts(done, buildPath, !production);
+gulp.task('build:pages:styles', (done) => {
+    buildStyles(paths.styles.pages, !!production);
+    if (!!production) buildStyles(paths.styles.pages, !production);
+    return done();
+})
+
+gulp.task("build::styles", gulp.parallel('build:template:styles', 'build:vendor:styles', 'build:pages:styles'))
+
+gulp.task('build:template:scripts', (done) => {
+    if (paths.scripts.template.length) {
+        buildScripts(done, paths.scripts.template, !!production);
+        if (!!production) buildScripts(done, paths.scripts.template, !production);
+        else browserSync.reload();
+    }
+
+    return done();
+})
+
+gulp.task('build:vendor:scripts', (done) => {
+    buildScripts(done, paths.scripts.vendor, !!production);
+    if (!!production) buildScripts(done, paths.scripts.vendor, !production);
     else browserSync.reload();
     return done();
 })
+
+gulp.task('build:pages:scripts', (done) => {
+    buildScripts(done, paths.scripts.pages, !!production);
+    if (!!production) buildScripts(done, paths.scripts.pages, !production);
+    else browserSync.reload();
+    return done();
+})
+
+gulp.task("build::scripts", gulp.parallel('build:template:scripts', 'build:vendor:scripts', 'build:pages:scripts'))
 
 gulp.task("build::images", (done) => buildImages(done, false))
 // force build images (rebuild)
@@ -333,7 +368,7 @@ gulp.task("watch", (done) => {
 /**
  * Build only
  */
-gulp.task("build", () => false); // gulp.parallel("build::styles", "build::scripts", "build::images")
+gulp.task("build", () => gulp.parallel("build::styles", "build::scripts", "build::images"))
 
 /**
  * Move assets (if yarn/npm installed them)
