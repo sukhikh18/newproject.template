@@ -353,22 +353,24 @@ gulp.task("build::images", (done) => buildImages(done, false))
 gulp.task("rebuild::images", (done) => buildImages(done, true))
 
 gulp.task("watch", (done) => {
-    // // Watch markup.
-    // gulp.watch(root + paths.markup, (done) => { browserSync.reload(); return done(); });
-    // // Watch styles.
-    // gulp.watch(buildSrcList(extension.scss, '**/*', []), gulp.series("build::styles"));
-    // gulp.watch([root + paths.variables, root + paths.modules + extension.scss], (e) =>
-    //     buildStyles(buildSrcList(extension.scss), !!production, true));
-    // // Watch javascript.
-    // gulp.watch(buildSrcList(extension.js, '**/' + source, []), gulp.series("build::scripts"));
-    // // Watch images.
-    // gulp.watch(paths.images, gulp.series("build::images"));
-})
+    // Watch markup.
+    gulp.watch(root + paths.markup, (done) => { browserSync.reload(); return done(); });
+    // Watch styles.
+    gulp.watch(paths.styles.variables, gulp.parallel('build::styles'));
+    gulp.watch(paths.styles.modules, gulp.parallel('build:template:styles', 'build:pages:styles'));
 
-/**
- * Build only
- */
-gulp.task("build", () => gulp.parallel("build::styles", "build::scripts", "build::images"))
+    gulp.watch(paths.styles.template, gulp.parallel('build:template:styles'));
+    gulp.watch(paths.styles.vendor, gulp.parallel('build:vendor:styles'));
+    gulp.watch(paths.styles.pages, gulp.parallel('build:pages:styles'));
+    // Watch javascript.
+    gulp.watch(paths.scripts.modules, gulp.parallel('build::scripts'));
+
+    gulp.watch(paths.scripts.template, gulp.parallel('build:template:scripts'));
+    gulp.watch(paths.scripts.vendor, gulp.parallel('build:vendor:scripts'));
+    gulp.watch(paths.scripts.pages, gulp.parallel('build:pages:scripts'));
+    // Watch images.
+    gulp.watch(paths.images, gulp.series("build::images"));
+})
 
 /**
  * Move assets (if yarn/npm installed them)
@@ -386,9 +388,14 @@ gulp.task("install", function(done) {
 
     buildSmartGrid(root + paths.vendor + source);
     return merge(tasks);
-});
+})
 
 /**
- * Build with start serve/watcher
+ * Build only
+ */
+gulp.task("build", () => gulp.parallel("build::styles", "build::scripts", "build::images"))
+
+/**
+ * Start serve/watcher
  */
 gulp.task("default", gulp.parallel("watch", () => browserSync.init(serve)))
