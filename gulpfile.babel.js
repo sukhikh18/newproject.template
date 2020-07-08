@@ -53,6 +53,8 @@ const template = 'template/new.project/';
 const assets = 'assets/';
 /** @type {String} Source folder */
 const source = '_source/';
+/** @type {String} Vendor assets */
+const vendor = 'vendor/';
 /** @type {String} Heavy (raw) images folder */
 const images = 'images/high/';
 /** @type {String} Domain for use local server proxy */
@@ -100,7 +102,7 @@ const paths = {
         // rebuild template styles
         template: template ? skipUnderscore(root + template + assets + source + '**/', extension.scss) : [],
         // rebuild vendor styles
-        vendor: skipUnderscore(root + template + assets + 'vendor/' + source + '**/', extension.scss),
+        vendor: skipUnderscore(root + template + assets + vendor + source + '**/', extension.scss),
         // rebuild pages styles
         pages: pagesList(extension.scss),
     },
@@ -111,7 +113,7 @@ const paths = {
         // rebuild template scripts
         template: template ? skipUnderscore(root + template + assets + source + '**/', extension.js) : [],
         // rebuild vendor scripts
-        vendor: skipUnderscore(root + template + assets + 'vendor/' + source + '**/', extension.js),
+        vendor: skipUnderscore(root + template + assets + vendor + source + '**/', extension.js),
         // rebuild pages scripts
         pages: pagesList(extension.js)
     },
@@ -377,23 +379,24 @@ gulp.task("watch", (done) => {
  * @var vendorList {Array}<{name, src}>
  */
 gulp.task("install", function(done) {
-    let tasks = vendorList.map((vendor) => {
-        let destination = root + paths.vendor + vendor.name.toLowerCase();
+    let tasks = vendorList.map((elem) => {
 
-        return gulp.src(vendor.src)
+        let destination = root + template + assets + vendor + elem.name.toLowerCase();
+
+        return gulp.src(elem.src)
             .pipe(gulp.newer(destination))
             .pipe(gulp.dest(destination))
-            .pipe(gulp.debug({ "title": "Vendor: " + vendor.name }))
+            .pipe(gulp.debug({"title": "Vendor: " + elem.name}))
     })
 
-    buildSmartGrid(root + paths.vendor + source);
+    buildSmartGrid(root + template + assets + vendor + source);
     return merge(tasks);
 })
 
 /**
  * Build only
  */
-gulp.task("build", () => gulp.parallel("build::styles", "build::scripts", "build::images"))
+gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::images"))
 
 /**
  * Start serve/watcher
