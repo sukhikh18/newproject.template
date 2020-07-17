@@ -201,10 +201,10 @@ const buildScripts = (done, srcPath, minify = !!production) => {
     const config = {
         entry: allScripts.reduce((entries, entry) => {
             const regex = new RegExp(``, 'g'),
-                matchForRename = /([\w\d.-_\/]+)\_source\/([\w\d._-]+)\.js$/g.exec(entry);
+                matchForRename = /([\w\d\.\-\_\/]+)\_source\/([\w\d\.\_\-]+)\.js$/g.exec(entry);
 
             if (matchForRename !== null) {
-                if (typeof matchForRename[1] !== 'undefined' && typeof matchForRename[2] !== 'undefined') {
+                if (typeof matchForRename[1] !== undefined && typeof matchForRename[2] !== undefined) {
                     entries[matchForRename[1].replace(root, '') + '/' + matchForRename[2]] = entry;
                 }
             }
