@@ -1770,15 +1770,17 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 jQuery(document).ready(function($) {
     /**
      * Phone formatter for RU phone numbers.
      */
-    if (typeof cleave_js__WEBPACK_IMPORTED_MODULE_0__["default"]) {
-        new cleave_js__WEBPACK_IMPORTED_MODULE_0__["default"]('[type="tel"]', {
-            phone: true,
-            phoneRegionCode: 'RU'
+    const $phones = $('[type="tel"]');
+    if (typeof cleave_js__WEBPACK_IMPORTED_MODULE_0__["default"] && $phones.length) {
+        $phones.each(function(i, phoneInput) {
+            new cleave_js__WEBPACK_IMPORTED_MODULE_0__["default"](phoneInput, {
+                phone: true,
+                phoneRegionCode: 'RU'
+            });
         });
     }
 

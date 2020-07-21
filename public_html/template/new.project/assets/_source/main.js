@@ -1,6 +1,5 @@
 import Cleave from 'cleave.js';
 import "cleave.js/dist/addons/cleave-phone.ru";
-
 import scrollTo from "./parts/_scrollTo.js";
 import preloader from "./parts/_preloader.js";
 
@@ -8,10 +7,13 @@ jQuery(document).ready(function($) {
     /**
      * Phone formatter for RU phone numbers.
      */
-    if (typeof Cleave) {
-        new Cleave('[type="tel"]', {
-            phone: true,
-            phoneRegionCode: 'RU'
+    const $phones = $('[type="tel"]');
+    if (typeof Cleave && $phones.length) {
+        $phones.each(function(i, phoneInput) {
+            new Cleave(phoneInput, {
+                phone: true,
+                phoneRegionCode: 'RU'
+            });
         });
     }
 
