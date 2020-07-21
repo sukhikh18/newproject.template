@@ -49,22 +49,20 @@ const webpack = {
 const root = './public_html/';
 /** @type {[type]} Template folder */
 const template = 'template/new.project/';
-/** @type {String} Assets folder relative by root */
-const assets = 'assets/';
-/** @type {String} Source folder */
-const source = '_source/';
-/** @type {String} Vendor assets */
-const vendor = 'vendor/';
-/** @type {String} [@todo description] */
-const imagesRaw = '_high/';
-/** @type {String} Heavy (raw) images folder */
 /** @type {String} Domain for use local server proxy */
 const domain = '';
 /** @type {String} Path to the destination directory. Target is root + dest + ${*.*} */
 const dest = root + '';
+/** @type {String} Source folder */
+const source = '_source/';
+/** @type {String} [@todo description] */
+const imagesRaw = '_high/';
+/** @type {String} Assets folder relative by root */
+const assets = 'assets/';
+/** @type {String} Vendor assets */
+const vendor = 'vendor/';
+/** @type {String} Heavy (raw) images folder */
 const images = 'images/' + imagesRaw;
-/** @type {Bool} When not development build */
-const production = !!yargs.argv.production;
 /** @type {Array} */
 const pages = [
     '', //- index page
@@ -76,12 +74,14 @@ const extension = {
     js: '*.js',
     img: '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}'
 }
+/** @type {Bool} When not development build */
+const production = !!yargs.argv.production;
 /** @type {Object} */
 const serve = {
     tunnel: !!yargs.argv.tunnel ? yargs.argv.tunnel : false,
     port: 9000,
     notify: false,
-    ...domain ? { proxy: domain } : { server: { baseDir: dest } }
+    ...(domain ? { proxy: domain } : { server: { baseDir: dest } })
 }
 
 const skipUnderscore = (path, ext) => [
@@ -124,7 +124,7 @@ const paths = {
         // default: /public_html/images/_high/*.{jpg,png...}
         root + template + images + extension.img,
         // default: /public_html/images/_high/*.{jpg,png...}
-        root + images  + '**/' + extension.img,
+        root + images + '**/' + extension.img,
         // default: /public_html/about/images/_high/*.{jpg,png...}
         root + 'about/' + images + extension.img,
     ],
@@ -150,7 +150,7 @@ const vendorList = [{
 /**
  * Build methods
  */
-const buildStyles = (src, minify = !!production, force = !!production) => gulp.src(src, {allowEmpty: true, base: root})
+const buildStyles = (src, minify = !!production, force = !!production) => gulp.src(src, { allowEmpty: true, base: root })
     .pipe(gulp.plumber())
     .pipe(gulp.rename((filename) => {
         filename.dirname += "/..";
@@ -390,7 +390,7 @@ gulp.task("install", function(done) {
         return gulp.src(elem.src)
             .pipe(gulp.newer(destination))
             .pipe(gulp.dest(destination))
-            .pipe(gulp.debug({"title": "Vendor: " + elem.name}))
+            .pipe(gulp.debug({ "title": "Vendor: " + elem.name }))
     })
 
     buildSmartGrid(root + template + assets + vendor + source);
