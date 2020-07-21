@@ -119,14 +119,12 @@ const paths = {
         // rebuild pages scripts
         pages: pagesList(extension.js)
     },
-    // @todo check script if u want depths (**)
+
     images: [
-        // default: /public_html/images/_high/*.{jpg,png...}
+        // default: /public_html/template/new.project/images/_high/*.{jpg,png...}
         root + template + images + extension.img,
-        // default: /public_html/images/_high/*.{jpg,png...}
-        root + images + '**/' + extension.img,
-        // default: /public_html/about/images/_high/*.{jpg,png...}
-        root + 'about/' + images + extension.img,
+        // default: /public_html/images/_high/*.{jpg,png...}, /public_html/about/images/_high/*.{jpg,png...}..
+        ...pages.map((pagename) => root + pagename + images + '**/' + extension.img),
     ],
 }
 
