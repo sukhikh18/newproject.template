@@ -55,12 +55,14 @@ const assets = 'assets/';
 const source = '_source/';
 /** @type {String} Vendor assets */
 const vendor = 'vendor/';
+/** @type {String} [@todo description] */
+const imagesRaw = '_high/';
 /** @type {String} Heavy (raw) images folder */
-const images = 'images/high/';
 /** @type {String} Domain for use local server proxy */
 const domain = '';
 /** @type {String} Path to the destination directory. Target is root + dest + ${*.*} */
 const dest = root + '';
+const images = 'images/' + imagesRaw;
 /** @type {Bool} When not development build */
 const production = !!yargs.argv.production;
 /** @type {Array} */
@@ -119,11 +121,11 @@ const paths = {
     },
     // @todo check script if u want depths (**)
     images: [
-        // default: /public_html/images/high/*.{jpg,png...}
+        // default: /public_html/images/_high/*.{jpg,png...}
         root + template + images + extension.img,
-        // default: /public_html/images/high/*.{jpg,png...}
-        root + images + extension.img,
-        // default: /public_html/about/images/high/*.{jpg,png...}
+        // default: /public_html/images/_high/*.{jpg,png...}
+        root + images  + '**/' + extension.img,
+        // default: /public_html/about/images/_high/*.{jpg,png...}
         root + 'about/' + images + extension.img,
     ],
 }
