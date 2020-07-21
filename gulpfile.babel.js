@@ -192,21 +192,18 @@ const buildStyles = (src, minify = !!production, force = !!production) => gulp.s
     .pipe(gulp.debug({ "title": "Styles" }))
     .on("end", () => minify || '' == domain ? browserSync.reload : null)
 
-const buildScripts = (done, srcPath, minify = !!production) => {
-    let allScripts = [];
-    srcPath.map((el) => {
-        allScripts.push(...glob.sync(el))
-    });
-
+const buildScripts = (done, src, minify = !!production) => {
+    const regex = new RegExp(`([\\w\\d.-_/]+)${source}([\\w\\d._-]+).js$`, 'g')
     const config = {
-        entry: allScripts.reduce((entries, entry) => {
-            const regex = new RegExp(``, 'g'),
-                matchForRename = /([\w\d\.\-\_\/]+)\_source\/([\w\d\.\_\-]+)\.js$/g.exec(entry);
-
-            if (matchForRename !== null) {
-                if (typeof matchForRename[1] !== undefined && typeof matchForRename[2] !== undefined) {
-                    entries[matchForRename[1].replace(root, '') + '/' + matchForRename[2]] = entry;
-                }
+        entry: src.reduce((entries, entry) => {
+            if (0 !== entry.indexOf('!')) {
+                glob.sync(entry).forEach((found) => {
+                    // @type { 0: path to _source, 1: basename (without ext) } match
+                    const match = regex.exec(found)
+                    if (match) {
+                        entries[match[1] + '/' + match[2]] = found
+                    }
+                })
             }
 
             return entries;
@@ -221,10 +218,10 @@ const buildScripts = (done, srcPath, minify = !!production) => {
         return done();
     }
 
-    return gulp.src(allScripts, { allowEmpty: true })
+    return gulp.src('nonsense', { allowEmpty: true })
         .pipe(webpack.stream(config), webpack)
         .pipe(gulp.if(minify, gulp.rename({ suffix: ".min" })))
-        .pipe(gulp.dest(root))
+        .pipe(gulp.dest('./'))
         .pipe(gulp.debug({ "title": "Script" }))
 }
 
