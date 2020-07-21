@@ -230,11 +230,13 @@ const buildScripts = (done, srcPath, minify = !!production) => {
         .pipe(gulp.debug({ "title": "Script" }))
 }
 
-const buildImages = (done, rebuild = false) => gulp.src(paths.images, {allowEmpty: true, base: root})
-    .pipe(gulp.rename((filename) => filename.dirname += "/.."))
-    .pipe(gulp.if(!rebuild, gulp.newer({
-        map: (relativePath) => root + relativePath
-    })))
+const buildImages = (done, force = false) => gulp.src(paths.images, { allowEmpty: true, base: root })
+    .pipe(gulp.rename((filename) => {
+        let raw = imagesRaw.replace(/\/$/, '')
+        let filedata = filename.dirname.split(raw, 2)
+        filename.dirname = path.join(filedata[0], filedata[1])
+    }))
+    .pipe(gulp.if(!force, gulp.newer(dest)))
     .pipe(gulp.imagemin([
         imagemin.Giflossy({
             optimizationLevel: 3,
@@ -265,8 +267,8 @@ const buildImages = (done, rebuild = false) => gulp.src(paths.images, {allowEmpt
             ]
         })
     ]))
-    .pipe(gulp.dest((file) => path.resolve(file.base)))
-    .pipe(gulp.debug({"title": "Images"}));
+    .pipe(gulp.dest(dest))
+    .pipe(gulp.debug({ "title": "Images" }));
     // buildFavicons, buildSprites
 
 const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
