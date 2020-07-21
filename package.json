@@ -56,7 +56,6 @@
 		"jquery": "^3.5.1",
 		"popper.js": "^1.16.1",
 		"slick-carousel": "^1.8.1",
-		"smart-grid": "^2.1.2",
-		"waypoints": "^4.0.1"
+		"smart-grid": "^2.1.2"
 	}
 }

@@ -1764,9 +1764,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var cleave_js_dist_addons_cleave_phone_ru__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! cleave.js/dist/addons/cleave-phone.ru */ "./node_modules/cleave.js/dist/addons/cleave-phone.ru.js");
 /* harmony import */ var cleave_js_dist_addons_cleave_phone_ru__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(cleave_js_dist_addons_cleave_phone_ru__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _parts_scrollTo_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./parts/_scrollTo.js */ "./public_html/template/new.project/assets/_source/parts/_scrollTo.js");
-/* harmony import */ var _parts_flyFromTo_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./parts/_flyFromTo.js */ "./public_html/template/new.project/assets/_source/parts/_flyFromTo.js");
-/* harmony import */ var _parts_preloader_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./parts/_preloader.js */ "./public_html/template/new.project/assets/_source/parts/_preloader.js");
-
+/* harmony import */ var _parts_preloader_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./parts/_preloader.js */ "./public_html/template/new.project/assets/_source/parts/_preloader.js");
 
 
 
@@ -1787,25 +1785,9 @@ jQuery(document).ready(function($) {
     /**
      * Smooth scroll window to target when link href start from a hash.
      */
-    // window.scrollTo = scrollTo;
     $(document).on('click', '[href^="#"]', function(event) {
         event.preventDefault();
         Object(_parts_scrollTo_js__WEBPACK_IMPORTED_MODULE_2__["default"])(this.getAttribute("href"));
-    });
-
-    /**
-     * Send an item to selector target
-     */
-    (function($) {
-        $.fn.flyTo = function(to, speed, beforeCSS, afterCSS) {
-            Object(_parts_flyFromTo_js__WEBPACK_IMPORTED_MODULE_3__["default"])(this, to, speed, beforeCSS, afterCSS);
-            return this;
-        }
-    })(jQuery);
-
-    $('.post__preview img').on('click', function(event) {
-        // flyFromTo(this, '.site-header', 500);
-        $(this).flyTo('.site__header', 500);
     });
 
     /**
@@ -1814,7 +1796,7 @@ jQuery(document).ready(function($) {
     if (typeof $.fancybox) {
         $('.modal form').on('submit', function(event) {
             event.preventDefault();
-            _parts_preloader_js__WEBPACK_IMPORTED_MODULE_4__["default"].show();
+            _parts_preloader_js__WEBPACK_IMPORTED_MODULE_3__["default"].show('Загрузка..');
 
             // Disable retry by 120 seconds
             const $submit = $(this).find('[type="submit"]');
@@ -1823,7 +1805,7 @@ jQuery(document).ready(function($) {
 
             // Show success
             setTimeout(() => {
-                _parts_preloader_js__WEBPACK_IMPORTED_MODULE_4__["default"].hide();
+                _parts_preloader_js__WEBPACK_IMPORTED_MODULE_3__["default"].hide();
                 $.fancybox.open({
                     content: '<h1>Отлично!</h1><p>Ваша заявка принята, ожидайте звонка.</p>',
                     type: 'html',
@@ -1831,61 +1813,7 @@ jQuery(document).ready(function($) {
             }, 5000);
         });
     }
-
-    /**
-     * Set event when DOM element in appearance
-     */
-    // $('.site-header').waypoint({
-    //     handler: function(event, direction) {
-    //         console.log(direction, this, event);
-    //     },
-    //     offset: 50
-    // });
 });
-
-/***/ }),
-
-/***/ "./public_html/template/new.project/assets/_source/parts/_flyFromTo.js":
-/*!*****************************************************************************!*\
-  !*** ./public_html/template/new.project/assets/_source/parts/_flyFromTo.js ***!
-  \*****************************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-const flyFromTo = (from, to, time = 1000, beforeCSS = {}, afterCSS = {}) => {
-    const $from = (from instanceof jQuery) ? from : $(from);
-    const $to = (to instanceof jQuery) ? to : $(to);
-
-    if (!$from.length || !$to.length) return $from;
-
-    let $clone = $from.clone()
-    .css({
-        opacity: 1,
-        position: 'fixed',
-        top: $from.offset().top + ($from.height() / 2) - window.pageYOffset,
-        left: $from.offset().left + ($from.width() / 2) - window.pageXOffset,
-        width: $from.width(),
-        transform: 'translate(-50%, -50%) scale(1)',
-        transition: time + 'ms linear all',
-        ...beforeCSS
-    })
-    .appendTo($from.parent())
-    .css({
-        'z-index': 9999,
-        opacity: 0,
-        top: $to.offset().top + ($to.height() / 2),
-        left: $to.offset().left + ($to.width() / 2),
-        transform: 'translate(-50%, -50%) scale(0.01)',
-        ...afterCSS
-    });
-
-    setTimeout(() => $clone.remove(), time);
-    return $from;
-}
-
-/* harmony default export */ __webpack_exports__["default"] = (flyFromTo);
 
 /***/ }),
 
@@ -1898,12 +1826,11 @@ const flyFromTo = (from, to, time = 1000, beforeCSS = {}, afterCSS = {}) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-
 const preloadClass = 'fancy-preloading';
 
 const preloader = {
-    show: (message = 'Загрузка..') => {
-        let $preload = $('<p>'+ message +'</p>').css({
+    show: (message = '') => {
+        let $preload = $('<p>' + message + '</p>').css({
             'margin-top': '50px',
             'margin-bottom': '-40px',
             'padding-bottom': '',
@@ -1912,24 +1839,24 @@ const preloader = {
 
         $.fancybox.open({
             closeExisting: true,
-            content  : $preload,
-            type     : 'html',
-            smallBtn : false,
+            content: $preload,
+            type: 'html',
+            smallBtn: false,
             afterLoad: function(instance, current) {
                 current.$content.css('background', 'none');
             },
             afterShow: function(instance, current) {
                 $('body').addClass(preloadClass);
-                instance.showLoading( current );
+                instance.showLoading(current);
             },
             afterClose: function(instance, current) {
                 $('body').removeClass(preloadClass);
-                instance.hideLoading( current );
+                instance.hideLoading(current);
             }
         });
     },
     hide: () => {
-        if( $('body').hasClass(preloadClass) ) {
+        if ($('body').hasClass(preloadClass)) {
             $.fancybox.getInstance().close();
         }
     }

@@ -97,26 +97,26 @@ const paths = {
     markup: '**/*.html',
 
     styles: {
-        // rebuild all styles
+        // make all styles
         variables: root + template + assets + source + '_site-settings.scss',
-        // rebuild template and pages styles
+        // make template and pages styles
         modules: root + template + assets + source + 'module/' + extension.scss,
-        // rebuild template styles
+        // make template styles
         template: template ? skipUnderscore(root + template + assets + source + '**/', extension.scss) : [],
-        // rebuild vendor styles
+        // make vendor styles
         vendor: skipUnderscore(root + template + assets + vendor + source + '**/', extension.scss),
-        // rebuild pages styles
+        // make pages styles
         pages: pagesList(extension.scss),
     },
 
     scripts: {
-        // rebuild template and pages scripts
-        modules: root + template + assets + source + 'module/' + extension.js,
-        // rebuild template scripts
+        // make template and pages scripts
+        modules: root + template + assets + source + 'parts/' + extension.js,
+        // make template scripts
         template: template ? skipUnderscore(root + template + assets + source + '**/', extension.js) : [],
-        // rebuild vendor scripts
+        // make vendor scripts
         vendor: skipUnderscore(root + template + assets + vendor + source + '**/', extension.js),
-        // rebuild pages scripts
+        // make pages scripts
         pages: pagesList(extension.js)
     },
 
@@ -140,7 +140,7 @@ const vendorList = [{
 }, {
     name: 'Fancybox',
     src: './node_modules/@fancyapps/fancybox/dist/**/*.*',
-}, {
+}, { // @note: use `yarn add waypoints` for install
     name: 'Waypoints',
     src: './node_modules/waypoints/lib/**/*.*',
 }]
