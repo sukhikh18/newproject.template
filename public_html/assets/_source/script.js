@@ -1,3 +1,6 @@
+/**
+ * This file includes in current page only.
+ */
 jQuery(document).ready(function($) {
 	if( 768 > $(window).width() ) {
 		$('.slick.slider').slick({

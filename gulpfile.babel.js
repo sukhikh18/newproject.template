@@ -47,8 +47,8 @@ const webpack = {
  */
 /** @type {String} Public folder */
 const root = './public_html/';
-/** @type {[type]} Template folder */
-const template = 'template/new.project/';
+/** @type {String} Template folder */
+const template = '';
 /** @type {String} Domain for use local server proxy */
 const domain = '';
 /** @type {String} Path to the destination directory. Target is root + dest + ${*.*} */
@@ -66,7 +66,7 @@ const images = 'images/' + imagesRaw;
 /** @type {Array} */
 const pages = [
     '', //- index page
-    'about/'
+    '404/'
 ];
 /** @type {Object} */
 const extension = {

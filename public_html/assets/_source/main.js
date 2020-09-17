@@ -1,3 +1,6 @@
+/**
+ * This file includes in all pages.
+ */
 import scrollTo from "./module/_scrollTo.js";
 import preloader from "./module/_preloader.js";
 
