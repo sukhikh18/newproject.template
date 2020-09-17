@@ -1,7 +1,5 @@
-import Cleave from 'cleave.js';
-import "cleave.js/dist/addons/cleave-phone.ru";
-import scrollTo from "./parts/_scrollTo.js";
-import preloader from "./parts/_preloader.js";
+import scrollTo from "./module/_scrollTo.js";
+import preloader from "./module/_preloader.js";
 
 jQuery(document).ready(function($) {
     /**

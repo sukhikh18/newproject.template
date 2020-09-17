@@ -1,82 +1,6 @@
-.fll,
-.float-left,
-.pull-left {
-  float: left !important;
-}
-
-.flr,
-.float-right,
-.pull-right {
-  float: right !important;
-}
-
-.fln,
-.float-none,
-.pull-none {
-  float: none !important;
-}
-
-.alignleft,
-.al,
-.alignright,
-.ar {
-  display: inline;
-  margin-bottom: 1rem;
-}
-
-.alignleft,
-.al {
-  float: left;
-  margin-right: 1.5em;
-}
-
-.alignright,
-.ar {
-  float: right;
-  margin-left: 1.5em;
-}
-
-.aligncenter,
-.ac {
-  clear: both;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.hidden {
-  opacity: 0 !important;
-  transition: .4s;
-}
-
-.invisible {
-  visibility: hidden !important;
-}
-
-.col-2-4,
-.col-sm-2-4,
-.col-md-2-4,
-.col-lg-2-4,
-.col-xl-2-4 {
-  position: relative;
-  width: 100%;
-  min-height: 1px;
-  padding-right: 15px;
-  padding-left: 15px;
-}
-
-.col-2-4 {
-  flex: 0 0 20%;
-  max-width: 20%;
-}
-
-.offset-2-4 {
-  margin-left: 20%;
-}
-
-/* ==========================================================================
-   Base styles: opinionated defaults
-   ========================================================================== */
+/**
+ * Base
+ */
 
 img {
   max-width: 100%;
@@ -92,10 +16,6 @@ img {
   background: #b3d4fc;
   text-shadow: none;
 }
-
-/*
- * Allow only vertical resizing of textareas.
- */
 
 textarea {
   resize: vertical;
@@ -121,6 +41,96 @@ textarea {
 h1 {
   font-size: 22px;
 }
+
+.alignleft {
+  float: left;
+  margin-right: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.alignright {
+  float: right;
+  margin-left: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.aligncenter {
+  clear: both;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1.5em;
+}
+
+/* Text meant only for screen readers. */
+
+.screen-reader-text {
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  -webkit-clip-path: inset(50%);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  width: 1px;
+  word-wrap: normal !important;
+}
+
+.screen-reader-text:focus {
+  background-color: #fff;
+  border-radius: 3px;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+  clip: auto !important;
+  -webkit-clip-path: none;
+  clip-path: none;
+  color: #000;
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 700;
+  height: auto;
+  left: 5px;
+  line-height: normal;
+  padding: 15px 23px 14px;
+  text-decoration: none;
+  top: 5px;
+  width: auto;
+  z-index: 100000;
+}
+
+/* Do not show the outline on the skip link target. */
+
+#primary[tabindex="-1"]:focus {
+  outline: 0;
+}
+
+/* Five columns in bootstrap row (2.4 * 5 = 12) */
+
+.col-2-4,
+.col-sm-2-4,
+.col-md-2-4,
+.col-lg-2-4,
+.col-xl-2-4 {
+  position: relative;
+  width: 100%;
+  min-height: 1px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.col-2-4 {
+  flex: 0 0 20%;
+  max-width: 20%;
+}
+
+.offset-2-4 {
+  margin-left: 20%;
+}
+
+/**
+ * Layouts
+ */
 
 .site__header {
   padding: .5rem 0;
@@ -162,6 +172,10 @@ h1 {
 .site__sidebar__title {
   font-size: 18px;
 }
+
+/**
+ * Modules
+ */
 
 .post {
   display: flex;
@@ -229,7 +243,11 @@ h1 {
   }
 }
 
-@media (min-width: 576px) {
+@media screen and (min-width: 576px) {
+  h1 {
+    font-size: calc( 22px + 18 * (100vw - 576px) / 1104);
+  }
+
   .col-sm-2-4 {
     flex: 0 0 20%;
     max-width: 20%;
@@ -238,19 +256,13 @@ h1 {
   .offset-sm-2-4 {
     margin-left: 20%;
   }
-}
-
-@media screen and (min-width: 576px) {
-  h1 {
-    font-size: calc( 22px + 18 * (100vw - 576px) / 1104);
-  }
 
   .site__sidebar__title {
-    font-size: calc( 18px + 4 * (100vw - 576px) / 1104);
+    font-size: calc( 18px + 4 * (100vw - 576px) / 1104);
   }
 }
 
-@media (min-width: 768px) {
+@media screen and (min-width: 768px) {
   .col-md-2-4 {
     flex: 0 0 20%;
     max-width: 20%;
@@ -261,7 +273,7 @@ h1 {
   }
 }
 
-@media (min-width: 992px) {
+@media screen and (min-width: 992px) {
   .col-lg-2-4 {
     flex: 0 0 20%;
     max-width: 20%;
@@ -270,32 +282,19 @@ h1 {
   .offset-lg-2-4 {
     margin-left: 20%;
   }
-}
 
-@media screen and (min-width: 992px) {
   .site__sidebar__title {
     margin-top: 4.5rem;
   }
 }
 
-@media (min-width: 1200px) {
+@media screen and (min-width: 1200px) {
   .col-xl-2-4 {
     flex: 0 0 20%;
     max-width: 20%;
   }
 
   .offset-xl-2-4 {
-    margin-left: 20%;
-  }
-}
-
-@media (min-width: 1680px) {
-  .col-hd-2-4 {
-    flex: 0 0 20%;
-    max-width: 20%;
-  }
-
-  .offset-hd-2-4 {
     margin-left: 20%;
   }
 }

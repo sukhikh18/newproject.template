@@ -1,6 +1,6 @@
-/* ==========================================================================
-   Base styles: opinionated defaults
-   ========================================================================== */
+//
+// Base elements
+//
 
 img {
     max-width: 100%;
@@ -17,9 +17,7 @@ img {
     text-shadow: none;
 }
 
-/*
- * Allow only vertical resizing of textareas.
- */
+// Allow only vertical resizing of textareas.
 
 textarea {
     resize: vertical;

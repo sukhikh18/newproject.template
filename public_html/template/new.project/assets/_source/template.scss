@@ -1,22 +1,21 @@
 
-// Variables
-@import "site-settings";
-@import "utils/mixins";
-@import "../vendor/_source/_smart-grid";
+// Import variables and mixins.
+@import "abstracts/abstracts";
 
-// Frequently asked classes
-@import "utils/utilites";
-@import "utils/grid-2-4";
-@import "base";
+/**
+ * Base
+ */
+@import "base/base";
 
-// Layouts
-@import "layout/header";
-@import "layout/footer";
-@import "layout/nav";
-@import "layout/sidebar";
+/**
+ * Layouts
+ */
+@import "layouts/layouts";
 
-// Modules
+/**
+ * Modules
+ */
 @import "module/post";
 
-// Properties (ex.)
-// @import "property/color/green";
+// States (ex.)
+// @import "state/color/green";

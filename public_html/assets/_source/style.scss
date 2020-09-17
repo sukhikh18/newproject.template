@@ -1,12 +1,16 @@
-// Variables
-@import "site-settings";
-@import "utils/mixins";
-@import "../vendor/_source/_smart-grid";
 
-// Modules
+// Import variables and mixins.
+@import "abstracts/abstracts";
+
+/**
+ * Modules
+ */
 @import "module/slick";
 @import "module/slider";
 
+/**
+ * Page content
+ */
 .site__prefix {
     margin-top: 3rem;
 }
