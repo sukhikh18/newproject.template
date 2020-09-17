@@ -1,9 +1,43 @@
 "use strict";
 
 /**
+ * @todo  Add force (exclude newer) session for pages and vendo
+ */
+
+/** @type {String} Public folder */
+const root = './public_html/';
+/** @type {String} Template folder */
+const template = '';
+/** @type {String} Domain for use local server proxy */
+const domain = '';
+/** @type {String} Path to the destination directory. Target is root + dest + ${*.*} */
+const dest = root + '';
+/** @type {String} Source folder */
+const source = '_source/';
+/** @type {String} Path to raw images */
+const imageSource = '_high/';
+/** @type {String} Assets folder relative by root */
+const assets = 'assets/';
+/** @type {String} Path to vendor assets */
+const vendor = template + assets + 'vendor/';
+/** @type {String} Heavy (raw) images folder */
+const images = 'images/' + imageSource;
+/** @type {Array} */
+const pages = [
+    '', //- index page
+    '404/'
+];
+/** @type {Object} */
+const extension = {
+    scss: '*.scss',
+    js: '*.js',
+    img: '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}'
+}
+
+/**
  * Modules
  */
-const path = require('path');
+const path = require('path')
 const glob = require('glob')
 const merge = require('merge-stream')
 const browserSync = require("browser-sync")
@@ -42,38 +76,6 @@ const webpack = {
     stream: require("webpack-stream"),
 }
 
-/**
- * Definitions
- */
-/** @type {String} Public folder */
-const root = './public_html/';
-/** @type {String} Template folder */
-const template = '';
-/** @type {String} Domain for use local server proxy */
-const domain = '';
-/** @type {String} Path to the destination directory. Target is root + dest + ${*.*} */
-const dest = root + '';
-/** @type {String} Source folder */
-const source = '_source/';
-/** @type {String} [@todo description] */
-const imagesRaw = '_high/';
-/** @type {String} Assets folder relative by root */
-const assets = 'assets/';
-/** @type {String} Vendor assets */
-const vendor = 'vendor/';
-/** @type {String} Heavy (raw) images folder */
-const images = 'images/' + imagesRaw;
-/** @type {Array} */
-const pages = [
-    '', //- index page
-    '404/'
-];
-/** @type {Object} */
-const extension = {
-    scss: '*.scss',
-    js: '*.js',
-    img: '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}'
-}
 /** @type {Bool} When not development build */
 const production = !!yargs.argv.production;
 /** @type {Object} */
@@ -89,24 +91,24 @@ const skipUnderscore = (path, ext) => [
     path + ext
 ];
 
-const pagesList = (ext) => pages.map((pageName) => {
-    return root + pageName + assets + source + '**/' + ext;
-})
-
 const paths = {
     markup: '**/*.html',
 
     styles: {
         // make all styles
-        variables: root + template + assets + source + '_site-settings.scss',
+        abstracts: root + template + assets + source + 'abstracts/**/' + extension.scss,
         // make template and pages styles
         modules: root + template + assets + source + 'module/' + extension.scss,
         // make template styles
-        template: template ? skipUnderscore(root + template + assets + source + '**/', extension.scss) : [],
+        template: template ? skipUnderscore(root + template + assets + source + '**/', extension.scss) : [
+            root + assets + source + 'template.scss',
+            ...skipUnderscore(root + assets + source + 'base/**/', extension.scss),
+            ...skipUnderscore(root + assets + source + 'layouts/**/', extension.scss),
+        ],
         // make vendor styles
-        vendor: skipUnderscore(root + template + assets + vendor + source + '**/', extension.scss),
+        vendor: skipUnderscore(root + vendor + source + '**/', extension.scss),
         // make pages styles
-        pages: pagesList(extension.scss),
+        pages: pages.map((pagename) => root + pagename + assets + source + '**/' + extension.scss),
     },
 
     scripts: {
@@ -115,15 +117,15 @@ const paths = {
         // make template scripts
         template: template ? skipUnderscore(root + template + assets + source + '**/', extension.js) : [],
         // make vendor scripts
-        vendor: skipUnderscore(root + template + assets + vendor + source + '**/', extension.js),
+        vendor: skipUnderscore(root + vendor + source + '**/', extension.js),
         // make pages scripts
-        pages: pagesList(extension.js)
+        pages: pages.map((pagename) => root + pagename + assets + source + '**/' + extension.js),
     },
 
     images: [
-        // default: /public_html/template/new.project/images/_high/*.{jpg,png...}
+        // default: /public_html/images/_high/*.{jpg,png...}
         root + template + images + extension.img,
-        // default: /public_html/images/_high/*.{jpg,png...}, /public_html/about/images/_high/*.{jpg,png...}..
+        // Optimize additional images: (for ex. /public_html/images/_high/*.{jpg,png...}, /public_html/404/images/_high/*.{jpg,png...})
         ...pages.map((pagename) => root + pagename + images + '**/' + extension.img),
     ],
 }
@@ -158,10 +160,8 @@ const buildStyles = (src, minify = !!production, force = !!production) => gulp.s
         map: (relative) => {
             return root + relative;
         },
-        // dest: root,
         ext: !!minify ? '.min.css' : '.css',
     })))
-    // .pipe(gulp.newer({ dest: buildRelativePath(args['src']) + '../', ext: production ? '.min.css' : '.css' }))
     // .pipe(gulp.sourcemaps())
     .pipe(gulp.sass({ includePaths: ['node_modules', root + template + assets + source] }))
     .pipe(gulp.groupCssMediaQueries())
@@ -227,7 +227,7 @@ const buildScripts = (done, src, minify = !!production) => {
 
 const buildImages = (done, force = false) => gulp.src(paths.images, { allowEmpty: true, base: root })
     .pipe(gulp.rename((filename) => {
-        let raw = imagesRaw.replace(/\/$/, '')
+        let raw = imageSource.replace(/\/$/, '')
         let filedata = filename.dirname.split(raw, 2)
         filename.dirname = path.join(filedata[0], filedata[1])
     }))
@@ -264,7 +264,7 @@ const buildImages = (done, force = false) => gulp.src(paths.images, { allowEmpty
     ]))
     .pipe(gulp.dest(dest))
     .pipe(gulp.debug({ "title": "Images" }));
-    // buildFavicons, buildSprites
+// @todo buildFavicons, buildSprites
 
 const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
     outputStyle: "scss",
@@ -302,7 +302,7 @@ const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
  */
 gulp.task('build:template:styles', (done) => {
     if (paths.styles.template.length) {
-        buildStyles(paths.styles.template, !!production);
+        buildStyles(paths.styles.template, !!production, true);
         if (!!production) buildStyles(paths.styles.template, !production);
     }
 
@@ -357,7 +357,7 @@ gulp.task("watch", (done) => {
     // Watch markup.
     gulp.watch(root + paths.markup, (done) => { browserSync.reload(); return done(); });
     // Watch styles.
-    gulp.watch(paths.styles.variables, gulp.parallel('build::styles'));
+    gulp.watch(paths.styles.abstracts, gulp.parallel('build::styles'));
     gulp.watch(paths.styles.modules, gulp.parallel('build:template:styles', 'build:pages:styles'));
 
     gulp.watch(paths.styles.template, gulp.parallel('build:template:styles'));
@@ -380,7 +380,7 @@ gulp.task("watch", (done) => {
 gulp.task("install", function(done) {
     let tasks = vendorList.map((elem) => {
 
-        let destination = root + template + assets + vendor + elem.name.toLowerCase();
+        let destination = root + vendor + elem.name.toLowerCase();
 
         return gulp.src(elem.src)
             .pipe(gulp.newer(destination))
@@ -388,7 +388,7 @@ gulp.task("install", function(done) {
             .pipe(gulp.debug({ "title": "Vendor: " + elem.name }))
     })
 
-    buildSmartGrid(root + template + assets + vendor + source);
+    buildSmartGrid(root + vendor + source);
     return merge(tasks);
 })
 
