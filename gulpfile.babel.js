@@ -1,38 +1,29 @@
 "use strict";
 
-/**
- * @todo  Add force (exclude newer) session for pages and vendo
- */
-
-/** @type {String} Public folder */
-const root = './public_html/';
-/** @type {String} Template folder */
-const template = '';
 /** @type {String} Domain for use local server proxy */
 const domain = '';
-/** @type {String} Path to the destination directory. Target is root + dest + ${*.*} */
-const dest = root + '';
-/** @type {String} Source folder */
+const basedir = './';
+/** @type {String} */
 const source = '_source/';
 /** @type {String} Path to raw images */
-const imageSource = '_high/';
-/** @type {String} Assets folder relative by root */
-const assets = 'assets/';
+const rawImages = '_high/';
+/** @type {String} Raw images location */
+const images = 'images/' + rawImages;
+const styles = 'sass/';
+const scripts = 'js/';
 /** @type {String} Path to vendor assets */
-const vendor = template + assets + 'vendor/';
-/** @type {String} Heavy (raw) images folder */
-const images = 'images/' + imageSource;
-/** @type {Array} */
-const pages = [
-    '', //- index page
-    '404/'
+const vendor = 'vendor/assets/';
+
+const folders = ['./', './404/'];
+/** @type {Array} Move src files to vendor */
+const vendorList = [
+    { name: 'Jquery', src: './node_modules/jquery/dist/**/*.*' },
+    { name: 'Bootstrap', src: './node_modules/bootstrap/dist/js/*.*' },
+    { name: 'Slick', src: './node_modules/slick-carousel/slick/**/*.*' },
+    { name: 'Fancybox', src: './node_modules/@fancyapps/fancybox/dist/**/*.*' },
+    // @note: use `yarn add waypoints` for install
+    { name: 'Waypoints', src: './node_modules/waypoints/lib/**/*.*' }
 ];
-/** @type {Object} */
-const extension = {
-    scss: '*.scss',
-    js: '*.js',
-    img: '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}'
-}
 
 /**
  * Modules
@@ -75,198 +66,261 @@ const webpack = {
     ...require("webpack"),
     stream: require("webpack-stream"),
 }
-
-/** @type {Bool} When not development build */
+/** @type {Bool} If production build */
 const production = !!yargs.argv.production;
 /** @type {Object} */
 const serve = {
     tunnel: !!yargs.argv.tunnel ? yargs.argv.tunnel : false,
     port: 9000,
     notify: false,
-    ...(domain ? { proxy: domain } : { server: { baseDir: dest } })
+    ...(domain ? { proxy: domain } : { server: { baseDir: basedir } })
 }
 
-const skipUnderscore = (path, ext) => [
-    '!' + path + '_' + ext,
-    path + ext
-];
-
-const paths = {
-    markup: '**/*.html',
-
-    styles: {
-        // make all styles
-        abstracts: root + template + assets + source + 'abstracts/**/' + extension.scss,
-        // make template and pages styles
-        modules: root + template + assets + source + 'module/' + extension.scss,
-        // make template styles
-        template: template ? skipUnderscore(root + template + assets + source + '**/', extension.scss) : [
-            root + assets + source + 'template.scss',
-            ...skipUnderscore(root + assets + source + 'base/**/', extension.scss),
-            ...skipUnderscore(root + assets + source + 'layouts/**/', extension.scss),
-        ],
-        // make vendor styles
-        vendor: skipUnderscore(root + vendor + source + '**/', extension.scss),
-        // make pages styles
-        pages: pages.map((pagename) => root + pagename + assets + source + '**/' + extension.scss),
-    },
-
-    scripts: {
-        // make template and pages scripts
-        modules: root + template + assets + source + 'parts/' + extension.js,
-        // make template scripts
-        template: template ? skipUnderscore(root + template + assets + source + '**/', extension.js) : [],
-        // make vendor scripts
-        vendor: skipUnderscore(root + vendor + source + '**/', extension.js),
-        // make pages scripts
-        pages: pages.map((pagename) => root + pagename + assets + source + '**/' + extension.js),
-    },
-
-    images: [
-        // default: /public_html/images/_high/*.{jpg,png...}
-        root + template + images + extension.img,
-        // Optimize additional images: (for ex. /public_html/images/_high/*.{jpg,png...}, /public_html/404/images/_high/*.{jpg,png...})
-        ...pages.map((pagename) => root + pagename + images + '**/' + extension.img),
-    ],
+function getExtension(expression) {
+    switch (expression) {
+        case 'markup': return '*.{htm,html,php}';
+        case 'style':  return '*.scss';
+        case 'script': return '*.js';
+        case 'images': return '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}';
+    }
 }
 
-const vendorList = [{
-    name: 'Jquery',
-    src: './node_modules/jquery/dist/**/*.*',
-}, {
-    name: 'Bootstrap',
-    src: './node_modules/bootstrap/dist/js/*.*',
-}, {
-    name: 'Slick',
-    src: './node_modules/slick-carousel/slick/**/*.*',
-}, {
-    name: 'Fancybox',
-    src: './node_modules/@fancyapps/fancybox/dist/**/*.*',
-}, { // @note: use `yarn add waypoints` for install
-    name: 'Waypoints',
-    src: './node_modules/waypoints/lib/**/*.*',
-}]
+/** @type {Array}<ResourceObject> */
+const resources = (function(sources) {
+    const resources = sources.map(function(value, i, arr) {
+        return {
+            markup: value,
+            style: value + styles + '**/',
+            script: value + scripts + '**/',
+            images: value + images + '**/',
+        }
+    });
+    // Add vendor source.
+    resources.push({
+        markup: null,
+        style: './' + vendor + source + '**/*.scss',
+        script: null,
+        images: null,
+    });
+
+    return resources;
+})(folders);
+
+function reloadBrowser(done) {
+    browserSync.reload();
+    return done();
+}
+
+function pathUnderscoreRule(path, ext) {
+    return [
+        '!' + path + '_' + ext,
+        path + ext
+    ];
+}
+
+function buildArray(resources, index, method, minify, done) {
+    resources.map(function(resource, i, arr) {
+        if (resource[index]) {
+            method(pathUnderscoreRule(resource[index], getExtension(index)));
+            if (minify) method(pathUnderscoreRule(resource[index], getExtension(index)), true);
+        }
+    });
+
+    return done();
+}
 
 /**
- * Build methods
+ * Build style gulp rules.
+ *
+ * @global basedir, production.
+ * @param  {String}  src    Glob argument.
+ * @param  {Boolean} minify If minificate required.
  */
-const buildStyles = (src, minify = !!production, force = !!production) => gulp.src(src, { allowEmpty: true, base: root })
-    .pipe(gulp.plumber())
-    .pipe(gulp.rename((filename) => {
-        filename.dirname += "/..";
-        if (minify) filename.extname = ".min" + filename.extname;
-    }))
-    .pipe(gulp.if(!force, gulp.newer({
-        map: (relative) => {
-            return root + relative;
-        },
-        ext: !!minify ? '.min.css' : '.css',
-    })))
-    // .pipe(gulp.sourcemaps())
-    .pipe(gulp.sass({ includePaths: ['node_modules', root + template + assets + source] }))
-    .pipe(gulp.groupCssMediaQueries())
-    .pipe(gulp.autoprefixer({ cascade: false, grid: true }))
-    .pipe(gulp.if(!minify, browserSync.stream()))
-    .pipe(gulp.if(minify, gulp.cleanCss({
-        compatibility: "*",
-        level: {
-            1: {
-                specialComments: 0,
-                removeEmpty: true,
-                removeWhitespace: true
+function buildStyles(src, minify = false) {
+    const settings = { allowEmpty: true, base: basedir };
+    const includes = ['node_modules', settings.base + styles, settings.base + vendor];
+
+    return gulp.src(src, settings)
+        .pipe(gulp.plumber())
+        .pipe(gulp.rename((filename) => {
+            filename.dirname += "/..";
+            if (minify) filename.extname = ".min" + filename.extname;
+        }))
+        .pipe(gulp.if(!production, gulp.newer({
+            map: (relative) => {
+                return settings.base + relative;
             },
-            2: {
-                mergeMedia: true,
-                removeEmpty: true,
-                removeDuplicateFontRules: true,
-                removeDuplicateMediaBlocks: true,
-                removeDuplicateRules: true,
-                removeUnusedAtRules: false
-            }
-        },
-        rebase: false
-    })))
-    // .pipe(gulp.if(!minify, gulp.sourcemaps.write("./assets/maps/")))
-    .pipe(gulp.plumber.stop())
-    .pipe(gulp.dest((file) => path.resolve(file.base))) // (file) => dest + path.basename(file.base)
-    .pipe(gulp.debug({ "title": "Styles" }))
-    .on("end", () => minify || '' == domain ? browserSync.reload : null)
+            ext: !!minify ? '.min.css' : '.css',
+        })))
+        // .pipe(gulp.sourcemaps())
+        .pipe(gulp.sass({ includePaths: includes }))
+        .pipe(gulp.groupCssMediaQueries())
+        .pipe(gulp.autoprefixer({ cascade: false, grid: true }))
+        .pipe(gulp.if(!minify, browserSync.stream()))
+        .pipe(gulp.if(minify, gulp.cleanCss({
+            compatibility: "*",
+            level: {
+                1: {
+                    specialComments: 0,
+                    removeEmpty: true,
+                    removeWhitespace: true
+                },
+                2: {
+                    mergeMedia: true,
+                    removeEmpty: true,
+                    removeDuplicateFontRules: true,
+                    removeDuplicateMediaBlocks: true,
+                    removeDuplicateRules: true,
+                    removeUnusedAtRules: false
+                }
+            },
+            rebase: false
+        })))
+        // .pipe(gulp.if(!minify, gulp.sourcemaps.write("./assets/maps/")))
+        .pipe(gulp.plumber.stop())
+        .pipe(gulp.dest((file) => path.resolve(file.base)))
+        .pipe(gulp.debug({ "title": "Styles" }))
+        .on("end", () => minify || '' == domain ? browserSync.reload : null)
+}
 
-const buildScripts = (done, src, minify = !!production) => {
-    const regex = new RegExp(`([\\w\\d.-_/]+)${source}([\\w\\d._-]+).js$`, 'g')
+/**
+ * Build script gulp rules.
+ *
+ * @global scripts.
+ * @param  {String}  src    Glob argument.
+ * @param  {Boolean} minify If minificate required.
+ */
+function buildScripts(src, minify = false) {
+    const regex = new RegExp(`([\\w\\d.-_/]+)${scripts}([\\w\\d._-]+).js$`, 'g');
+    const findMatches = (entries, entry) => {
+        if (0 !== entry.indexOf('!')) {
+            glob.sync(entry).forEach((found) => {
+                // @type { 0: path to _source, 1: basename (without ext) } match
+                const match = regex.exec(found)
+                if (match) {
+                    entries[match[1] + '/' + match[2]] = found
+                }
+            })
+        }
+
+        return entries;
+    }
+
     const config = {
-        entry: src.reduce((entries, entry) => {
-            if (0 !== entry.indexOf('!')) {
-                glob.sync(entry).forEach((found) => {
-                    // @type { 0: path to _source, 1: basename (without ext) } match
-                    const match = regex.exec(found)
-                    if (match) {
-                        entries[match[1] + '/' + match[2]] = found
-                    }
-                })
-            }
-
-            return entries;
-        }, {}),
+        entry: src.reduce(findMatches, {}),
         output: { filename: "[name].js" },
         stats: 'errors-only',
         mode: minify ? 'production' : 'development',
         devtool: minify ? false : "source-map",
     }
 
-    if (!Object.keys(config.entry).length) {
-        return done();
+    if (Object.keys(config.entry).length) {
+        gulp.src('nonsense', { allowEmpty: true })
+            .pipe(webpack.stream(config), webpack)
+            .pipe(gulp.if(minify, gulp.rename({ suffix: ".min" })))
+            .pipe(gulp.dest('./'))
+            .pipe(gulp.debug({ "title": "Script" }))
     }
-
-    return gulp.src('nonsense', { allowEmpty: true })
-        .pipe(webpack.stream(config), webpack)
-        .pipe(gulp.if(minify, gulp.rename({ suffix: ".min" })))
-        .pipe(gulp.dest('./'))
-        .pipe(gulp.debug({ "title": "Script" }))
 }
 
-const buildImages = (done, force = false) => gulp.src(paths.images, { allowEmpty: true, base: root })
-    .pipe(gulp.rename((filename) => {
-        let raw = imageSource.replace(/\/$/, '')
-        let filedata = filename.dirname.split(raw, 2)
-        filename.dirname = path.join(filedata[0], filedata[1])
-    }))
-    .pipe(gulp.if(!force, gulp.newer(dest)))
-    .pipe(gulp.imagemin([
-        imagemin.Giflossy({
-            optimizationLevel: 3,
-            optimize: 3,
-            lossy: 2
-        }),
-        imagemin.Pngquant({
-            speed: 5,
-            quality: [0.6, 0.8]
-        }),
-        imagemin.Zopfli({
-            more: true
-        }),
-        imagemin.Mozjpeg({
-            progressive: true,
-            quality: 90
-        }),
-        gulp.imagemin.svgo({
-            plugins: [
-                { removeViewBox: false },
-                { removeUnusedNS: false },
-                { removeUselessStrokeAndFill: false },
-                { cleanupIDs: false },
-                { removeComments: true },
-                { removeEmptyAttrs: true },
-                { removeEmptyText: true },
-                { collapseGroups: true }
-            ]
-        })
-    ]))
-    .pipe(gulp.dest(dest))
-    .pipe(gulp.debug({ "title": "Images" }));
-// @todo buildFavicons, buildSprites
+gulp.task('build::styles', (done) => buildArray(resources, 'style', buildStyles, !!production, done));
+gulp.task('build::scripts', (done) => buildArray(resources, 'script', buildScripts, !!production, done));
 
-const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
+function buildFavicon() {}
+
+function buildSprites() {}
+
+/**
+ * Lossless image optimization.
+ *
+ * @global basedir, rawImages.
+ * @param  {String}  src Glob argument.
+ */
+function optimizeImages(src, force) {
+    const settings = { allowEmpty: true, base: basedir };
+
+    return gulp.src(src, settings)
+        .pipe(gulp.rename((filename) => {
+            let raw = rawImages.replace(/\/$/, '')
+            let filedata = filename.dirname.split(raw, 2)
+            filename.dirname = path.join(filedata[0], filedata[1])
+        }))
+        .pipe(gulp.if(!force, gulp.newer(settings.base)))
+        .pipe(gulp.imagemin([
+            imagemin.Giflossy({
+                optimizationLevel: 3,
+                optimize: 3,
+                lossy: 2
+            }),
+            imagemin.Pngquant({
+                speed: 5,
+                quality: [0.6, 0.8]
+            }),
+            imagemin.Zopfli({
+                more: true
+            }),
+            imagemin.Mozjpeg({
+                progressive: true,
+                quality: 90
+            }),
+            gulp.imagemin.svgo({
+                plugins: [
+                    { removeViewBox: false },
+                    { removeUnusedNS: false },
+                    { removeUselessStrokeAndFill: false },
+                    { cleanupIDs: false },
+                    { removeComments: true },
+                    { removeEmptyAttrs: true },
+                    { removeEmptyText: true },
+                    { collapseGroups: true }
+                ]
+            })
+        ]))
+        .pipe(gulp.dest('./'))
+        .pipe(gulp.debug({ "title": "Images" }));
+}
+
+function buildArrayImages(resources, done, force = false) {
+    buildArray(resources, 'images', optimizeImages, force, done);
+}
+
+gulp.task('build::images', function(done) {
+    buildFavicon();
+    buildSprites();
+
+    buildArrayImages(resources, done);
+});
+
+gulp.task('build:all:images', function(done) {
+    buildArrayImages(resources, done, true);
+});
+
+gulp.task('watch', function(done) {
+    resources.map(function(resource, i, arr) {
+        /**
+         * Reload browser when change markup data.
+         */
+        if (resource.markup) {
+            gulp.watch(resource.markup + getExtension('markup'), reloadBrowser);
+        }
+
+        if (resource.style) {
+            gulp.watch(resource.style + getExtension('style'), () =>
+                buildArray([resource], 'style', buildStyles, false, done));
+        }
+
+        if (resource.script) {
+            gulp.watch(resource.script + getExtension('script'), () =>
+                buildArray([resource], 'script', buildScripts, false, done));
+        }
+
+        if (resource.images) {
+            gulp.watch(resource.images + getExtension('images'), () => buildArrayImages([resource], done));
+        }
+    });
+});
+
+const compileSmartGrid = (buildSrc) => smartgrid(buildSrc, {
     outputStyle: "scss",
     filename: "_smart-grid",
     columns: 12, // number of grid columns
@@ -298,106 +352,29 @@ const buildSmartGrid = (buildSrc) => smartgrid(buildSrc, {
 })
 
 /**
- * Tasks
- */
-gulp.task('build:template:styles', (done) => {
-    if (paths.styles.template.length) {
-        buildStyles(paths.styles.template, !!production, true);
-        if (!!production) buildStyles(paths.styles.template, !production);
-    }
-
-    return done();
-})
-
-gulp.task('build:vendor:styles', (done) => {
-    buildStyles(paths.styles.vendor, !!production);
-    if (!!production) buildStyles(paths.styles.vendor, !production);
-    return done();
-})
-
-gulp.task('build:pages:styles', (done) => {
-    buildStyles(paths.styles.pages, !!production);
-    if (!!production) buildStyles(paths.styles.pages, !production);
-    return done();
-})
-
-gulp.task("build::styles", gulp.parallel('build:template:styles', 'build:vendor:styles', 'build:pages:styles'))
-
-gulp.task('build:template:scripts', (done) => {
-    if (paths.scripts.template.length) {
-        buildScripts(done, paths.scripts.template, !!production);
-        if (!!production) buildScripts(done, paths.scripts.template, !production);
-        else browserSync.reload();
-    }
-
-    return done();
-})
-
-gulp.task('build:vendor:scripts', (done) => {
-    buildScripts(done, paths.scripts.vendor, !!production);
-    if (!!production) buildScripts(done, paths.scripts.vendor, !production);
-    else browserSync.reload();
-    return done();
-})
-
-gulp.task('build:pages:scripts', (done) => {
-    buildScripts(done, paths.scripts.pages, !!production);
-    if (!!production) buildScripts(done, paths.scripts.pages, !production);
-    else browserSync.reload();
-    return done();
-})
-
-gulp.task("build::scripts", gulp.parallel('build:template:scripts', 'build:vendor:scripts', 'build:pages:scripts'))
-
-gulp.task("build::images", (done) => buildImages(done, false))
-// force build images (rebuild)
-gulp.task("rebuild::images", (done) => buildImages(done, true))
-
-gulp.task("watch", (done) => {
-    // Watch markup.
-    gulp.watch(root + paths.markup, (done) => { browserSync.reload(); return done(); });
-    // Watch styles.
-    gulp.watch(paths.styles.abstracts, gulp.parallel('build::styles'));
-    gulp.watch(paths.styles.modules, gulp.parallel('build:template:styles', 'build:pages:styles'));
-
-    gulp.watch(paths.styles.template, gulp.parallel('build:template:styles'));
-    gulp.watch(paths.styles.vendor, gulp.parallel('build:vendor:styles'));
-    gulp.watch(paths.styles.pages, gulp.parallel('build:pages:styles'));
-    // Watch javascript.
-    gulp.watch(paths.scripts.modules, gulp.parallel('build::scripts'));
-
-    gulp.watch(paths.scripts.template, gulp.parallel('build:template:scripts'));
-    gulp.watch(paths.scripts.vendor, gulp.parallel('build:vendor:scripts'));
-    gulp.watch(paths.scripts.pages, gulp.parallel('build:pages:scripts'));
-    // Watch images.
-    gulp.watch(paths.images, gulp.series("build::images"));
-})
-
-/**
- * Move assets (if yarn/npm installed them)
- * @var vendorList {Array}<{name, src}>
+ * @global vendorList {Array}<{name, src}>
  */
 gulp.task("install", function(done) {
-    let tasks = vendorList.map((elem) => {
+    // Compile grid sass mixin.
+    compileSmartGrid(basedir + vendor + source);
 
-        let destination = root + vendor + elem.name.toLowerCase();
+    // Replace assets to project when exists (installed).
+    return merge(vendorList.map((elem) => {
+        let destination = basedir + vendor + elem.name.toLowerCase();
 
         return gulp.src(elem.src)
             .pipe(gulp.newer(destination))
             .pipe(gulp.dest(destination))
-            .pipe(gulp.debug({ "title": "Vendor: " + elem.name }))
-    })
-
-    buildSmartGrid(root + vendor + source);
-    return merge(tasks);
-})
+            .pipe(gulp.debug({ "title": "Vendor: " + elem.name }));
+    }));
+});
 
 /**
  * Build only
  */
-gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::images"))
+gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::images"));
 
 /**
  * Start serve/watcher
  */
-gulp.task("default", gulp.parallel("watch", () => browserSync.init(serve)))
+gulp.task("default", gulp.parallel("watch", () => browserSync.init(serve)));
