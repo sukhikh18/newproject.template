@@ -8,13 +8,11 @@
         <!-- <link rel="manifest" href="site.webmanifest">-->
         <!-- <link rel="apple-touch-icon" href="icon.png">-->
         <!-- Place favicon.ico in the root directory -->
-        <link rel="stylesheet" type="text/css" href="/assets/vendor/hamburgers.min.css">
-        <link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="/assets/vendor/fancybox/jquery.fancybox.min.css">
-        <link rel="stylesheet" href="/assets/template.css">
-        <!-- <link rel="stylesheet" href="/assets/template.min.css"> -->
-        <link rel="stylesheet" href="assets/style.css">
-        <!-- <link rel="stylesheet" href="assets/style.min.css"> -->
+        <link rel="stylesheet" type="text/css" href="/vendor/assets/hamburgers.min.css">
+        <link rel="stylesheet" type="text/css" href="/vendor/assets/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/vendor/assets/fancybox/jquery.fancybox.min.css">
+        <link rel="stylesheet" href="style.css">
+        <!-- <link rel="stylesheet" href="style.min.css"> -->
     </head>
 
     <body class="page">
@@ -81,14 +79,38 @@
                 </aside>
                 <!-- /#secondary -->
                 <main class="site__main col-12 col-lg-9">
-                    <h1 class="page__title mb-0">Ошибка 404</h1>
-                    <div class="page__description mb-5">Страница не найдена</div>
+                    <h1 class="page__title mb-0">Заготовка нового проекта</h1>
+                    <div class="page__description mb-5">Скоро это будет грандиозный проект</div>
+                    <article class="post" id="post-id_1">
+                        <div class="post__preview">
+                            <img src="/images/placeholder.png" alt="" width="180" height="180">
+                        </div>
+                        <h4 class="post__name">Заголовок записи</h4>
+                        <div class="post__content">
+                            <div class="post__text">
+                                <p>Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
+                                <p class="collapse post__more">Сайт рыбатекст поможет дизайнеру, верстальщику, вебмастеру сгенерировать несколько абзацев более менее осмысленного текста рыбы на русском языке, а начинающему оратору отточить навык публичных выступлений в домашних условиях. При создании генератора мы использовали небезизвестный универсальный код речей.</p>
+
+                                <a class="more meta-nav" href="#post-id_1 .post__more" data-toggle="collapse" onclick="this.className='d-none'">Читать еще..</a>
+                            </div>
+                        </div>
+                    </article>
                     <!-- the_template_pagination()-->
                 </main>
                 <!-- /#primary -->
             </div>
         </section>
         <!-- /.site__content -->
+        <section class="site__prefix container">
+            <div class="slick slider" id="slider">
+                <div class="mb-3 slider__slide"><a href="/images/placeholder.png" data-fancybox="gallery1"><img class="ac" data-lazy="https://picsum.photos/400/400/" src="/images/placeholder.png" alt=""></a></div>
+                <div class="mb-3 slider__slide"><a href="/images/placeholder.png" data-fancybox="gallery1"><img class="ac" src="/images/placeholder.png" alt=""></a></div>
+                <div class="mb-3 slider__slide"><a href="/images/placeholder.png" data-fancybox="gallery1"><img class="ac" src="/images/placeholder.png" alt=""></a></div>
+                <div class="mb-3 slider__slide"><a href="/images/placeholder.png" data-fancybox="gallery1"><img class="ac" src="/images/placeholder.png" alt=""></a></div>
+                <div class="mb-3 slider__slide"><a href="/images/placeholder.png" data-fancybox="gallery1"><img class="ac" src="/images/placeholder.png" alt=""></a></div>
+            </div>
+        </section>
+        <!-- /.site__prefix -->
         <footer class="site__footer">
             <div class="container text-center">
                 <a href="javascript:;" data-fancybox data-src="#hidden-content">Отрыть модальное окно</a>
@@ -124,9 +146,9 @@
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" crossorigin="anonymous" type="text/javascript"></script> -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js" crossorigin="anonymous" type="text/javascript"></script>
         <script>window.jQuery || document.write('<script src="\/template\/new.project\/assets\/vendor\/jquery\/jquery.min.js"><\/script>');</script>
-        <script type="text/javascript" src="/assets/vendor/bootstrap/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/assets/vendor/slick/slick.min.js"></script>
-        <script type="text/javascript" src="/assets/vendor/fancybox/jquery.fancybox.min.js"></script>
+        <script type="text/javascript" src="/vendor/assets/bootstrap/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/vendor/assets/slick/slick.min.js"></script>
+        <script type="text/javascript" src="/vendor/assets/fancybox/jquery.fancybox.min.js"></script>
         <script>
             if(typeof($.fancybox)) {
                 // more: 'share', 'download', 'thumbs',
@@ -147,10 +169,8 @@
                 }
             }
         </script>
-        <script src="/assets/main.js"></script>
-        <!-- <script src="/assets/main.min.js"></script> -->
-        <!-- <script src="assets/script.js"></script> -->
-        <!-- <script src="assets/script.min.js"></script> -->
+        <script src="script.js"></script>
+        <!-- <script src="script.min.js"></script> -->
 
         <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
         <!-- <script>
