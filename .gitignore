@@ -12,11 +12,3 @@ _config.yml
 *.log
 package-lock.json
 /node_modules/
-
-/images/*
-!/images/_high/
-
-/sass/*
-!/vendor/assets/
-/vendor/assets/*
-!/vendor/assets/_source/
