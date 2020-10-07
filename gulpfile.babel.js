@@ -146,12 +146,6 @@ function buildStyles(src, minify = false) {
             filename.dirname += "/..";
             if (minify) filename.extname = ".min" + filename.extname;
         }))
-        .pipe(gulp.if(!production, gulp.newer({
-            map: (relative) => {
-                return settings.base + relative;
-            },
-            ext: !!minify ? '.min.css' : '.css',
-        })))
         // .pipe(gulp.sourcemaps())
         .pipe(gulp.sass({ includePaths: includes }))
         .pipe(gulp.groupCssMediaQueries())
@@ -211,7 +205,7 @@ function buildScripts(src, minify = false) {
         output: { filename: "[name].js" },
         stats: 'errors-only',
         mode: minify ? 'production' : 'development',
-        devtool: minify ? false : "source-map",
+        // devtool: minify ? false : "source-map",
     }
 
     if (Object.keys(config.entry).length) {
