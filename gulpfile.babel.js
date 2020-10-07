@@ -10,7 +10,7 @@ const rawImages = '_high/';
 /** @type {String} Raw images location */
 const images = 'images/' + rawImages;
 const styles = 'sass/';
-const scripts = 'js/';
+const scripts = 'js/' + source;
 /** @type {String} Path to vendor assets */
 const vendor = 'vendor/assets/';
 
@@ -186,12 +186,12 @@ function buildStyles(src, minify = false) {
 /**
  * Build script gulp rules.
  *
- * @global scripts.
+ * @global source.
  * @param  {String}  src    Glob argument.
  * @param  {Boolean} minify If minificate required.
  */
 function buildScripts(src, minify = false) {
-    const regex = new RegExp(`([\\w\\d.-_/]+)${scripts}([\\w\\d._-]+).js$`, 'g');
+    const regex = new RegExp(`([\\w\\d.-_/]+)${source}([\\w\\d._-]+).js$`, 'g');
     const findMatches = (entries, entry) => {
         if (0 !== entry.indexOf('!')) {
             glob.sync(entry).forEach((found) => {
