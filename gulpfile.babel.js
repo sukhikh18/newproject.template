@@ -228,7 +228,8 @@ function buildSprites() {}
  * Lossless image optimization.
  *
  * @global basedir, rawImages.
- * @param  {String}  src Glob argument.
+ * @param  {String}  src   Glob argument.
+ * @param  {Boolean} force Don't use newer.
  */
 function optimizeImages(src, force) {
     const settings = { allowEmpty: true, base: basedir };
