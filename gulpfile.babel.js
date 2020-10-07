@@ -76,12 +76,12 @@ const serve = {
     ...(domain ? { proxy: domain } : { server: { baseDir: basedir } })
 }
 
-function getExtension(expression) {
+function getExtension(expression, path = '') {
     switch (expression) {
-        case 'markup': return '*.{htm,html,php}';
-        case 'style':  return '*.scss';
-        case 'script': return '*.js';
-        case 'images': return '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}';
+        case 'markup': return path + '*.{htm,html,php}';
+        case 'style':  return path + '*.scss';
+        case 'script': return path + '*.js';
+        case 'images': return path + '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}';
     }
 }
 
@@ -98,7 +98,7 @@ const resources = (function(sources) {
     // Add vendor source.
     resources.push({
         markup: null,
-        style: './' + vendor + source + '**/*.scss',
+        style: './' + vendor + source + '**/',
         script: null,
         images: null,
     });
@@ -121,8 +121,8 @@ function pathUnderscoreRule(path, ext) {
 function buildArray(resources, index, method, minify, done) {
     resources.map(function(resource, i, arr) {
         if (resource[index]) {
-            method(pathUnderscoreRule(resource[index], getExtension(index)));
-            if (minify) method(pathUnderscoreRule(resource[index], getExtension(index)), true);
+            done = method(pathUnderscoreRule(resource[index], getExtension(index)));
+            if (minify) done = method(pathUnderscoreRule(resource[index], getExtension(index)), true);
         }
     });
 
@@ -295,21 +295,33 @@ gulp.task('watch', function(done) {
          * Reload browser when change markup data.
          */
         if (resource.markup) {
-            gulp.watch(resource.markup + getExtension('markup'), reloadBrowser);
+            const watchMarkup = getExtension('markup', resource.markup);
+            // @debug.
+            // console.log('--', watchMarkup, glob.sync(watchMarkup));
+            gulp.watch(watchMarkup, reloadBrowser);
         }
 
         if (resource.style) {
-            gulp.watch(resource.style + getExtension('style'), () =>
+            const watchStyles = getExtension('style', resource.style);
+            // @debug.
+            // console.log('--', watchStyles, glob.sync(watchStyles));
+            gulp.watch(watchStyles, () =>
                 buildArray([resource], 'style', buildStyles, false, done));
         }
 
         if (resource.script) {
-            gulp.watch(resource.script + getExtension('script'), () =>
+            const watchScripts = getExtension('script', resource.script);
+            // @debug.
+            // console.log('--', watchScripts, glob.sync(watchScripts));
+            gulp.watch(watchScripts, () =>
                 buildArray([resource], 'script', buildScripts, false, done));
         }
 
         if (resource.images) {
-            gulp.watch(resource.images + getExtension('images'), () => buildArrayImages([resource], done));
+            const watchImages = getExtension('images', resource.images);
+            // @debug.
+            // console.log('--', watchImages, glob.sync(watchImages));
+            gulp.watch(watchImages, () => buildArrayImages([resource], done));
         }
     });
 });
