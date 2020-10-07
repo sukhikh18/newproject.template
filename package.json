@@ -9,9 +9,9 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "gulp --silent",
-		"watch": "gulp --silent",
+		"watch": "gulp",
 		"build": "gulp build --production",
-		"build::images": "gulp rebuild::images",
+		"build::images": "gulp build:all:images",
 		"tunnel": "gulp --tunnel --silent",
 		"install": "gulp install"
 	},
