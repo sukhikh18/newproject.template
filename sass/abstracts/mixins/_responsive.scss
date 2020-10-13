@@ -1,0 +1,37 @@
+@mixin vw-sm($context, $value) {
+    $wsm: (1 / (320 * 0.01)) * 1vw;
+    #{$context}: num($value) * $wsm;
+}
+
+@mixin vw-md($context, $value) {
+    $wmd: (1 / (num(media('md')) * 0.01)) * 1vw;
+    #{$context}: num($value) * $wmd;
+}
+
+@mixin vw-lg($context, $value) {
+    $wlg: (1 / (num(media('lg')) * 0.01)) * 1vw;
+    #{$context}: num($value) * $wlg;
+}
+
+@mixin vw-xl($context, $value) {
+    $wxl: (1 / (num(media('xl')) * 0.01)) * 1vw;
+    #{$context}: num($value) * $wxl;
+}
+
+@mixin font-size($size-from, $size-to: null, $min: 320px, $max: media('lg')) {
+    font-size: $size-from;
+
+    @if $size-to {
+
+        // start stretch from
+        @include from($min) {
+            // from + ={to - from} * (100vw - min) / ={max - min}
+            font-size: calc(#{$size-from} + #{num($size-to) - num($size-from)} * (100vw - #{$min}) / #{num($max) - num($min)});
+        }
+
+        // end stretch from
+        @include from($max) {
+            font-size: $size-to;
+        }
+    }
+}
