@@ -1,4 +1,3 @@
-
 // Import variables and mixins.
 @import "abstracts/abstracts";
 
@@ -23,3 +22,43 @@
  * States
  */
 // @import "state/color/green";
+
+html {
+    --primary: #{$primary};
+    --secondary: #{$secondary};
+    --gap-title: 50px;
+    --gap-section: 100px;
+}
+
+.flex-container {
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    display: flex;
+    flex-wrap: wrap;
+
+    @each $breakpoint, $container-max-width in $container-max-widths {
+        @include from(map-get($grid-breakpoints, $breakpoint)) {
+            max-width: $container-max-width;
+        }
+    }
+}
+
+.has-sidebar {
+    .site__main {
+        @include col();
+        @include size-lg(9);
+        margin-bottom: 1rem;
+    }
+
+    .site__sidebar {
+        order: -1;
+        @include col();
+        @include size-lg(3);
+        margin-bottom: 1rem;
+
+        @include from(media("lg")) {
+            order: 99;
+        }
+    }
+}

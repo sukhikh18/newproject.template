@@ -1,6 +1,6 @@
-//
-// Nav
-//
+/**
+ * Navigation
+ */
 
 .site__navigation {
     width: 100%;
@@ -12,25 +12,21 @@
 
     .navbar {
         z-index: 999;
-        background: #fff;
+        background: #ffffff;
         padding: 0;
         border-radius: 0;
 
         .nav-link {
+
+            &,
+            &:hover,
+            &:focus {
+                text-decoration: none;
+            }
         }
 
-        .nav-link:hover,
-        .nav-link:focus {
-        }
-
-        .nav-link,
-        .nav-link:hover,
-        .nav-link:focus {
-            text-decoration: none;
-        }
-
-        @include from-to($media-lg, $media-xl) {
-            > .container {
+        @include from-to(media("lg"), media("xl")) {
+            >.container {
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
@@ -44,7 +40,7 @@
     }
 
     .navbar-toggler {
-        // reset bootstrap defaults
+        // reset bootstrap defaults.
         padding: 0 10px;
         border: 0;
         border-radius: 0;
