@@ -1,0 +1,22 @@
+// strip units helper function
+@function num($input) {
+    @return $input/($input * 0 + 1);
+}
+
+@function media($size) {
+    @return map-get($grid-breakpoints, $size);
+}
+
+@function rem($pixels, $context: 16) {
+    $context: num($context);
+
+    @if (unitless($pixels)) {
+        $pixels: $pixels * 1px;
+    }
+
+    @if (unitless($context)) {
+        $context: $context * 1px;
+    }
+
+    @return $pixels / $context * 1rem;
+}

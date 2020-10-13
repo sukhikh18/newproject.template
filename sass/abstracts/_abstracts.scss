@@ -1,5 +1,13 @@
+@import "variables/colors";
+@import "variables/options";
+@import "variables/spacing";
+@import "variables/links";
+@import "variables/grid";
+@import "variables/components";
+@import "variables/typography";
 
-@import "variables/variables";
-@import "mixins/mixins";
+@import "mixins/functions";
+@import "mixins/responsive";
+@import "mixins/images";
 
 @import "_source/smart-grid";
