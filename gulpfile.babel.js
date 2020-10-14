@@ -39,16 +39,14 @@ const gulp = {
     ...require("gulp"),
     if: require("gulp-if"),
     rename: require("gulp-rename"),
-    replace: require("gulp-replace"),
     plumber: require("gulp-plumber"),
     debug: require("gulp-debug"),
+    newer: require("gulp-newer"),
     autoprefixer: require("gulp-autoprefixer"),
     sass: require("gulp-sass"),
     groupCssMediaQueries: require("gulp-group-css-media-queries"),
     cleanCss: require("gulp-clean-css"),
-    newer: require("gulp-newer"),
     imagemin: require("gulp-imagemin"),
-    // const sourcemaps = require("gulp-sourcemaps"),
     // const favicons = require("gulp-favicons"),
     // const svgSprite = require("gulp-svg-sprite"),
     // const webp = require("gulp-webp"),
@@ -66,6 +64,7 @@ const webpack = {
     ...require("webpack"),
     stream: require("webpack-stream"),
 }
+
 /** @type {Bool} If production build */
 const production = !!yargs.argv.production;
 /** @type {Object} */
@@ -129,52 +128,50 @@ function buildArray(resources, index, method, minify, done) {
     return typeof done === "function" ? done() : done;
 }
 
+const gulpSettings = { allowEmpty: true, base: basedir };
+
 /**
  * Build style gulp rules.
  *
- * @global basedir, production.
  * @param  {String}  src    Glob argument.
  * @param  {Boolean} minify If minificate required.
  */
 function buildStyles(src, minify = false) {
-    const settings = { allowEmpty: true, base: basedir };
-    const includes = ['node_modules', settings.base + styles, settings.base + vendor];
+    const includes = ['node_modules', gulpSettings.base + styles, gulpSettings.base + vendor];
+    const minifySettings = {
+        compatibility: "*",
+        level: {
+            1: {
+                specialComments: 0,
+                removeEmpty: true,
+                removeWhitespace: true
+            },
+            2: {
+                mergeMedia: true,
+                removeEmpty: true,
+                removeDuplicateFontRules: true,
+                removeDuplicateMediaBlocks: true,
+                removeDuplicateRules: true,
+                removeUnusedAtRules: false
+            }
+        },
+        rebase: false
+    };
 
-    return gulp.src(src, settings)
+    return gulp.src(src, gulpSettings)
         .pipe(gulp.plumber())
+        .pipe(gulp.sass({ includePaths: includes }))
+        .pipe(gulp.groupCssMediaQueries())
+        .pipe(gulp.autoprefixer({ cascade: false, grid: true }))
+        .pipe(browserSync.stream())
+        .pipe(gulp.if(minify, gulp.cleanCss(minifySettings)))
+        .pipe(gulp.plumber.stop())
         .pipe(gulp.rename((filename) => {
             filename.dirname += "/..";
             if (minify) filename.extname = ".min" + filename.extname;
         }))
-        // .pipe(gulp.sourcemaps())
-        .pipe(gulp.sass({ includePaths: includes }))
-        .pipe(gulp.groupCssMediaQueries())
-        .pipe(gulp.autoprefixer({ cascade: false, grid: true }))
-        .pipe(gulp.if(!minify, browserSync.stream()))
-        .pipe(gulp.if(minify, gulp.cleanCss({
-            compatibility: "*",
-            level: {
-                1: {
-                    specialComments: 0,
-                    removeEmpty: true,
-                    removeWhitespace: true
-                },
-                2: {
-                    mergeMedia: true,
-                    removeEmpty: true,
-                    removeDuplicateFontRules: true,
-                    removeDuplicateMediaBlocks: true,
-                    removeDuplicateRules: true,
-                    removeUnusedAtRules: false
-                }
-            },
-            rebase: false
-        })))
-        // .pipe(gulp.if(!minify, gulp.sourcemaps.write("./assets/maps/")))
-        .pipe(gulp.plumber.stop())
         .pipe(gulp.dest((file) => path.resolve(file.base)))
         .pipe(gulp.debug({ "title": "Styles" }))
-        .on("end", () => minify || '' == domain ? browserSync.reload : null)
 }
 
 /**
@@ -186,30 +183,24 @@ function buildStyles(src, minify = false) {
  */
 function buildScripts(src, minify = false) {
     const regex = new RegExp(`([\\w\\d.-_/]+)${source}([\\w\\d._-]+).js$`, 'g');
-    const findMatches = (entries, entry) => {
-        if (0 !== entry.indexOf('!')) {
-            glob.sync(entry).forEach((found) => {
-                // @type { 0: path to _source, 1: basename (without ext) } match
-                const match = regex.exec(found)
-                if (match) {
-                    entries[match[1] + '/' + match[2]] = found
-                }
-            })
-        }
-
-        return entries;
-    }
-
     const config = {
-        entry: src.reduce(findMatches, {}),
+        entry: src
+            .filter(entry => 0 !== entry.indexOf('!'))
+            .reduce((entries, entry) => {
+                glob.sync(entry).map(found => {
+                    const match = regex.exec(found);
+                    if (match) entries[match[1] + '/' + match[2]] = found;
+                });
+                return entries;
+            }, {}),
         output: { filename: "[name].js" },
         stats: 'errors-only',
-        mode: minify ? 'production' : 'development',
-        devtool: minify ? false : "source-map",
+        mode: !!minify ? 'production' : 'development',
+        devtool: !minify ? "source-map" : false,
     }
 
     if (Object.keys(config.entry).length) {
-        return gulp.src('nonsense', { allowEmpty: true })
+        return gulp.src('nonsense', gulpSettings)
             // Start webpack when exist files.
             .pipe(webpack.stream(config), webpack)
             .pipe(gulp.if(minify, gulp.rename({ suffix: ".min" })))
@@ -217,7 +208,7 @@ function buildScripts(src, minify = false) {
             .pipe(gulp.debug({ "title": "Script" }));
     }
     // done return required.
-    return gulp.src('nonsense', { allowEmpty: true })
+    return gulp.src('nonsense', gulpSettings)
         .pipe(gulp.dest(basedir))
         .pipe(gulp.debug({ "title": "Script" }));
 }
@@ -237,45 +228,45 @@ function buildSprites() {}
  * @param  {Boolean} force Don't use newer.
  */
 function optimizeImages(src, force) {
-    const settings = { allowEmpty: true, base: basedir };
+    const imageminSettings = [
+        imagemin.Giflossy({
+            optimizationLevel: 3,
+            optimize: 3,
+            lossy: 2
+        }),
+        imagemin.Pngquant({
+            speed: 5,
+            quality: [0.6, 0.8]
+        }),
+        imagemin.Zopfli({
+            more: true
+        }),
+        imagemin.Mozjpeg({
+            progressive: true,
+            quality: 90
+        }),
+        gulp.imagemin.svgo({
+            plugins: [
+                { removeViewBox: false },
+                { removeUnusedNS: false },
+                { removeUselessStrokeAndFill: false },
+                { cleanupIDs: false },
+                { removeComments: true },
+                { removeEmptyAttrs: true },
+                { removeEmptyText: true },
+                { collapseGroups: true }
+            ]
+        })
+    ];
 
-    return gulp.src(src, settings)
+    return gulp.src(src, gulpSettings)
+        .pipe(gulp.if(!force, gulp.newer(gulpSettings.base)))
+        .pipe(gulp.imagemin(imageminSettings))
         .pipe(gulp.rename((filename) => {
             let raw = rawImages.replace(/\/$/, '')
             let filedata = filename.dirname.split(raw, 2)
             filename.dirname = path.join(filedata[0], filedata[1])
         }))
-        .pipe(gulp.if(!force, gulp.newer(settings.base)))
-        .pipe(gulp.imagemin([
-            imagemin.Giflossy({
-                optimizationLevel: 3,
-                optimize: 3,
-                lossy: 2
-            }),
-            imagemin.Pngquant({
-                speed: 5,
-                quality: [0.6, 0.8]
-            }),
-            imagemin.Zopfli({
-                more: true
-            }),
-            imagemin.Mozjpeg({
-                progressive: true,
-                quality: 90
-            }),
-            gulp.imagemin.svgo({
-                plugins: [
-                    { removeViewBox: false },
-                    { removeUnusedNS: false },
-                    { removeUselessStrokeAndFill: false },
-                    { cleanupIDs: false },
-                    { removeComments: true },
-                    { removeEmptyAttrs: true },
-                    { removeEmptyText: true },
-                    { collapseGroups: true }
-                ]
-            })
-        ]))
         .pipe(gulp.dest('./'))
         .pipe(gulp.debug({ "title": "Images" }));
 }
