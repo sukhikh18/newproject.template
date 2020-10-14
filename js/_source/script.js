@@ -7,9 +7,8 @@ jQuery(document).ready(function($) {
     /**
      * Phone formatter for RU phone numbers.
      */
-    const cleaveOpts = { phone: true, phoneRegionCode: 'RU' }
     document.querySelectorAll('input[type="tel"]').forEach(function(el) {
-        new Cleave(el, { ...cleaveOpts });
+        new Cleave(el, { phone: true, phoneRegionCode: 'RU' });
     });
 
     /**
@@ -28,7 +27,7 @@ jQuery(document).ready(function($) {
             event.preventDefault();
             preloader.show('Загрузка..');
 
-            // Disable retry by 120 seconds.
+            // Disable retry by 2 minutes.
             const $submit = $(this).find('[type="submit"]');
             $submit.attr('disabled', 'disabled');
             setTimeout(() => { $submit.removeAttr('disabled'); }, 120000);
