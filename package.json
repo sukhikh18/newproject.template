@@ -11,6 +11,8 @@
 		"dev": "gulp --silent",
 		"watch": "gulp",
 		"build": "gulp build --production",
+		"build::styles": "gulp build::styles --production",
+		"build::scripts": "gulp build::scripts --production",
 		"build::images": "gulp build:all:images",
 		"tunnel": "gulp --tunnel --silent",
 		"install": "gulp install"
