@@ -193,9 +193,8 @@ jQuery(document).ready(function($) {
     /**
      * Phone formatter for RU phone numbers.
      */
-    const cleaveOpts = { phone: true, phoneRegionCode: 'RU' }
     document.querySelectorAll('input[type="tel"]').forEach(function(el) {
-        new cleave_js__WEBPACK_IMPORTED_MODULE_0__["default"](el, { ...cleaveOpts });
+        new cleave_js__WEBPACK_IMPORTED_MODULE_0__["default"](el, { phone: true, phoneRegionCode: 'RU' });
     });
 
     /**
@@ -214,7 +213,7 @@ jQuery(document).ready(function($) {
             event.preventDefault();
             _module_preloader_js__WEBPACK_IMPORTED_MODULE_3__["default"].show('Загрузка..');
 
-            // Disable retry by 120 seconds.
+            // Disable retry by 2 minutes.
             const $submit = $(this).find('[type="submit"]');
             $submit.attr('disabled', 'disabled');
             setTimeout(() => { $submit.removeAttr('disabled'); }, 120000);
@@ -307,7 +306,7 @@ function $(){this.a={}}function A(n){return 0==n.length||un.test(n)}function N(n
  limitations under the License.
 */
 var nn={7:["RU","KZ"]},ln={KZ:[null,[null,null,"(?:33622|(?:7\\d|80)\\d{3})\\d{5}",null,null,null,null,null,null,[10]],[null,null,"(?:33622|7(?:1(?:0(?:[23]\\d|4[0-3]|59|63)|1(?:[23]\\d|4[0-79]|59)|2(?:[23]\\d|59)|3(?:2\\d|3[0-79]|4[0-35-9]|59)|4(?:[24]\\d|3[013-9]|5[1-9])|5(?:2\\d|3[1-9]|4[0-7]|59)|6(?:[2-4]\\d|5[19]|61)|72\\d|8(?:[27]\\d|3[1-46-9]|4[0-5]))|2(?:1(?:[23]\\d|4[46-9]|5[3469])|2(?:2\\d|3[0679]|46|5[12679])|3(?:[2-4]\\d|5[139])|4(?:2\\d|3[1-35-9]|59)|5(?:[23]\\d|4[0-246-8]|59|61)|6(?:2\\d|3[1-9]|4[0-4]|59)|7(?:[2379]\\d|40|5[279])|8(?:[23]\\d|4[0-3]|59)|9(?:2\\d|3[124578]|59))))\\d{5}",null,null,null,"7123456789"],[null,null,"7(?:0[0-2578]|47|6[02-4]|7[15-8]|85)\\d{7}",null,null,null,"7710009998"],[null,null,"800\\d{7}",null,null,null,"8001234567"],[null,null,"809\\d{7}",null,null,null,"8091234567"],[null,null,null,null,null,null,null,null,null,[-1]],[null,null,"808\\d{7}",null,null,null,"8081234567"],[null,null,"751\\d{7}",null,null,null,"7511234567"],"KZ",7,"810","8",null,null,"8",null,"8~10",null,null,null,[null,null,null,null,null,null,null,null,null,[-1]],null,"33|7",[null,null,"751\\d{7}"],[null,null,null,null,null,null,null,null,null,[-1]],null,null,[null,null,null,null,null,null,null,null,null,[-1]]],RU:[null,[null,null,"[347-9]\\d{9}",null,null,null,null,null,null,[10],[7]],[null,null,"(?:3(?:0[12]|4[1-35-79]|5[1-3]|65|8[1-58]|9[0145])|4(?:01|1[1356]|2[13467]|7[1-5]|8[1-7]|9[1-689])|8(?:1[1-8]|2[01]|3[13-6]|4[0-8]|5[15]|6[1-35-79]|7[1-37-9]))\\d{7}",null,null,null,"3011234567",null,null,null,[7]],[null,null,"9\\d{9}",null,null,null,"9123456789"],[null,null,"80[04]\\d{7}",null,null,null,"8001234567"],[null,null,"80[39]\\d{7}",null,null,null,"8091234567"],[null,null,null,null,null,null,null,null,null,[-1]],[null,null,"808\\d{7}",null,null,null,"8081234567"],[null,null,null,null,null,null,null,null,null,[-1]],"RU",7,"810","8",null,null,"8",null,"8~10",null,[[null,"(\\d{3})(\\d{2})(\\d{2})","$1-$2-$3"],[null,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["7"],"8 ($1)",null,1],[null,"(\\d{3})(\\d{3})(\\d{2})(\\d{2})","$1 $2-$3-$4",["[3489]"],"8 ($1)",null,1]],[[null,"(\\d{3})(\\d{3})(\\d{4})","$1 $2 $3",["7"],"8 ($1)",null,1],[null,"(\\d{3})(\\d{3})(\\d{2})(\\d{2})","$1 $2-$3-$4",["[3489]"],"8 ($1)",null,1]],[null,null,null,null,null,null,null,null,null,[-1]],1,"3[04-689]|[489]",[null,null,null,null,null,null,null,null,null,[-1]],[null,null,null,null,null,null,null,null,null,[-1]],null,null,[null,null,null,null,null,null,null,null,null,[-1]]]};$.b=function(){return $.a?$.a:$.a=new $};var tn={0:"0",1:"1",2:"2",3:"3",4:"4",5:"5",6:"6",7:"7",8:"8",9:"9","０":"0","１":"1","２":"2","３":"3","４":"4","５":"5","６":"6","７":"7","８":"8","９":"9","٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9","۰":"0","۱":"1","۲":"2","۳":"3","۴":"4","۵":"5","۶":"6","۷":"7","۸":"8","۹":"9"},en=RegExp("[+＋]+"),rn=RegExp("([0-9０-９٠-٩۰-۹])"),un=/^\(?\$1\)?$/,an=new _;b(an,11,"NA");var on=/\[([^\[\]])*\]/g,sn=/\d(?=[^,}][^,}])/g,fn=RegExp("^[-x‐-―−ー－-／  ­​⁠　()（）［］.\\[\\]/~⁓∼～]*(\\$\\d[-x‐-―−ー－-／  ­​⁠　()（）［］.\\[\\]/~⁓∼～]*)+$"),pn=/[- ]/;R.prototype.K=function(){this.C="",e(this.i),e(this.u),e(this.m),this.s=0,this.w="",e(this.b),this.h="",e(this.a),this.l=!0,this.A=this.o=this.F=!1,this.f=[],this.B=!1,this.g!=this.J&&(this.g=E(this,this.D))},R.prototype.L=function(n){return this.C=C(this,n)},n("Cleave.AsYouTypeFormatter",R),n("Cleave.AsYouTypeFormatter.prototype.inputDigit",R.prototype.L),n("Cleave.AsYouTypeFormatter.prototype.clear",R.prototype.K)}.call("object"==typeof global&&global?global:window);
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../webpack-stream/node_modules/webpack/buildin/global.js */ "./node_modules/webpack-stream/node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 
@@ -1879,11 +1878,11 @@ var Cleave_1 = Cleave;
 
 /* harmony default export */ __webpack_exports__["default"] = (Cleave_1);
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack-stream/node_modules/webpack/buildin/global.js */ "./node_modules/webpack-stream/node_modules/webpack/buildin/global.js")))
 
 /***/ }),
 
-/***/ "./node_modules/webpack/buildin/global.js":
+/***/ "./node_modules/webpack-stream/node_modules/webpack/buildin/global.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
   \***********************************/
