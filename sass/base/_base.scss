@@ -1,12 +1,6 @@
 //
 // Base router
 // --------------------------
-
-@import "elements";
-@import "aligment";
-@import "accessibility";
-@import "columns-5";
-
 // @import "bootstrap/scss/root";
 @import "bootstrap/scss/reboot";
 @import "bootstrap/scss/type";
@@ -17,3 +11,8 @@
 @import "bootstrap/scss/forms";
 @import "bootstrap/scss/buttons";
 @import "bootstrap/scss/transitions";
+
+@import "elements";
+@import "aligment";
+@import "accessibility";
+@import "columns-5";
