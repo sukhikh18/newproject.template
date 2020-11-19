@@ -21,6 +21,7 @@ const vendorList = [
     { name: 'Bootstrap', src: './node_modules/bootstrap/dist/js/*.*' },
     { name: 'Slick', src: './node_modules/slick-carousel/slick/**/*.*' },
     { name: 'Fancybox', src: './node_modules/@fancyapps/fancybox/dist/**/*.*' },
+    { name: 'Font-Awesome', src: './node_modules/font-awesome/fonts/*.*' },
     // @note: use `yarn add waypoints` for install
     { name: 'Waypoints', src: './node_modules/waypoints/lib/**/*.*' }
 ];
