@@ -1,8 +1,4 @@
-/**
- * Accessibility
- */
-
-/* Text meant only for screen readers. */
+// Text meant only for screen readers.
 .screen-reader-text {
     border: 0;
     clip: rect(1px, 1px, 1px, 1px);
@@ -36,7 +32,7 @@
     }
 }
 
-/* Do not show the outline on the skip link target. */
+// Do not show the outline on the skip link target.
 #primary[tabindex="-1"]:focus {
     outline: 0;
 }
