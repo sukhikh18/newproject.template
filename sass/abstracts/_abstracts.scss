@@ -2,6 +2,10 @@
 // Abstracts router
 // --------------------------
 
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
 @import "variables/colors";
 @import "variables/options";
 @import "variables/spacing";
@@ -15,7 +19,3 @@
 @import "mixins/images";
 
 @import "_source/smart-grid";
-
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/mixins";
