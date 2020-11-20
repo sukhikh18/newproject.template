@@ -13,7 +13,7 @@ const scripts = 'js/_source/';
 const vendor = 'vendor/assets/';
 const vendorSource = vendor + '_source/';  
 
-const folders = ['./', './404/'];
+const folders = [basedir, './404/'];
 /** @type {Array} Move src files to vendor */
 const vendorList = [
     { name: 'Jquery', src: './node_modules/jquery/dist/**/*.*' },
