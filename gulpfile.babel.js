@@ -7,8 +7,8 @@ const basedir = './';
 const rawImages = '_high/';
 /** @type {String} Raw images location */
 const images = 'images/' + rawImages;
-const styles = 'sass/';
-const scripts = 'js/_source/';
+const styles = '_source/';
+const scripts = '_source/';
 /** @type {String} Path to vendor assets */
 const vendor = 'vendor/assets/';
 const vendorSource = vendor + '_source/';  
