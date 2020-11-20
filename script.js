@@ -81,15 +81,15 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./js/_source/script.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./_source/script.js");
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./js/_source/module/_preloader.js":
-/*!*****************************************!*\
-  !*** ./js/_source/module/_preloader.js ***!
-  \*****************************************/
+/***/ "./_source/modules/_preloader.js":
+/*!***************************************!*\
+  !*** ./_source/modules/_preloader.js ***!
+  \***************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -135,10 +135,10 @@ const preloader = {
 
 /***/ }),
 
-/***/ "./js/_source/module/_scrollTo.js":
-/*!****************************************!*\
-  !*** ./js/_source/module/_scrollTo.js ***!
-  \****************************************/
+/***/ "./_source/modules/_scrollTo.js":
+/*!**************************************!*\
+  !*** ./_source/modules/_scrollTo.js ***!
+  \**************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -170,10 +170,10 @@ const scrollTo = (target, topOffset = 30, delay = 400) => {
 
 /***/ }),
 
-/***/ "./js/_source/script.js":
-/*!******************************!*\
-  !*** ./js/_source/script.js ***!
-  \******************************/
+/***/ "./_source/script.js":
+/*!***************************!*\
+  !*** ./_source/script.js ***!
+  \***************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -182,8 +182,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var cleave_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! cleave.js */ "./node_modules/cleave.js/dist/cleave-esm.js");
 /* harmony import */ var cleave_js_dist_addons_cleave_phone_ru__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! cleave.js/dist/addons/cleave-phone.ru */ "./node_modules/cleave.js/dist/addons/cleave-phone.ru.js");
 /* harmony import */ var cleave_js_dist_addons_cleave_phone_ru__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(cleave_js_dist_addons_cleave_phone_ru__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _module_scrollTo_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./module/_scrollTo.js */ "./js/_source/module/_scrollTo.js");
-/* harmony import */ var _module_preloader_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./module/_preloader.js */ "./js/_source/module/_preloader.js");
+/* harmony import */ var _modules_scrollTo_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modules/_scrollTo.js */ "./_source/modules/_scrollTo.js");
+/* harmony import */ var _modules_preloader_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./modules/_preloader.js */ "./_source/modules/_preloader.js");
 
 
 
@@ -202,7 +202,7 @@ jQuery(document).ready(function($) {
      */
     $(document).on('click', '[href^="#"]', function(event) {
         event.preventDefault();
-        Object(_module_scrollTo_js__WEBPACK_IMPORTED_MODULE_2__["default"])(this.getAttribute("href"));
+        Object(_modules_scrollTo_js__WEBPACK_IMPORTED_MODULE_2__["default"])(this.getAttribute("href"));
     });
 
     /**
@@ -211,7 +211,7 @@ jQuery(document).ready(function($) {
     if (typeof $.fancybox) {
         $('.modal form').on('submit', function(event) {
             event.preventDefault();
-            _module_preloader_js__WEBPACK_IMPORTED_MODULE_3__["default"].show('Загрузка..');
+            _modules_preloader_js__WEBPACK_IMPORTED_MODULE_3__["default"].show('Загрузка..');
 
             // Disable retry by 2 minutes.
             const $submit = $(this).find('[type="submit"]');
@@ -220,7 +220,7 @@ jQuery(document).ready(function($) {
 
             // Show success.
             setTimeout(() => {
-                _module_preloader_js__WEBPACK_IMPORTED_MODULE_3__["default"].hide();
+                _modules_preloader_js__WEBPACK_IMPORTED_MODULE_3__["default"].hide();
                 $.fancybox.open({
                     content: '<h1>Отлично!</h1><p>Ваша заявка принята, ожидайте звонка.</p>',
                     type: 'html',
