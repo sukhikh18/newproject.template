@@ -2,17 +2,21 @@
 
 /** @type {String} Domain for use local server proxy */
 const domain = '';
+/** @type {String} */
 const basedir = './';
 /** @type {String} Path to raw images */
 const rawImages = '_high/';
 /** @type {String} Raw images location */
 const images = 'images/' + rawImages;
+/** @type {String} */
 const styles = 'sass/';
+/** @type {String} */
 const scripts = 'js/_source/';
 /** @type {String} Path to vendor assets */
 const vendor = 'vendor/assets/';
+/** @type {String} */
 const vendorSource = vendor + '_source/';  
-
+/** @type {Array} */
 const folders = ['./', './404/'];
 /** @type {Array} Move src files to vendor */
 const vendorList = [
