@@ -3,16 +3,15 @@
 /** @type {String} Domain for use local server proxy */
 const domain = '';
 const basedir = './';
-/** @type {String} */
-const source = '_source/';
 /** @type {String} Path to raw images */
 const rawImages = '_high/';
 /** @type {String} Raw images location */
 const images = 'images/' + rawImages;
 const styles = 'sass/';
-const scripts = 'js/' + source;
+const scripts = 'js/_source/';
 /** @type {String} Path to vendor assets */
 const vendor = 'vendor/assets/';
+const vendorSource = vendor + '_source/';  
 
 const folders = ['./', './404/'];
 /** @type {Array} Move src files to vendor */
@@ -98,7 +97,7 @@ const resources = (function(sources) {
     // Add vendor source.
     resources.push({
         markup: null,
-        style: './' + vendor + source + '**/',
+        style: './' + vendorSource + '**/',
         script: null,
         images: null,
     });
@@ -178,19 +177,20 @@ function buildStyles(src, minify = false) {
 /**
  * Build script gulp rules.
  *
- * @global source.
  * @param  {String}  src    Glob argument.
  * @param  {Boolean} minify If minificate required.
  */
 function buildScripts(src, minify = false) {
-    const regex = new RegExp(`([\\w\\d.-_/]+)${source}([\\w\\d._-]+).js$`, 'g');
+    const regex = new RegExp(`([\\w\\d.-_/]+)\/[\\w\\d.-_]+\/([\\w\\d.-_]+).js$`, 'g');
     const config = {
         entry: src
             .filter(entry => 0 !== entry.indexOf('!'))
             .reduce((entries, entry) => {
                 glob.sync(entry).map(found => {
                     const match = regex.exec(found);
-                    if (match) entries[match[1] + '/' + match[2]] = found;
+                    if (match && '_' != match[match.length - 1][0]) {
+                        entries[match[1] + '/' + match[2]] = found;
+                    }
                 });
                 return entries;
             }, {}),
@@ -360,7 +360,7 @@ const compileSmartGrid = (buildSrc) => smartgrid(buildSrc, {
  */
 gulp.task("install", function(done) {
     // Compile grid sass mixin.
-    compileSmartGrid(basedir + vendor + source);
+    compileSmartGrid(basedir + vendorSource);
 
     // Replace assets to project when exists (installed).
     return merge(vendorList.map((elem) => {
