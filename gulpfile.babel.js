@@ -9,9 +9,9 @@ const rawImages = '_high/';
 /** @type {String} Raw images location */
 const images = 'images/' + rawImages;
 /** @type {String} */
-const styles = 'sass/';
+const styles = '_source/';
 /** @type {String} */
-const scripts = 'js/_source/';
+const scripts = '_source/';
 /** @type {String} Path to vendor assets */
 const vendor = 'vendor/assets/';
 /** @type {String} */
