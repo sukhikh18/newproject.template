@@ -2,7 +2,38 @@
 // Layouts router
 // --------------------------
 
+@import "bootstrap/scss/grid";
+@import "columns-5";
+
+/**
+ * Layouts
+ */
+
 @import "header";
 @import "footer";
 @import "nav";
 @import "sidebar";
+
+.site {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+
+    &__header {
+        padding: .5rem 0;
+    }
+    
+    &__navigation {
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    &__content {
+        margin-bottom: auto;
+    }
+
+    &__footer {
+        margin-top: 2rem;
+        padding-bottom: 2rem;
+    }
+}
