@@ -2,10 +2,7 @@
  * Navigation
  */
 
-.site__navigation {
-    width: 100%;
-    margin-bottom: 2rem;
-
+.site-navigation {
     .container {
         padding: 0 15px;
     }
@@ -17,7 +14,6 @@
         border-radius: 0;
 
         .nav-link {
-
             &,
             &:hover,
             &:focus {

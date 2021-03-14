@@ -18,11 +18,10 @@
     #{$context}: num($value) * $wxl;
 }
 
-@mixin font-size($size-from, $size-to: null, $min: 320px, $max: media('lg')) {
+@mixin vw-font-size($size-from, $size-to: null, $min: 320px, $max: media('lg')) {
     font-size: $size-from;
 
     @if $size-to {
-
         // start stretch from
         @include from($min) {
             // from + ={to - from} * (100vw - min) / ={max - min}
