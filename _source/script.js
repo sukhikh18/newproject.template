@@ -1,20 +1,33 @@
+import $ from 'jquery';
+// Global jQuery
+window.$ = window.jQuery = $;
+
+// Slider
+import 'slick-carousel';
+
+// Modals
+import '@fancyapps/fancybox';
+
+// Formatter
 import Cleave from 'cleave.js';
 import "cleave.js/dist/addons/cleave-phone.ru";
+
+// Custom modules
 import scrollTo from "./modules/_scrollTo.js";
 import preloader from "./modules/_preloader.js";
 
-jQuery(document).ready(function($) {
+jQuery(document).ready(function ($) {
     /**
      * Phone formatter for RU phone numbers.
      */
-    document.querySelectorAll('input[type="tel"]').forEach(function(el) {
-        new Cleave(el, { phone: true, phoneRegionCode: 'RU' });
+    document.querySelectorAll('input[type="tel"]').forEach(function (el) {
+        new Cleave(el, {phone: true, phoneRegionCode: 'RU'});
     });
 
     /**
      * Smooth scroll window to target when link href start from a hash.
      */
-    $(document).on('click', '[href^="#"]', function(event) {
+    $(document).on('click', '[href^="#"]', function (event) {
         event.preventDefault();
         scrollTo(this.getAttribute("href"));
     });
@@ -23,14 +36,16 @@ jQuery(document).ready(function($) {
      * Example form submit event.
      */
     if (typeof $.fancybox) {
-        $('.modal form').on('submit', function(event) {
+        $('.modal form').on('submit', function (event) {
             event.preventDefault();
             preloader.show('Загрузка..');
 
             // Disable retry by 2 minutes.
             const $submit = $(this).find('[type="submit"]');
             $submit.attr('disabled', 'disabled');
-            setTimeout(() => { $submit.removeAttr('disabled'); }, 120000);
+            setTimeout(() => {
+                $submit.removeAttr('disabled');
+            }, 120000);
 
             // Show success.
             setTimeout(() => {

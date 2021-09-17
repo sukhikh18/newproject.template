@@ -129,14 +129,11 @@
         <!-- /#hidden-content -->
 
         <!-- Scripts and Analitics -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" crossorigin="anonymous" type="text/javascript"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js" crossorigin="anonymous" type="text/javascript"></script>
-        <script>window.jQuery || document.write('<script src="\/vendor\/assets\/jquery\/jquery.min.js"><\/script>');</script>
-        <script type="text/javascript" src="/vendor/assets/bootstrap/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/vendor/assets/slick/slick.min.js"></script>
-        <script type="text/javascript" src="/vendor/assets/fancybox/jquery.fancybox.min.js"></script>
+        <script src="/vendor/assets/jquery/jquery.min.js" crossorigin="anonymous" type="text/javascript"></script>\
+        <script src="script.js"></script>
+        <!-- <script src="script.min.js"></script> -->
         <script>
-            if(typeof($.fancybox)) {
+            if(typeof(jQuery.fancybox)) {
                 // more: 'share', 'download', 'thumbs',
                 $.fancybox.defaults.buttons = ['zoom', 'slideShow', 'fullScreen', 'close'];
                 $.fancybox.defaults.lang = 'ru';
@@ -155,9 +152,6 @@
                 }
             }
         </script>
-        <script src="script.js"></script>
-        <!-- <script src="script.min.js"></script> -->
-
         <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
         <!-- <script>
             window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;

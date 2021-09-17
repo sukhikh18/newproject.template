@@ -15,18 +15,18 @@ const scripts = '_source/';
 /** @type {String} Path to vendor assets */
 const vendor = 'vendor/assets/';
 /** @type {String} */
-const vendorSource = vendor + '_source/';  
+const vendorSource = vendor + '_source/';
 /** @type {Array} */
 const folders = ['./', './404/'];
 /** @type {Array} Move src files to vendor */
 const vendorList = [
-    { name: 'Jquery', src: './node_modules/jquery/dist/**/*.*' },
-    { name: 'Bootstrap', src: './node_modules/bootstrap/dist/js/*.*' },
-    { name: 'Slick', src: './node_modules/slick-carousel/slick/**/*.*' },
-    { name: 'Fancybox', src: './node_modules/@fancyapps/fancybox/dist/**/*.*' },
-    { name: 'Font-Awesome', src: './node_modules/font-awesome/fonts/*.*' },
+    {name: 'Jquery', src: './node_modules/jquery/dist/**/*.*'},
+    {name: 'Bootstrap', src: './node_modules/bootstrap/dist/js/*.*'},
+    {name: 'Slick', src: './node_modules/slick-carousel/slick/**/*.*'},
+    {name: 'Fancybox', src: './node_modules/@fancyapps/fancybox/dist/**/*.*'},
+    {name: 'Font-Awesome', src: './node_modules/font-awesome/fonts/*.*'},
     // @note: use `yarn add waypoints` for install
-    { name: 'Waypoints', src: './node_modules/waypoints/lib/**/*.*' }
+    {name: 'Waypoints', src: './node_modules/waypoints/lib/**/*.*'}
 ];
 
 /**
@@ -69,28 +69,32 @@ const webpack = {
     stream: require("webpack-stream"),
 }
 
-/** @type {Bool} If production build */
+/** @type {bool} If production build */
 const production = !!yargs.argv.production;
 /** @type {Object} */
 const serve = {
     tunnel: !!yargs.argv.tunnel ? yargs.argv.tunnel : false,
     port: 9000,
     notify: false,
-    ...(domain ? { proxy: domain } : { server: { baseDir: basedir } })
+    ...(domain ? {proxy: domain} : {server: {baseDir: basedir}})
 }
 
 function getExtension(expression, path = '') {
     switch (expression) {
-        case 'markup': return path + '*.{htm,html,php}';
-        case 'style':  return path + '*.scss';
-        case 'script': return path + '*.js';
-        case 'images': return path + '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}';
+        case 'markup':
+            return path + '*.{htm,html,php}';
+        case 'style':
+            return path + '*.scss';
+        case 'script':
+            return path + '*.js';
+        case 'images':
+            return path + '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}';
     }
 }
 
 /** @type {Array}<ResourceObject> */
-const resources = (function(sources) {
-    const resources = sources.map(function(value, i, arr) {
+const resources = (function (sources) {
+    const resources = sources.map(function (value, i, arr) {
         return {
             markup: value,
             style: value + styles + '**/',
@@ -122,7 +126,7 @@ function pathUnderscoreRule(path, ext) {
 }
 
 function buildArray(resources, index, method, minify, done) {
-    resources.map(function(resource, i, arr) {
+    resources.map(function (resource, i, arr) {
         if (resource[index]) {
             done = method(pathUnderscoreRule(resource[index], getExtension(index)));
             if (minify) done = method(pathUnderscoreRule(resource[index], getExtension(index)), true);
@@ -132,7 +136,7 @@ function buildArray(resources, index, method, minify, done) {
     return typeof done === "function" ? done() : done;
 }
 
-const gulpSettings = { allowEmpty: true, base: basedir };
+const gulpSettings = {allowEmpty: true, base: basedir};
 
 /**
  * Build style gulp rules.
@@ -164,9 +168,9 @@ function buildStyles(src, minify = false) {
 
     return gulp.src(src, gulpSettings)
         .pipe(gulp.plumber())
-        .pipe(gulp.sass({ includePaths: includes }))
+        .pipe(gulp.sass({includePaths: includes}))
         .pipe(gulp.groupCssMediaQueries())
-        .pipe(gulp.autoprefixer({ cascade: false, grid: true }))
+        .pipe(gulp.autoprefixer({cascade: false, grid: true}))
         .pipe(browserSync.stream())
         .pipe(gulp.if(minify, gulp.cleanCss(minifySettings)))
         .pipe(gulp.plumber.stop())
@@ -175,7 +179,7 @@ function buildStyles(src, minify = false) {
             if (minify) filename.extname = ".min" + filename.extname;
         }))
         .pipe(gulp.dest((file) => path.resolve(file.base)))
-        .pipe(gulp.debug({ "title": "Styles" }))
+        .pipe(gulp.debug({"title": "Styles"}))
 }
 
 /**
@@ -192,13 +196,13 @@ function buildScripts(src, minify = false) {
             .reduce((entries, entry) => {
                 glob.sync(entry).map(found => {
                     const match = regex.exec(found);
-                    if (match && '_' != match[match.length - 1][0]) {
+                    if (match && '_' !== match[match.length - 1][0]) {
                         entries[match[1] + '/' + match[2]] = found;
                     }
                 });
                 return entries;
             }, {}),
-        output: { filename: "[name].js" },
+        output: {filename: "[name].js"},
         stats: 'errors-only',
         mode: !!minify ? 'production' : 'development',
         devtool: !minify ? "source-map" : false,
@@ -208,22 +212,24 @@ function buildScripts(src, minify = false) {
         return gulp.src('nonsense', gulpSettings)
             // Start webpack when exist files.
             .pipe(webpack.stream(config), webpack)
-            .pipe(gulp.if(minify, gulp.rename({ suffix: ".min" })))
+            .pipe(gulp.if(minify, gulp.rename({suffix: ".min"})))
             .pipe(gulp.dest(basedir))
-            .pipe(gulp.debug({ "title": "Script" }));
+            .pipe(gulp.debug({"title": "Script"}));
     }
     // done return required.
     return gulp.src('nonsense', gulpSettings)
         .pipe(gulp.dest(basedir))
-        .pipe(gulp.debug({ "title": "Script" }));
+        .pipe(gulp.debug({"title": "Script"}));
 }
 
 gulp.task('build::styles', (done) => buildArray(resources, 'style', buildStyles, !!production, done));
 gulp.task('build::scripts', (done) => buildArray(resources, 'script', buildScripts, !!production, done));
 
-function buildFavicon() {}
+function buildFavicon() {
+}
 
-function buildSprites() {}
+function buildSprites() {
+}
 
 /**
  * Lossless image optimization.
@@ -252,14 +258,14 @@ function optimizeImages(src, force) {
         }),
         gulp.imagemin.svgo({
             plugins: [
-                { removeViewBox: false },
-                { removeUnusedNS: false },
-                { removeUselessStrokeAndFill: false },
-                { cleanupIDs: false },
-                { removeComments: true },
-                { removeEmptyAttrs: true },
-                { removeEmptyText: true },
-                { collapseGroups: true }
+                {removeViewBox: false},
+                {removeUnusedNS: false},
+                {removeUselessStrokeAndFill: false},
+                {cleanupIDs: false},
+                {removeComments: true},
+                {removeEmptyAttrs: true},
+                {removeEmptyText: true},
+                {collapseGroups: true}
             ]
         })
     ];
@@ -273,26 +279,26 @@ function optimizeImages(src, force) {
             filename.dirname = path.join(filedata[0], filedata[1])
         }))
         .pipe(gulp.dest('./'))
-        .pipe(gulp.debug({ "title": "Images" }));
+        .pipe(gulp.debug({"title": "Images"}));
 }
 
 function buildArrayImages(resources, done, force = false) {
     return buildArray(resources, 'images', optimizeImages, force, done);
 }
 
-gulp.task('build::images', function(done) {
+gulp.task('build::images', function (done) {
     buildFavicon();
     buildSprites();
 
     return buildArrayImages(resources, done);
 });
 
-gulp.task('build:all:images', function(done) {
+gulp.task('build:all:images', function (done) {
     return buildArrayImages(resources, done, true);
 });
 
-gulp.task('watch', function(done) {
-    resources.map(function(resource, i, arr) {
+gulp.task('watch', function (done) {
+    resources.map(function (resource, i, arr) {
         /**
          * Reload browser when change markup data.
          */
@@ -362,7 +368,7 @@ const compileSmartGrid = (buildSrc) => smartgrid(buildSrc, {
 /**
  * @global vendorList {Array}<{name, src}>
  */
-gulp.task("install", function(done) {
+gulp.task("install", function (done) {
     // Compile grid sass mixin.
     compileSmartGrid(basedir + vendorSource);
 
@@ -373,7 +379,7 @@ gulp.task("install", function(done) {
         return gulp.src(elem.src)
             .pipe(gulp.newer(destination))
             .pipe(gulp.dest(destination))
-            .pipe(gulp.debug({ "title": "Vendor: " + elem.name }));
+            .pipe(gulp.debug({"title": "Vendor: " + elem.name}));
     }));
 });
 
