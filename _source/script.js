@@ -1,7 +1,3 @@
-import $ from 'jquery';
-// Global jQuery
-window.$ = window.jQuery = $;
-
 // Slider
 import 'slick-carousel';
 
