@@ -1,29 +1,29 @@
 // Import variables and mixins.
-@import "abstracts/abstracts";
+@import "assets/abstracts/abstracts";
 
-// @import "vendor/animate";
-// @import "vendor/font-awesome";
-// @import "vendor/hamburgers";
+// @import "assets/vendor/animate";
+// @import "assets/vendor/font-awesome";
+// @import "assets/vendor/hamburgers";
 
 /**
  * Base
  */
-@import "base/base";
+@import "assets/base/base";
 
 /**
  * Layouts
  */
-@import "layouts/layouts";
+@import "assets/layouts/layouts";
 
 /**
  * Modules
  */
-@import "modules/modules";
+@import "assets/modules/modules";
 
 /**
  * States
  */
-@import "states/states";
+@import "assets/states/states";
 
 h1 {
     @include font-size(22px, 40px);

@@ -4,15 +4,15 @@
 
 .site {
     .has-sidebar &__main {
-        @include col();
-        @include size-lg(9);
+        // @include col();
+        // @include size-lg(9);
         margin-bottom: 1rem;
     }
 
     .has-sidebar &__sidebar {
         order: -1;
-        @include col();
-        @include size-lg(3);
+        // @include col();
+        // @include size-lg(3);
         margin-bottom: 1rem;
 
         @include from(media("lg")) {

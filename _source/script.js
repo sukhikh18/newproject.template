@@ -9,8 +9,8 @@ import Cleave from 'cleave.js';
 import "cleave.js/dist/addons/cleave-phone.ru";
 
 // Custom modules
-import scrollTo from "./modules/_scrollTo.js";
-import preloader from "./modules/_preloader.js";
+import scrollTo from "./assets/utils/_scrollTo.js";
+import preloader from "./assets/utils/_preloader.js";
 
 jQuery(document).ready(function ($) {
     /**
