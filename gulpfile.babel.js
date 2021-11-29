@@ -64,19 +64,6 @@ const serve = {
     ...(domain ? {proxy: domain} : {server: {baseDir: basedir}})
 }
 
-function getExtension(expression, path = '') {
-    switch (expression) {
-        case 'markup':
-            return path + '*.{htm,html,php}';
-        case 'style':
-            return path + '*.scss';
-        case 'script':
-            return path + '*.js';
-        case 'images':
-            return path + '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}';
-    }
-}
-
 /** @type {Array}<ResourceObject> */
 const resources = (function (sources) {
     const resources = sources.map(function (value, i, arr) {
@@ -204,9 +191,11 @@ gulp.task('build::styles', (done) => buildArray(resources, 'style', buildStyles,
 gulp.task('build::scripts', (done) => buildArray(resources, 'script', buildScripts, !!production, done));
 
 function buildFavicon() {
+    // @todo
 }
 
 function buildSprites() {
+    // @todo
 }
 
 /**
@@ -321,3 +310,16 @@ gulp.task("build", gulp.parallel("build::styles", "build::scripts", "build::imag
  * Start serve/watcher
  */
 gulp.task("default", gulp.parallel("watch", () => browserSync.init(serve)));
+
+function getExtension(expression, path = '') {
+    switch (expression) {
+        case 'markup':
+            return path + '*.{htm,html,php}';
+        case 'style':
+            return path + '*.scss';
+        case 'script':
+            return path + '*.js';
+        case 'images':
+            return path + '*.{jpg,jpeg,png,gif,svg,JPG,JPEG,PNG,GIF,SVG}';
+    }
+}
