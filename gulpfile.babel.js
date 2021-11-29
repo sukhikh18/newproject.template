@@ -12,22 +12,8 @@ const images = 'images/' + rawImages;
 const styles = '_source/';
 /** @type {String} */
 const scripts = '_source/';
-/** @type {String} Path to vendor assets */
-const vendor = 'vendor/assets/';
-/** @type {String} */
-const vendorSource = vendor + '_source/';
 /** @type {Array} */
 const folders = ['./', './404/'];
-/** @type {Array} Move src files to vendor */
-const vendorList = [
-    {name: 'Jquery', src: './node_modules/jquery/dist/**/*.*'},
-    {name: 'Bootstrap', src: './node_modules/bootstrap/dist/js/*.*'},
-    {name: 'Slick', src: './node_modules/slick-carousel/slick/**/*.*'},
-    {name: 'Fancybox', src: './node_modules/@fancyapps/fancybox/dist/**/*.*'},
-    {name: 'Font-Awesome', src: './node_modules/font-awesome/fonts/*.*'},
-    // @note: use `yarn add waypoints` for install
-    {name: 'Waypoints', src: './node_modules/waypoints/lib/**/*.*'}
-];
 
 /**
  * Modules
@@ -37,7 +23,6 @@ const glob = require('glob')
 const merge = require('merge-stream')
 const browserSync = require("browser-sync")
 const yargs = require("yargs")
-const smartgrid = require("smart-grid")
 
 const gulp = {
     ...require("gulp"),
@@ -102,13 +87,6 @@ const resources = (function (sources) {
             images: value + images + '**/',
         }
     });
-    // Add vendor source.
-    resources.push({
-        markup: null,
-        style: './' + vendorSource + '**/',
-        script: null,
-        images: null,
-    });
 
     return resources;
 })(folders);
@@ -145,7 +123,7 @@ const gulpSettings = {allowEmpty: true, base: basedir};
  * @param  {Boolean} minify If minificate required.
  */
 function buildStyles(src, minify = false) {
-    const includes = ['node_modules', gulpSettings.base + styles, gulpSettings.base + vendor];
+    const includes = ['node_modules', gulpSettings.base + styles];
     const minifySettings = {
         compatibility: "*",
         level: {
@@ -332,55 +310,6 @@ gulp.task('watch', function (done) {
             gulp.watch(watchImages, () => buildArrayImages([resource], done));
         }
     });
-});
-
-const compileSmartGrid = (buildSrc) => smartgrid(buildSrc, {
-    outputStyle: "scss",
-    filename: "_smart-grid",
-    columns: 12, // number of grid columns
-    offset: "1.875rem", // gutter width - 30px
-    mobileFirst: true,
-    mixinNames: {
-        container: "container"
-    },
-    container: {
-        fields: "0.9375rem" // side fields - 15px
-    },
-    breakPoints: {
-        xs: {
-            width: "20rem" // 320px
-        },
-        sm: {
-            width: "36rem" // 576px
-        },
-        md: {
-            width: "48rem" // 768px
-        },
-        lg: {
-            width: "62rem" // 992px
-        },
-        xl: {
-            width: "75rem" // 1200px
-        }
-    }
-})
-
-/**
- * @global vendorList {Array}<{name, src}>
- */
-gulp.task("install", function (done) {
-    // Compile grid sass mixin.
-    compileSmartGrid(basedir + vendorSource);
-
-    // Replace assets to project when exists (installed).
-    return merge(vendorList.map((elem) => {
-        let destination = basedir + vendor + elem.name.toLowerCase();
-
-        return gulp.src(elem.src)
-            .pipe(gulp.newer(destination))
-            .pipe(gulp.dest(destination))
-            .pipe(gulp.debug({"title": "Vendor: " + elem.name}));
-    }));
 });
 
 /**
